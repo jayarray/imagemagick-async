@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "imagemagick-async.js",
+  "dependencies": {
+    "fs-extra": "^5.0.0",
+    "mkdirp": "^0.5.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
