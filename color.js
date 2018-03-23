@@ -343,7 +343,7 @@ class Color {
    * @param {string} hexStr
    */
   constructor(hexStr) {
-    let o = ParseHextString(hexStr);
+    let o = ParseHextString(hexStr.toLowerCase());
 
     this.hex = o.hex;
     this.numbers = o.numbers;
