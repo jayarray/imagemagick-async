@@ -29,13 +29,13 @@ function FormatValidator(hexString) {
   if (!hexString.startsWith('#'))
     return `is invalid. Must start with a '#' symbol.`;
 
-  let
+  let hex = hexString.substring(1);
   if (
-    hexString.length != RGB1_LENGTH &&
-    hexString.length != RGB2_LENGTH &&
-    hexString.length != RGBA2_LENGTH &&
-    hexString.length != RGB4_LENGTH &&
-    hexString.length != RGBA4_LENGTH
+    hex.length != RGB1_LENGTH &&
+    hex.length != RGB2_LENGTH &&
+    hex.length != RGBA2_LENGTH &&
+    hex.length != RGB4_LENGTH &&
+    hex.length != RGBA4_LENGTH
   )
     return `is invalid. Must have length ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`;
 
@@ -141,7 +141,7 @@ function SimplifiedHexString(hexStr) {
     let simplifiedHexStr = '';
 
     for (let i = 0; i < pairs.length; ++i) {
-      let currPair = pairs[0];
+      let currPair = pairs[i];
       if (currPair.charAt(0) != currPair.charAt(1))
         return hexStr;
       else
@@ -149,7 +149,7 @@ function SimplifiedHexString(hexStr) {
     }
 
     if (simplifiedHexStr.endsWith('0'))
-      simplifiedHexStr = simplifiedHexStr.substring(0, -1);
+      simplifiedHexStr = simplifiedHexStr.substring(0, simplifiedHexStr.length - 1);
 
     return simplifiedHexStr;
   }
@@ -193,28 +193,29 @@ function ParseHextString(hexStr) {
   let hexStrNoHash = hexStr.substring(1);
 
   if (channelType.includes('8')) {
+    object.bitsPerChannel = 8;
+    object.alphaChannel = false;
+
     // Hex strings
     let hex = {};
-    hex.bitsPerChannel = 8;
-    hex.r = hex.substring(0, 2);
-    hex.g = hex.substring(2, 4);
-    hex.b = hex.substring(4, 6);
+    hex.r = hexStrNoHash.substring(0, 2);
+    hex.g = hexStrNoHash.substring(2, 4);
+    hex.b = hexStrNoHash.substring(4, 6);
     hex.a = '00';
-    hex.alphaChannel = false;
 
     if (channelType.includes('A')) {
-      hex.alphaChannel = true;
-      hex.a = hex.substring(6, 8);
+      object.alphaChannel = true;
+      hex.a = hexStrNoHash.substring(6, 8);
     }
-    hex.string = SimplifiedHexString(`${hex.r}${hex.g}${hex.b}${hex.a}`);
+    hex.string = SimplifiedHexString(`#${hex.r}${hex.g}${hex.b}${hex.a}`);
 
     object.hex = hex;
 
     // Get numbers:  rgba(r, g, b, a)
     let numbers = {};
-    numbers.r = HexStringToInt(rHex);
-    numbers.g = HexStringToInt(gHex);
-    numbers.b = HexStringToInt(bHex);
+    numbers.r = HexStringToInt(hex.r);
+    numbers.g = HexStringToInt(hex.g);
+    numbers.b = HexStringToInt(hex.b);
     let args = [numbers.r, numbers.g, numbers.b];
 
     numbers.a = 0.0;
@@ -234,17 +235,17 @@ function ParseHextString(hexStr) {
     let pArgs = [];
 
     let rPercent = numbers.r / RGB_8_BIT_MAX;
-    rPercent = parseFloat(rPercent.toFixed(1));
+    rPercent = parseFloat(rPercent.toFixed(1)) * 100;
     percents.r = rPercent;
     pArgs.push(`${percents.r}%`);
 
     let gPercent = numbers.g / RGB_8_BIT_MAX;
-    gPercent = parseFloat(gPercent.toFixed(1));
+    gPercent = parseFloat(gPercent.toFixed(1)) * 100;
     percents.g = gPercent;
     pArgs.push(`${percents.g}%`);
 
     let bPercent = numbers.b / RGB_8_BIT_MAX;
-    bPercent = parseFloat(bPercent.toFixed(1));
+    bPercent = parseFloat(bPercent.toFixed(1)) * 100;
     percents.b = bPercent;
     pArgs.push(`${percents.b}%`);
 
@@ -254,36 +255,37 @@ function ParseHextString(hexStr) {
       percents.a = numbers.a;
       pArgs.push(percents.a);
     }
-    percents.string = `rgb(${args.join(', ')})`;
+    percents.string = `rgb(${pArgs.join(', ')})`;
 
     object.percents = percents;
 
     return object;
   }
   else if (channelType.includes('16')) {
+    object.bitsPerChannel = 16;
+    object.alphaChannel = false;
+
     // Hex strings
     let hex = {};
-    hex.bitsPerChannel = 16;
     hex.r = hex.substring(0, 4);
     hex.g = hex.substring(4, 8);
     hex.b = hex.substring(8, 12);
     hex.a = '0000';
-    hex.alphaChannel = false;
 
     if (channelType.includes('A')) {
-      hex.alphaChannel = true;
+      object.alphaChannel = true;
       hex.a = hex.substring(12, 16);
     }
 
-    hex.string = SimplifiedHexString(`${hex.r}${hex.g}${hex.b}${hex.a}`);
+    hex.string = SimplifiedHexString(`#${hex.r}${hex.g}${hex.b}${hex.a}`);
 
     object.hex = hex;
 
     // Get numbers:  rgba(r, g, b, a)
     let numbers = {};
-    numbers.r = HexStringToInt(rHex);
-    numbers.g = HexStringToInt(gHex);
-    numbers.b = HexStringToInt(bHex);
+    numbers.r = HexStringToInt(hex.r);
+    numbers.g = HexStringToInt(hex.g);
+    numbers.b = HexStringToInt(hex.b);
     let args = [numbers.r, numbers.g, numbers.b];
 
     numbers.a = 0.0;
@@ -323,7 +325,7 @@ function ParseHextString(hexStr) {
       percents.a = numbers.a;
       pArgs.push(percents.a);
     }
-    percents.string = `rgb(${args.join(', ')})`;
+    percents.string = `rgb(${pArgs.join(', ')})`;
 
     object.percents = percents;
 
@@ -346,6 +348,8 @@ class Color {
     this.hex = o.hex;
     this.numbers = o.numbers;
     this.percents = o.percents;
+    this.alphaChannel = o.alphaChannel;
+    this.bitsPerChannel = o.bitsPerChannel;
   }
 
   /**
@@ -461,16 +465,6 @@ class Color {
     return Promise.resolve(new Color(hexStr));
   }
 }
-
-//------------------------------
-
-let hexStr = '#0000ff';
-Color.CreateUsingRGBHexString(hexStr).then(o => {
-  console.log(`OUTPUT: ${JSON.stringify(o)}`);
-}).catch(error => {
-  console.log(`ERROR: ${error}`);
-})
-
 
 //------------------------------
 // EXPORTS
