@@ -1,11 +1,10 @@
 {
   "name": "imagemagick-async",
   "version": "1.0.0",
-  "description": "",
-  "main": "imagemagick-async.js",
+  "description": "An API for Image Magick commands",
+  "main": "color.js",
   "dependencies": {
-    "fs-extra": "^5.0.0",
-    "mkdirp": "^0.5.1"
+    "linux-commands-async": "^1.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
