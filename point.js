@@ -49,7 +49,7 @@ class Point {
 }
 
 /**
- * Render a canvas to the specified destination.
+ * Render a point to the specified destination.
  * @param {Canvas} canvas Canvas object
  * @param {Point} point Point object
  * @param {string} dest Destination
