@@ -26,8 +26,8 @@ class Point {
 
   /**
    * Creates a Point object given the specified x and y coordinates.
-   * @param {*} x X-ccordinate
-   * @param {*} y Y-coordinate
+   * @param {number} x X-ccordinate
+   * @param {number} y Y-coordinate
    * @returns {Promise<Point>} Returns a promise. If it resolves, it returns a Point object. Otherwise, it returns an error.
    */
   Create(x, y) {
@@ -45,7 +45,8 @@ class Point {
 
 /**
  * Render a canvas to the specified destination.
- * @param {Point} point Point object.
+ * @param {Canvas} canvas Canvas object
+ * @param {Point} point Point object
  * @param {string} dest Destination
  */
 function Draw(canvas, point, dest) {
