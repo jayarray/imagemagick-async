@@ -78,7 +78,7 @@ function RGBAIntegersToHexString(r, g, b, a) {
     hexStr += aHex;
   }
 
-  return hexStr;
+  return `#${hexStr}`;
 }
 
 function RGBAPercentsToHexString(r, g, b, a) {
@@ -106,7 +106,7 @@ function RGBAPercentsToHexString(r, g, b, a) {
     hexStr += aHex;
   }
 
-  return hexStr;
+  return `#${hexStr}`;
 }
 
 function ChannelType(hexStr) {
@@ -151,7 +151,7 @@ function SimplifiedHexString(hexStr) {
     if (simplifiedHexStr.endsWith('0'))
       simplifiedHexStr = simplifiedHexStr.substring(0, simplifiedHexStr.length - 1);
 
-    return simplifiedHexStr;
+    return `#${simplifiedHexStr}`;
   }
   else if (channelType.includes('16')) {
     let tuples = [];
@@ -179,7 +179,7 @@ function SimplifiedHexString(hexStr) {
     if (simplifiedHexStr.endsWith('0'))
       simplifiedHexStr = simplifiedHexStr.substring(0, -1);
 
-    return simplifiedHexStr;
+    return `#${simplifiedHexStr}`;
   }
   else
     return null;
