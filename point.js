@@ -9,7 +9,7 @@ class Point {
   /**
    * @param {number} x X-coordinate
    * @param {number} y Y-coordinate
-   * @param {number} color Valid color format string used in Image Magick.
+   * @param {string} color Valid color format string used in Image Magick.
    */
   constructor(x, y, color) {
     this.x_ = x;
@@ -21,16 +21,17 @@ class Point {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   Args() {
-    return ['-fill', color, '-draw', `point ${this.x_},${this.y_}`];
+    return ['-fill', this.color_, '-draw', `point ${this.x_},${this.y_}`];
   }
 
   /**
    * Creates a Point object given the specified x and y coordinates.
    * @param {number} x X-ccordinate
    * @param {number} y Y-coordinate
+   * @param {string} color Valid color format string used in Image Magick.
    * @returns {Promise<Point>} Returns a promise. If it resolves, it returns a Point object. Otherwise, it returns an error.
    */
-  Create(x, y) {
+  static Create(x, y, color) {
     let error = VALIDATE.IsInteger(x);
     if (error)
       return Promise.reject(`Failed to create point: x is ${error}`);
@@ -39,7 +40,11 @@ class Point {
     if (error)
       return Promise.reject(`Failed to create point: y is ${error}`);
 
-    return new Promise.resolve(new Point(x, y));
+    error = VALIDATE.IsStringInput(color);
+    if (error)
+      return Promise.reject(`Failed to create point: color is ${error}`);
+
+    return Promise.resolve(new Point(x, y, color));
   }
 }
 
@@ -61,6 +66,9 @@ function Draw(canvas, point, dest) {
     return Promise.reject(`Failed to draw point: dest is ${error}`);
 
   return new Promise((resolve, reject) => {
+    let args = canvas.Args().concat(point.Args()).concat(dest);
+    console.log(`CMD: ${args.join(' ')}\n`);
+
     LOCAL_COMMAND.Execute('convert', canvas.Args().concat(point.Args()).concat(dest)).then(output => {
       console.log(`convert ${canvas.Args().concat(point.Args()).concat(dest).join(' ')}`);
 
@@ -70,7 +78,7 @@ function Draw(canvas, point, dest) {
       }
       resolve();
     }).catch(error => `Failed to draw point: ${error}`);
-  });
+});
 }
 
 //------------------------------
