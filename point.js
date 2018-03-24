@@ -55,10 +55,10 @@ class Point {
  * @param {string} dest Destination
  */
 function Draw(canvas, point, dest) {
-  if (typeof canvas == 'Canvas')
+  if (typeof canvas != 'Canvas')
     return Promise.reject(`Failed to draw point: canvas is invalid type.`);
 
-  if (typeof point == 'Point')
+  if (typeof point != 'Point')
     return Promise.reject(`Failed to draw point: point is invalid type.`);
 
   let error = VALIDATE.IsStringInput(dest);
