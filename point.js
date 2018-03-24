@@ -66,8 +66,6 @@ function Draw(canvas, point, dest) {
     return Promise.reject(`Failed to draw point: dest is ${error}`);
 
   return new Promise((resolve, reject) => {
-    let args = canvas.Args().concat(point.Args()).concat(dest);
-
     LOCAL_COMMAND.Execute('convert', canvas.Args().concat(point.Args()).concat(dest)).then(output => {
       if (output.stderr) {
         reject(`Failed to draw point: ${output.stderr}`);
