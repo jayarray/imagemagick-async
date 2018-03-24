@@ -63,7 +63,7 @@ class Line {
 }
 
 /**
- * Render a canvas to the specified destination.
+ * Render a line to the specified destination.
  * @param {Canvas} canvas Canvas object
  * @param {Line} line Line object
  * @param {string} dest Destination
