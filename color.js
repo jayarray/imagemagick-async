@@ -207,8 +207,9 @@ function ParseHextString(hexStr) {
       object.alphaChannel = true;
       hex.a = hexStrNoHash.substring(6, 8);
     }
-    hex.string = SimplifiedHexString(`#${hex.r}${hex.g}${hex.b}${hex.a}`);
 
+    hex.simplifiedString = SimplifiedHexString(hexStr);
+    hex.string = hexStr;
     object.hex = hex;
 
     // Get numbers:  rgba(r, g, b, a)
@@ -277,8 +278,8 @@ function ParseHextString(hexStr) {
       hex.a = hex.substring(12, 16);
     }
 
-    hex.string = SimplifiedHexString(`#${hex.r}${hex.g}${hex.b}${hex.a}`);
-
+    hex.simplifiedString = SimplifiedHexString(hexStr);
+    hex.string = hexStr;
     object.hex = hex;
 
     // Get numbers:  rgba(r, g, b, a)
