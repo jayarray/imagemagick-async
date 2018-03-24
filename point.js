@@ -70,8 +70,6 @@ function Draw(canvas, point, dest) {
     console.log(`CMD: ${args.join(' ')}\n`);
 
     LOCAL_COMMAND.Execute('convert', canvas.Args().concat(point.Args()).concat(dest)).then(output => {
-      console.log(`convert ${canvas.Args().concat(point.Args()).concat(dest).join(' ')}`);
-
       if (output.stderr) {
         reject(`Failed to draw point: ${output.stderr}`);
         return;
