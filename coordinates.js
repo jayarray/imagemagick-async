@@ -42,4 +42,4 @@ class Coordinates {
 //--------------------------------
 // EXPORTS
 
-exports.Create = Create;
+exports.Create = Coordinates.Create;
