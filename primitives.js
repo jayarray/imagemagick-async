@@ -12,12 +12,12 @@ class Canvas {
   /**
    * @param {number} width 
    * @param {number} height 
-   * @param {string} color Hex string representation of the desired color starting with a '#' symbol.
+   * @param {string} color Valid color format string used in Image Magick.
    */
   constructor(width, height, color) {
     this.width_ = width;
     this.height_ = height;
-    this.color_ = color;  // HEX  #RRGGBB
+    this.color_ = color;
   }
 
   /** 
@@ -29,7 +29,7 @@ class Canvas {
     if (this.color_ == 'none')
       args.push('canvas:none');
     else
-      args.push(`canvas:'${this.color_}'`);
+      args.push(`canvas:${this.color_}`);
     return args;
   }
 
