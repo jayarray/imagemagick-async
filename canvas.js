@@ -12,8 +12,8 @@ const DIMENSION_MIN = 1;
 
 class Canvas {
   /**
-   * @param {number} width 
-   * @param {number} height 
+   * @param {number} width Width in pixels.
+   * @param {number} height Height in pixels.
    * @param {string} color Valid color format string used in Image Magick.
    */
   constructor(width, height, color) {
@@ -37,8 +37,8 @@ class Canvas {
 
   /**
    * Creates a Canvas object given the specified width, height, and color.
-   * @param {number} width 
-   * @param {number} height 
+   * @param {number} width Width in pixels.
+   * @param {number} height Height in pixels.
    * @param {string} color Valid color format string used in Image Magick.
    * @returns {Promise<Canvas>} Returns a promise. If it resolves, it returns a Canvas object. Otherwise, it returns an error.
    */
@@ -71,7 +71,7 @@ class Canvas {
 
 /**
  * Render a canvas to the specified destination.
- * @param {Canvas} canvas Canvas object.
+ * @param {Canvas} canvas Canvas object
  * @param {string} dest Destination
  */
 function Draw(canvas, dest) {
