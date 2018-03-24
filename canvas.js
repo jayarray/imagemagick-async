@@ -79,7 +79,7 @@ function Draw(canvas, dest) {
   if (error)
     return Promise.reject(`Failed to draw canvas: dest is ${error}`);
 
-  if (typeof canvas == 'Canvas')
+  if (canvas.constructor.name == 'Canvas')
     return Promise.reject(`Failed to draw canvas: canvas is invalid type.`);
 
   return new Promise((resolve, reject) => {
