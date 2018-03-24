@@ -67,7 +67,6 @@ function Draw(canvas, point, dest) {
 
   return new Promise((resolve, reject) => {
     let args = canvas.Args().concat(point.Args()).concat(dest);
-    console.log(`CMD: ${args.join(' ')}\n`);
 
     LOCAL_COMMAND.Execute('convert', canvas.Args().concat(point.Args()).concat(dest)).then(output => {
       if (output.stderr) {
