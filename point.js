@@ -78,7 +78,7 @@ function Draw(canvas, point, dest) {
       }
       resolve();
     }).catch(error => `Failed to draw point: ${error}`);
-});
+  });
 }
 
 //------------------------------
