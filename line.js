@@ -36,7 +36,7 @@ class Line {
    * @param {Coordinates} start Start coordinates
    * @param {Coordinates} end End coordinates
    * @param {string} color Valid color format string used in Image Magick.
-   * @param {number} width Width of line. As number increases, so does the width.
+   * @param {number} width Width of line. (Larger values produce thicker lines.)
    * @returns {Promise<Point>} Returns a promise. If it resolves, it returns a Line object. Otherwise, it returns an error.
    */
   static Create(start, end, color, width) {
