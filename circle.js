@@ -96,38 +96,6 @@ function Draw(canvas, circle, dest) {
   });
 }
 
-//---------------------------------
-
-let COORDINATES = require('./coordinates.js');
-let CANVAS = require('./canvas.js');
-
-CANVAS.Create(800, 800, '#ffffff').then(canvas => {
-  COORDINATES.Create(400, 400).then(center => {
-    COORDINATES.Create(400, 600).then(edge => {
-      let strokeColor = '#f0f0f0';
-      let strokeWidth = 5;
-      let fillColor = '#000000';
-      let dest = '/home/isa/Downloads/DRAW_CIRCLE.png';
-
-      Circle.Create(center, edge, strokeColor, strokeWidth, fillColor).then(circle => {
-        Draw(canvas, circle, dest).then(success => {
-          console.log(`Success :-)`);
-        }).catch(error => {
-          console.log(`ERROR: ${error}`);
-        });
-      }).catch(error => {
-        console.log(`ERROR: ${error}`);
-      });
-    }).catch(error => {
-      console.log(`ERROR: ${error}`);
-    });
-  }).catch(error => {
-    console.log(`ERROR: ${error}`);
-  });
-}).catch(error => {
-  console.log(`ERROR: ${error}`);
-});
-
 //-----------------------------------
 // EXPORTS
 
