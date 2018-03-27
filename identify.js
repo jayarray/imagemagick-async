@@ -1,6 +1,9 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
+let COLOR = require('./color.js');
+let COORDINATES = require('./coordinates.js');
+
 //---------------------------------
 // CONSTANTS
 
@@ -194,13 +197,13 @@ function ParseImageInfo(infoStr) {
   object.statistics.blue = blueStats;
 
   // Alpha
-  object.alpha = null;
+  object.statistics.alpha = null;
 
   line = GetLineContaining(lines, 'Alpha:');
   if (line != null) {
     let alphaLines = lines.slice(line.lineNumber);
     let alphaStats = GetStats(alphaLines);
-    object.alpha = alphaStats;
+    object.statistics.alpha = alphaStats;
   }
 
   // Overall
@@ -217,7 +220,7 @@ function ParseImageInfo(infoStr) {
  * @param {string} src Source
  * @returns {Promise<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
-function ImageInfo(src) {
+function GetImageInfo(src) {
   let error = VALIDATE.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to get image info: source is ${error}`);
@@ -281,7 +284,7 @@ function ParseGifInfo(infoStr) {
  * @param {string} src Source
  * @returns {Promise<{frameCount: number, path: string, images: Array<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
-function GifInfo(src) {
+function GetGifInfo(src) {
   let error = VALIDATE.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to get GIF info: source is ${error}`);
@@ -335,17 +338,209 @@ function Format(src) {
 //-------------------------------------
 // PIXELS
 
-function PixeRowlInfo(src, row) {
-  // TO DO
+function ParsePixelInfo(infoStr) {
+  let lines = infoStr.trim().split('\n').slice(1);
+  let infos = [];
+
+  for (let i = 0; i < lines.length; ++i) {
+    let currLine = lines[0];
+    let parts = currLine.split(' ').filter(str => str && str != '' && str.trim() != '').map(str => str.trim());
+
+    // Coordinates
+    let coordinatesStr = parts[0].trim().replace(':', '');
+    let coordinateParts = coordinatesStr.split(',');
+    let x = parseInt(coordinateParts[0]);
+    let y = parseInt(coordinateParts[1]);
+
+    // Color
+    let hexStr = parts[2];
+
+    infos.push({
+      x: x,
+      y: y,
+      color: hexStr
+    });
+  }
+
+  return infos;
 }
 
-function AllPixelRowsInfo(src) {
-  // TO DO
+//-------------------------
+// IMAGE
+
+class Pixel {
+  /**
+   * @param {number} x X-coordinate
+   * @param {number} y Y-coordinate
+   * @param {string} color Hex color string
+   */
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  }
 }
 
-class PixelRowInfo {
-  constructor() {
-    // TO DO
+class ImageInfo {
+  constructor(infoObj, isGif) {
+    this.info_ = infoObj;
+    this.isGif_ = isGif;
+  }
+
+  /**
+   * Get info about the pixel located at (x,y).
+   * @param {number} x X-coordinate
+   * @param {number} y Y-ccordinate
+   * @returns {Promise<{x: number, y: number, color: string}>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   */
+  PixelInfo(x, y) {
+    let error = VALIDATE.IsInteger(x);
+    if (error)
+      return Promise.reject(`Failed to get pixel info: x is ${error}`);
+
+    error = VALIDATE.IsInteger(y);
+    if (error)
+      return Promise.reject(`Failed to get pixel info: y is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      let args = [this.info_.path, '-crop', `1x1+${x}+${y}`, 'text:-'];
+      console.log(`CMD: convert ${args.join(' ')}`);
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
+        if (output.stderr) {
+          reject(`Failed to get pixel info: ${output.stderr}`);
+          return;
+        }
+
+        let info = ParsePixelInfo(output.stdout.trim())[0];
+        let pixel = new Pixel(x, y, info.color);
+        resolve(pixel);
+      }).catch(error => `Failed to get pixel info: ${error}`);
+    });
+  }
+
+  /**
+   * Get info about all pixels in the specified row.
+   * @param {number} row Row number
+   * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   */
+  PixelRowInfo(row) {
+    let error = VALIDATE.IsInteger(row);
+    if (error)
+      return Promise.reject(`Failed to get pixel row info: row is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      let args = [this.info_.path, '-crop', `${this.info_.width}x1+0+${row}`, 'text:-'];
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
+        if (output.stderr) {
+          reject(`Failed to get pixel row info: ${output.stderr}`);
+          return;
+        }
+
+        let infos = ParsePixelInfo(output.stdout.trim())
+
+        let pixels = [];
+        infos.forEach(info => pixels.push(new Pixel(info.x, info.y + row, info.color)));
+        resolve(pixels);
+      }).catch(error => `Failed to get pixel row info: ${error}`);
+    });
+  }
+
+  /**
+   * Get info about all pixels in the specified column.
+   * @param {number} column Column number
+   * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   */
+  PixelColumnInfo(column) {
+    let error = VALIDATE.IsInteger(row);
+    if (error)
+      return Promise.reject(`Failed to get pixel column info: row is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      let args = [this.info_.path, '-crop', `1x${this.info_.height}+${column}+0`, 'text:-'];
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
+        if (output.stderr) {
+          reject(`Failed to get pixel column info: ${output.stderr}`);
+          return;
+        }
+
+        let infos = ParsePixelInfo(output.stdout.trim())
+
+        let pixels = [];
+        infos.forEach(info => pixels.push(new Pixel(info.x + column, info.y, info.color)));
+        resolve(pixels);
+      }).catch(error => `Failed to get pixel column info: ${error}`);
+    });
+  }
+
+  /**
+   * Get info about all pixels in the specified range.
+   * @param {number} startRow Starting row number
+   * @param {number} endRow Ending row number
+   * @param {number} startColumn Starting column number
+   * @param {number} endColumn Ending column number
+   * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   */
+  PixelRangeInfo(startRow, endRow, startColumn, endColumn) {
+    let error = VALIDATE.IsInteger(startRow);
+    if (error)
+      return Promise.reject(`Failed to get pixel range info: start row is ${error}`);
+
+    error = VALIDATE.IsInteger(endRow);
+    if (error)
+      return Promise.reject(`Failed to get pixel range info: end row is ${error}`);
+
+    error = VALIDATE.IsInteger(startColumn);
+    if (error)
+      return Promise.reject(`Failed to get pixel range info: start column is ${error}`);
+
+    error = VALIDATE.IsInteger(endColumn);
+    if (error)
+      return Promise.reject(`Failed to get pixel range info: end column is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      let width = (endRow - startRow) + 1;
+      let height = (endColumn - startColumn) + 1;
+
+      let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, 'text:-'];
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
+        if (output.stderr) {
+          reject(`Failed to get pixel range info: ${output.stderr}`);
+          return;
+        }
+
+        let infos = ParsePixelInfo(output.stdout.trim())
+
+        let pixels = [];
+        infos.forEach(info => pixels.push(new Pixel(info.x + startColumn, info.y + startRow, info.color)));
+        resolve(pixels);
+      }).catch(error => `Failed to get pixel range info: ${error}`);
+    });
+  }
+
+  /**
+   * Create an ImageInfo object.
+   * @param {string} src Source
+   * @returns {Promise<ImageInfo>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   */
+  static Create(src) {
+    let error = VALIDATE.IsStringInput(src);
+    if (error)
+      return Promise.reject(`Failed to get image info: source is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      Format(src).then(format => {
+        if (format == 'gif') {
+          GetGifInfo(src).then(info => {
+            resolve(new ImageInfo(info, true));
+          }).catch(error => `Failed to get image info: ${error}`);
+        }
+        else {
+          GetImageInfo(src).then(info => {
+            resolve(new ImageInfo(info, false));
+          }).catch(error => `Failed to get image info: ${error}`);
+        }
+      });
+    });
   }
 }
 
@@ -356,27 +551,24 @@ let src = '/home/isa/Downloads/pika3D.png';
 Format(src).then(format => {
   console.log(`FORMAT: ${format}`);
 
-  if (format == 'gif') {
-    GifInfo(src).then(info => {
-      console.log(`OUTPUT: ${JSON.stringify(info)}`)
+  ImageInfo.Create(src).then(i => {
+    console.log(`IS_GIF: ${i.isGif_}`);
+
+    let startX = 52;
+    let startY = 130;
+
+    i.PixelInfo(startX, startY).then(pixel => {
+      console.log(`PIXEL: ${JSON.stringify(pixel)}`);
     }).catch(error => {
       console.log(`ERROR: ${error}`);
     });
-  }
-  else {
-    ImageInfo(src).then(info => {
-      console.log(`OUTPUT: ${JSON.stringify(info)}`)
-    }).catch(error => {
-      console.log(`ERROR: ${error}`);
-    });
-  }
-}).catch(error => {
-  console.log(`ERROR: ${error}`);
+  }).catch(error => {
+    console.log(`ERROR: ${error}`);
+  });
 });
 
 //-------------------------------------
 // EXPORTS
 
 exports.Format = Format;
-exports.ImageInfo = ImageInfo;
-exports.GifInfo = GifInfo;
+exports.Create = ImageInfo.Create;
