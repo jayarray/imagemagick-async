@@ -429,23 +429,16 @@ class ImageInfo {
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `${this.info_.width}x1+0+${row}`, 'text:-'];
-      console.log(`CMD: convert ${args.join(' ')}`);
-
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel row info: ${output.stderr}`);
           return;
         }
 
-        let infos = ParsePixelInfo(output.stdout.trim())
-
         let pixels = [];
 
-        for (let i = 0; i < infos.length; ++i) {
-          let currInfo = infos[i];
-          let pixel = new Pixel(currInfo.x, currInfo.y + row, currInfo.color);
-          pixels.push(pixel);
-        }
+        let infos = ParsePixelInfo(output.stdout.trim());
+        infos.forEach(info => pixels.push(new Pixel(info.x, row, info.color)));
         resolve(pixels);
       }).catch(error => `Failed to get pixel row info: ${error}`);
     });
@@ -457,7 +450,7 @@ class ImageInfo {
    * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   PixelColumnInfo(column) {
-    let error = VALIDATE.IsInteger(row);
+    let error = VALIDATE.IsInteger(column);
     if (error)
       return Promise.reject(`Failed to get pixel column info: row is ${error}`);
 
@@ -472,7 +465,7 @@ class ImageInfo {
         let infos = ParsePixelInfo(output.stdout.trim())
 
         let pixels = [];
-        infos.forEach(info => pixels.push(new Pixel(info.x + column, info.y, info.color)));
+        infos.forEach(info => pixels.push(new Pixel(column, info.y, info.color)));
         resolve(pixels);
       }).catch(error => `Failed to get pixel column info: ${error}`);
     });
@@ -508,6 +501,8 @@ class ImageInfo {
       let height = (endColumn - startColumn) + 1;
 
       let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, 'text:-'];
+      console.log(`CMD: convert ${args.join(' ')}`);
+      
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel range info: ${output.stderr}`);
@@ -563,7 +558,7 @@ Format(src).then(format => {
     let startX = 52;
     let startY = 130;
 
-    i.PixelRowInfo(startY).then(pixels => {
+    i.PixelColumnInfo(startX).then(pixels => {
       pixels.forEach(pixel => {
         console.log(`PIXEL: ${JSON.stringify(pixel)}`);
       });
