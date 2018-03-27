@@ -136,7 +136,7 @@ function Fonts() {
       }
 
       let outputStr = output.stdout.trim();
-      let outputStr = outputStr.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim()).slice(1).join('\n');
+      outputStr = outputStr.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim()).slice(1).join('\n');
 
       let blocks = outputStr.split('Font:').filter(str => str && str != '' && str.trim() != '').map(str => str.trim());
 
@@ -144,11 +144,11 @@ function Fonts() {
       blocks.forEach(block => {
         let lines = block.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim());
 
-        let name = lines[0].split(':')[1].trim();
+        let name = lines[0].trim();
         let family = lines[1].split(':')[1].trim();
         let style = lines[2].split(':')[1].trim();
         let stretch = lines[3].split(':')[1].trim();
-        let weight = parseInt(lines[2].split(':')[1].trim());
+        let weight = parseInt(lines[4].split(':')[1].trim());
 
         fonts.push({
           name: name,
