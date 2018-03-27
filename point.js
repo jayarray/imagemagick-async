@@ -52,6 +52,7 @@ class Point {
  * @param {Canvas} canvas Canvas object
  * @param {Point} point Point object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, point, dest) {
   if (canvas.constructor.name != 'Canvas')

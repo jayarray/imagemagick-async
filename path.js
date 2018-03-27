@@ -85,6 +85,7 @@ class Path {
  * @param {Canvas} canvas Canvas object
  * @param {Path} path Path object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, path, dest) {
   if (canvas.constructor.name != 'Canvas')

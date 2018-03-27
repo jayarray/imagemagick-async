@@ -66,6 +66,7 @@ class Line {
  * @param {Canvas} canvas Canvas object
  * @param {Line} line Line object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, line, dest) {
   if (canvas.constructor.name != 'Canvas')

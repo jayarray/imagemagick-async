@@ -44,6 +44,7 @@ class Ellipse {
    * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick)
    * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen)
    * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen)
+   * @returns {Promise<Ellipse>} Returns a promise. If it resolves, it returns an Ellipse object. Otherwise, it returns an error.
    */
   static Create(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
     if (center.constructor.name != 'Coordinates')
@@ -98,6 +99,7 @@ class Ellipse {
  * @param {Canvas} canvas Canvas object
  * @param {Ellipse} ellipse Ellipse object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, ellipse, dest) {
   if (canvas.constructor.name != 'Canvas')

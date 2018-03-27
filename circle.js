@@ -39,6 +39,7 @@ class Circle {
    * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick)
    * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.)
    * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick)
+   * @returns {Promise<Circle>} Returns a promise. If it resolves, it returns a Circle object. Otherwise, it returns an error.
    */
   static Create(center, edge, strokeColor, strokeWidth, fillColor) {
     if (center.constructor.name != 'Coordinates')
@@ -72,6 +73,7 @@ class Circle {
  * @param {Canvas} canvas Canvas object
  * @param {Circle} circle Circle object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, circle, dest) {
   if (canvas.constructor.name != 'Canvas')

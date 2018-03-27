@@ -42,6 +42,7 @@ class Bezier {
    * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick)
    * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.)
    * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick)
+   * @returns {Promise<Bezier>} Returns a promise. If it resolves, it returns a Bezier object. Otherwise, it returns an error.
    */
   static Create(points, strokeColor, strokeWidth, fillColor) {
     let error = VALIDATE.IsArray(points);
@@ -73,6 +74,7 @@ class Bezier {
  * @param {Canvas} canvas Canvas object
  * @param {Bezier} bezier Ellipse object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, bezier, dest) {
   if (canvas.constructor.name != 'Canvas')
