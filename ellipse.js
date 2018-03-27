@@ -93,7 +93,36 @@ class Ellipse {
   }
 }
 
+/**
+ * Render an ellipse to the specified destination.
+ * @param {Canvas} canvas Canvas object
+ * @param {Ellipse} ellipse Ellipse object
+ * @param {string} dest Destination
+ */
+function Draw(canvas, ellipse, dest) {
+  if (canvas.constructor.name != 'Canvas')
+    return Promise.reject(`Failed to draw ellipse: canvas is invalid type.`);
+
+  if (ellipse.constructor.name != 'Ellipse')
+    return Promise.reject(`Failed to draw ellipse: ellipse is invalid type.`);
+
+  let error = VALIDATE.IsStringInput(dest);
+  if (error)
+    return Promise.reject(`Failed to draw ellipse: dest is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    LOCAL_COMMAND.Execute('convert', canvas.Args().concat(ellipse.Args()).concat(dest)).then(output => {
+      if (output.stderr) {
+        reject(`Failed to draw ellipse: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to draw ellipse: ${error}`);
+  });
+}
+
 //----------------------------
 // EXPORTS.
 
 exports.Create = Ellipse.Create;
+exports.Draw = Draw;
