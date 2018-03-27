@@ -343,7 +343,7 @@ function ParsePixelInfo(infoStr) {
   let infos = [];
 
   for (let i = 0; i < lines.length; ++i) {
-    let currLine = lines[0];
+    let currLine = lines[i];
     let parts = currLine.split(' ').filter(str => str && str != '' && str.trim() != '').map(str => str.trim());
 
     // Coordinates
@@ -404,7 +404,6 @@ class ImageInfo {
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `1x1+${x}+${y}`, 'text:-'];
-      console.log(`CMD: convert ${args.join(' ')}`);
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel info: ${output.stderr}`);
@@ -430,6 +429,8 @@ class ImageInfo {
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `${this.info_.width}x1+0+${row}`, 'text:-'];
+      console.log(`CMD: convert ${args.join(' ')}`);
+
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel row info: ${output.stderr}`);
@@ -439,7 +440,12 @@ class ImageInfo {
         let infos = ParsePixelInfo(output.stdout.trim())
 
         let pixels = [];
-        infos.forEach(info => pixels.push(new Pixel(info.x, info.y + row, info.color)));
+
+        for (let i = 0; i < infos.length; ++i) {
+          let currInfo = infos[i];
+          let pixel = new Pixel(currInfo.x, currInfo.y + row, currInfo.color);
+          pixels.push(pixel);
+        }
         resolve(pixels);
       }).catch(error => `Failed to get pixel row info: ${error}`);
     });
@@ -557,8 +563,10 @@ Format(src).then(format => {
     let startX = 52;
     let startY = 130;
 
-    i.PixelInfo(startX, startY).then(pixel => {
-      console.log(`PIXEL: ${JSON.stringify(pixel)}`);
+    i.PixelRowInfo(startY).then(pixels => {
+      pixels.forEach(pixel => {
+        console.log(`PIXEL: ${JSON.stringify(pixel)}`);
+      });
     }).catch(error => {
       console.log(`ERROR: ${error}`);
     });
