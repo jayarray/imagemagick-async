@@ -1,5 +1,4 @@
 let VALIDATE = require('./validate.js');
-let COLOR = require('./color.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //-----------------------------------
