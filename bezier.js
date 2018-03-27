@@ -78,7 +78,7 @@ function Draw(canvas, bezier, dest) {
   if (canvas.constructor.name != 'Canvas')
     return Promise.reject(`Failed to draw bezier curve: canvas is invalid type.`);
 
-  if (ellipse.constructor.name != 'Ellipse')
+  if (bezier.constructor.name != 'Bezier')
     return Promise.reject(`Failed to draw bezier curve: bezier is invalid type.`);
 
   let error = VALIDATE.IsStringInput(dest);
