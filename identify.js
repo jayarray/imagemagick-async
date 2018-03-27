@@ -549,34 +549,6 @@ class ImageInfo {
   }
 }
 
-//--------------------------------------
-
-let src = '/home/isa/Downloads/pika3D.png';
-
-Format(src).then(format => {
-  console.log(`FORMAT: ${format}`);
-
-  ImageInfo.Create(src).then(i => {
-    console.log(`IS_GIF: ${i.isGif_}`);
-
-    let startRow = 130;
-    let endRow = 130;
-
-    let startColumn = 100;
-    let endColumn = 479;
-
-    i.PixelRangeInfo(startRow, endRow, startColumn, endColumn).then(pixels => {
-      pixels.forEach(pixel => {
-        console.log(`PIXEL: ${JSON.stringify(pixel)}`);
-      });
-    }).catch(error => {
-      console.log(`ERROR: ${error}`);
-    });
-  }).catch(error => {
-    console.log(`ERROR: ${error}`);
-  });
-});
-
 //-------------------------------------
 // EXPORTS
 
