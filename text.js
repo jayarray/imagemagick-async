@@ -51,6 +51,7 @@ class Text {
    * @param {string} strokeColor The color of the outline of the text.
    * @param {number} strokeWidth The width of the outline of the text.
    * @param {string} fillColor The color to fill the text with.  (Valid color format string used in Image Magick)
+   * @returns {Promise<Text>} Returns a promise. If it resolves, it returns a Text object. Otherwise, it returns an error.
    */
   static Create(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor) {
     let error = VALIDATE.IsStringInput(string);
@@ -98,6 +99,7 @@ class Text {
  * @param {Canvas} canvas Canvas object
  * @param {Text} text Ellipse object
  * @param {string} dest Destination
+ * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
  */
 function Draw(canvas, text, dest) {
   if (canvas.constructor.name != 'Canvas')
@@ -121,8 +123,50 @@ function Draw(canvas, text, dest) {
   });
 }
 
+/** 
+ * @returns {Promise<Array<{name: string, family: string, style: string, stretch: string, weight: number}>>} Returns a promise. If it resolves, it returns a list of objects. Otherwise, it returns an error.
+ */
+function Fonts() {
+  return new Promise((resolve, reject) => {
+    let args = ['-list', 'font'];
+    LOCAL_COMMAND.Execute('identify', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get fonts: ${output.stderr}`);
+        return;
+      }
+
+      let outputStr = output.stdout.trim();
+      let outputStr = outputStr.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim()).slice(1).join('\n');
+
+      let blocks = outputStr.split('Font:').filter(str => str && str != '' && str.trim() != '').map(str => str.trim());
+
+      let fonts = [];
+      blocks.forEach(block => {
+        let lines = block.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim());
+
+        let name = lines[0].split(':')[1].trim();
+        let family = lines[1].split(':')[1].trim();
+        let style = lines[2].split(':')[1].trim();
+        let stretch = lines[3].split(':')[1].trim();
+        let weight = parseInt(lines[2].split(':')[1].trim());
+
+        fonts.push({
+          name: name,
+          family: family,
+          style: style,
+          stretch: stretch,
+          weight: weight
+        });
+      });
+
+      resolve(fonts);
+    }).catch(error => `Failed to get fonts: ${error}`);
+  });
+}
+
 //----------------------------
 // EXPORTS
 
-exports.Create = Ellipse.Create;
+exports.Create = Text.Create;
 exports.Draw = Draw;
+exports.Fonts = Fonts;
