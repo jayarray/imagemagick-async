@@ -497,12 +497,12 @@ class ImageInfo {
       return Promise.reject(`Failed to get pixel range info: end column is ${error}`);
 
     return new Promise((resolve, reject) => {
-      let width = (endRow - startRow) + 1;
-      let height = (endColumn - startColumn) + 1;
+      let width = (endColumn - startColumn) + 1;
+      let height = (endRow - startRow) + 1;
 
       let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, 'text:-'];
       console.log(`CMD: convert ${args.join(' ')}`);
-      
+
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel range info: ${output.stderr}`);
@@ -510,9 +510,13 @@ class ImageInfo {
         }
 
         let infos = ParsePixelInfo(output.stdout.trim())
-
         let pixels = [];
-        infos.forEach(info => pixels.push(new Pixel(info.x + startColumn, info.y + startRow, info.color)));
+
+        infos.forEach((info, i) => {
+          let adjustedX = info.x + startColumn;
+          let adjustedY = info.y + startRow;
+          pixels.push(new Pixel(adjustedX, adjustedY, info.color))
+        });
         resolve(pixels);
       }).catch(error => `Failed to get pixel range info: ${error}`);
     });
@@ -555,10 +559,13 @@ Format(src).then(format => {
   ImageInfo.Create(src).then(i => {
     console.log(`IS_GIF: ${i.isGif_}`);
 
-    let startX = 52;
-    let startY = 130;
+    let startRow = 130;
+    let endRow = 130;
 
-    i.PixelColumnInfo(startX).then(pixels => {
+    let startColumn = 100;
+    let endColumn = 479;
+
+    i.PixelRangeInfo(startRow, endRow, startColumn, endColumn).then(pixels => {
       pixels.forEach(pixel => {
         console.log(`PIXEL: ${JSON.stringify(pixel)}`);
       });
