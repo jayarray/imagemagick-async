@@ -92,3 +92,8 @@ class Ellipse {
     return Promise.resolve(new Ellipse(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd));
   }
 }
+
+//----------------------------
+// EXPORTS.
+
+exports.Create = Ellipse.Create;
