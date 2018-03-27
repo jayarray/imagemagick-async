@@ -26,14 +26,11 @@ class Ellipse {
    * @returns {Array<string|number>} Returns an array of arguments.
   */
   Args() {
-    let edgeX = Math.floor(this.width_ / 2);
-    let edgeY = Math.floor(this.width_ / 2);
-
     return [
       '-fill', this.fillColor_,
       '-stroke', this.strokeColor_,
       '-strokewidth', this.strokeWidth_,
-      '-draw', `ellipse ${this.center_.String()} ${edgeX},${edgeY} ${this.angleStart_},${this.angleEnd_}`
+      '-draw', `ellipse ${this.center_.String()} ${Math.floor(this.width_ / 2)},${Math.floor(this.height_ / 2)} ${this.angleStart_},${this.angleEnd_}`
     ];
   }
 
