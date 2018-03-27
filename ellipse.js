@@ -49,7 +49,7 @@ class Ellipse {
     if (center.constructor.name != 'Coordinates')
       return Promise.reject(`Failed to create circle: center is not valid type.`);
 
-    error = VALIDATE.IsInteger(width);
+    let error = VALIDATE.IsInteger(width);
     if (error)
       return Promise.reject(`Failed to create path: width is ${error}`);
 
