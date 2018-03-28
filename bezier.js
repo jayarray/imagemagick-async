@@ -101,5 +101,5 @@ function Draw(canvas, bezier, dest) {
 //----------------------------
 // EXPORTS
 
-exports.Create = Ellipse.Create;
+exports.Create = Bezier.Create;
 exports.Draw = Draw;
