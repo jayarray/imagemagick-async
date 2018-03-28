@@ -113,6 +113,9 @@ function Draw(canvas, ellipse, dest) {
     return Promise.reject(`Failed to draw ellipse: dest is ${error}`);
 
   return new Promise((resolve, reject) => {
+    let args = canvas.Args().concat(ellipse.Args()).concat(dest);
+    console.log(`CMD: convert ${args.join(' ')}`);
+
     LOCAL_COMMAND.Execute('convert', canvas.Args().concat(ellipse.Args()).concat(dest)).then(output => {
       if (output.stderr) {
         reject(`Failed to draw ellipse: ${output.stderr}`);
