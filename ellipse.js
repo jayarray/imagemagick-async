@@ -124,7 +124,7 @@ function Draw(canvas, ellipse, dest) {
 }
 
 //----------------------------
-// EXPORTS.
+// EXPORTS
 
 exports.Create = Ellipse.Create;
 exports.Draw = Draw;

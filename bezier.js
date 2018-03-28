@@ -99,7 +99,7 @@ function Draw(canvas, bezier, dest) {
 }
 
 //----------------------------
-// EXPORTS.
+// EXPORTS
 
 exports.Create = Ellipse.Create;
 exports.Draw = Draw;
