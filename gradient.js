@@ -113,8 +113,8 @@ class LinearGradient {
       `gradient:angle=${this.angle_}`,
       `gradient:bounding-box=${this.boundingBox_.String()}`,
       `gradient:direction=${this.direction_}`,
-      `gradient:extent=${this.extent_}`
-        `gradient:'${this.startColor_}'-'${this.endColor_}'`
+      `gradient:extent=${this.extent_}`,
+        `gradient:'${this.startColor_}-${this.endColor_}'`
     ];
   }
 
@@ -225,7 +225,7 @@ class RadialGradient {
       `gradient:angle=${this.angle_}`,
       `gradient:bounding-box=${this.boundingBox_.String()}`,
       `gradient:extent=${this.extent_}`,
-      `radial-gradient:'${this.startColor_}'-'${this.endColor_}'`
+      `radial-gradient:'${this.startColor_}-${this.endColor_}'`
     ];
   }
 
