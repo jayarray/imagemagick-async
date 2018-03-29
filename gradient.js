@@ -114,7 +114,7 @@ class LinearGradient {
       `gradient:bounding-box=${this.boundingBox_.String()}`,
       `gradient:direction=${this.direction_}`,
       `gradient:extent=${this.extent_}`,
-        `gradient:'${this.startColor_}-${this.endColor_}'`
+      `gradient:'${this.startColor_}-${this.endColor_}'`
     ];
   }
 
