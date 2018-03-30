@@ -31,9 +31,9 @@ class Coordinates {
     if (error)
       return Promise.reject(`Failed to create coordinates: x is ${error}`);
 
-    error = VALIDATE.IsInteger(x);
+    error = VALIDATE.IsInteger(y);
     if (error)
-      return Promise.reject(`Failed to create coordinates: x is ${error}`);
+      return Promise.reject(`Failed to create coordinates: y is ${error}`);
 
     return Promise.resolve(new Coordinates(x, y));
   }
