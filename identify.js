@@ -552,4 +552,4 @@ class ImageInfo {
 // EXPORTS
 
 exports.Format = Format;
-exports.Create = ImageInfo.Create;
+exports.CreateImageInfo = ImageInfo.Create;
