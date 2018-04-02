@@ -18,8 +18,8 @@ function AllObjectsArePrimitiveType(arr) {
     let parentClass = GetParentClass(arr[i].primitive_);
     if (parentClass != 'Primitive')
       return false;
-    return true;
   }
+  return true;
 }
 
 //-----------------------------------
@@ -91,7 +91,7 @@ class PlainCanvas extends Canvas {
     if (error)
       return Promise.reject(`Failed to draw canvas: output path is ${error}`);
 
-    if (!AllObjectsArePrimitiveType(this.elements_))
+    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
       return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
 
     return new Promise((resolve, reject) => {
@@ -166,12 +166,12 @@ class GradientCanvas extends Canvas {
     if (error)
       return Promise.reject(`Failed to draw canvas: output path is ${error}`);
 
-    if (!AllObjectsArePrimitiveType(this.elements_))
+    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
       return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
 
     return new Promise((resolve, reject) => {
       // Add canvas and gradient args
-      let args = ['-size', `${this.width_}x${this.height_}`, 'canvas:none'].concat(this.gradient_.Args());
+      let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
       // Add args for all elements on canvas
       if (this.elements_.length == 0) {
@@ -203,11 +203,10 @@ class GradientCanvas extends Canvas {
    */
   static Create(width, height, gradient) {
     let parentClass = GetParentClass(gradient);
-    if (
-      parentClass != 'Gradient')
+    if ( parentClass != 'Gradient')
       return null;
 
-    return new GradientCanvas(gradient);
+    return new GradientCanvas(width, height, gradient);
   }
 }
 
@@ -233,7 +232,7 @@ class ImageCanvas extends Canvas {
     if (error)
       return Promise.reject(`Failed to draw canvas: output path is ${error}`);
 
-    if (!AllObjectsArePrimitiveType(this.elements_))
+    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
       return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
 
     return new Promise((resolve, reject) => {
@@ -268,7 +267,6 @@ class ImageCanvas extends Canvas {
 let canvasWidth = 1600;
 let canvasHeight = 1200;
 let canvasColor = '#000000';
-let plainCanvas = PlainCanvas.Create(canvasWidth, canvasHeight, canvasColor);
 
 // Corrdinates
 let COORDINATES = require('./coordinates.js');
@@ -276,28 +274,25 @@ let centerX = parseInt(canvasWidth / 2);
 let centerY = parseInt(canvasHeight / 2);
 let center = COORDINATES.Create(centerX, centerY);
 
-let edgeX = centerX;
-let edgeY = centerY + 400;
-let edge = COORDINATES.Create(edgeX, edgeY);
 
-// Circle
-let strokeColor = '#6600cc';
-let strokeWidth = 2;
-let fillColor = 'none';
+// Linear Gradient
+let GRADIENTS = require('./gradients.js');
+let startColor = '#0000ff';
+let endColor = '#00ffff';
+let vector = GRADIENTS.CreateVector(COORDINATES.Create(0, 0), COORDINATES.Create(1600, 1200));
+let angle = null;
+let boundingBox = null;
+let direction = null;
+let extent = null;
+let LinearGradient = GRADIENTS.CreateLinearGradient(startColor, endColor, vector, angle, boundingBox, direction, extent);
 
-let PRIMITIVES = require('./primitives.js');
-let circle = PRIMITIVES.CreateCircle(center, edge, strokeColor, strokeWidth, fillColor);
-
+let gradientCanvas = GradientCanvas.Create(canvasWidth, canvasHeight, LinearGradient);
 let gravity = 'Northwest';
 
 let outputPath = '/home/isa/Downloads/X_COMP.png';
 
-// Add multiple circles to canvas
-for (let i = 0; i < 10; ++i)
-  plainCanvas.Add(circle, 20 * i, 10 * i);
-
 // render
-plainCanvas.Draw(outputPath).then(success => {
+gradientCanvas.Draw(outputPath).then(success => {
   console.log('Success :-)');
 }).catch(error => {
   console.log(`ERROR: ${error}`);
