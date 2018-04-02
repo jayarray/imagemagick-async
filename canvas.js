@@ -203,7 +203,7 @@ class GradientCanvas extends Canvas {
    */
   static Create(width, height, gradient) {
     let parentClass = GetParentClass(gradient);
-    if ( parentClass != 'Gradient')
+    if (parentClass != 'Gradient')
       return null;
 
     return new GradientCanvas(width, height, gradient);
@@ -259,46 +259,18 @@ class ImageCanvas extends Canvas {
       }).catch(error => `Failed to draw canvas: ${error}`);
     });
   }
+
+  /**
+   * Create an ImageCanvas object. If inputs are invalid it returns null.
+   * @param {string} src Source
+   */
+  static Create(src) {
+    if (VALIDATE.IsStringInput(src))
+      return null;
+
+    return new ImageCanvas(src);
+  }
 }
-
-//---------------------------------
-
-// Canvas
-let canvasWidth = 1600;
-let canvasHeight = 1200;
-let canvasColor = '#000000';
-
-// Corrdinates
-let COORDINATES = require('./coordinates.js');
-let centerX = parseInt(canvasWidth / 2);
-let centerY = parseInt(canvasHeight / 2);
-let center = COORDINATES.Create(centerX, centerY);
-
-
-// Linear Gradient
-let GRADIENTS = require('./gradients.js');
-let startColor = '#0000ff';
-let endColor = '#00ffff';
-let vector = GRADIENTS.CreateVector(COORDINATES.Create(0, 0), COORDINATES.Create(1600, 1200));
-let angle = null;
-let boundingBox = null;
-let direction = null;
-let extent = null;
-let LinearGradient = GRADIENTS.CreateLinearGradient(startColor, endColor, vector, angle, boundingBox, direction, extent);
-
-let gradientCanvas = GradientCanvas.Create(canvasWidth, canvasHeight, LinearGradient);
-let gravity = 'Northwest';
-
-let outputPath = '/home/isa/Downloads/X_COMP.png';
-
-// render
-gradientCanvas.Draw(outputPath).then(success => {
-  console.log('Success :-)');
-}).catch(error => {
-  console.log(`ERROR: ${error}`);
-});
-
-
 
 //--------------------------------
 // EXPORTS
