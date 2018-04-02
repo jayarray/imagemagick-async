@@ -24,18 +24,16 @@ class Coordinates {
    * Create a Coordinates object given the specifiec x and y values.
    * @param {number} x X-coordinate
    * @param {number} y Y-coordinate
-   * @returns {Promise<Coordinates>} Returns a promise. If it resolves, it returns a Coordinates object. Otherwise, it returns an error.
+   * @returns {Coordinates} Returns a Coordinates object. If inputs are invalid, it returns null.
    */
   static Create(x, y) {
-    let error = VALIDATE.IsInteger(x);
-    if (error)
-      return Promise.reject(`Failed to create coordinates: x is ${error}`);
+    if (
+      VALIDATE.IsInteger(x) ||
+      VALIDATE.IsInteger(y)
+    )
+      return null;
 
-    error = VALIDATE.IsInteger(y);
-    if (error)
-      return Promise.reject(`Failed to create coordinates: y is ${error}`);
-
-    return Promise.resolve(new Coordinates(x, y));
+    return new Coordinates(x, y);
   }
 }
 
