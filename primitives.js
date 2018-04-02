@@ -123,7 +123,7 @@ class Circle extends Primitive {
   */
   Args() {
     let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
-    let egde = COORDINATES.Create(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
+    let edge = COORDINATES.Create(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
 
     return [
       '-fill', this.fillColor_,
