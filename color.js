@@ -1,4 +1,5 @@
 let VALIDATE = require('./validate.js');
+let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //-------------------------------------
 // CONSTANTS
@@ -420,10 +421,271 @@ class Color {
   }
 }
 
+//-------------------------------
+// NEGATE
+
+/**
+ * Negate all the colors in an image.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Negate(src, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to negate colors: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to negate colors: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-negate', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to negate colors: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to negate colors: ${error}`);
+  });
+}
+
+//-------------------------------
+// COLORIZE
+
+/**
+ * Colorize an image. (Places a veil of color over the image.)
+ * @param {string} src Source
+ * @param {string} fillColor The color that will be placed over the image.
+ * @param {number} percent The higher the percent, the more dominant and apparent the color becomes.
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Colorize(src, fillColor, percent, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to colorize image: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(fillColor);
+  if (error)
+    return Promise.reject(`Failed to colorize image: fill color is ${error}`);
+
+  error = VALIDATE.IsInteger(percent);
+  if (error)
+    return Promise.reject(`Failed to colorize image: percent is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to colorize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [
+      src,
+      '-fill', fillColor,
+      '-colorize', `${percent}%`,
+      outputPath
+    ];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to colorize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to colorize image: ${error}`);
+  });
+}
+
+//-------------------------------
+// TO GRAYSCALE
+
+/**
+ * Convert an image to grayscale.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function ToGrayScale(src, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to change to grayscale: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to change to grayscale: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-colorspace', 'Gray', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to change to grayscale: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to change to grayscale: ${error}`);
+  });
+}
+
+//------------------------------
+// TO RGB
+
+/**
+ * Convert an image to RGB.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function ToRGB(src, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to change to RGB: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to change to RGB: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-colorspace', 'RGB', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to change to RGB: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to change to RGB: ${error}`);
+  });
+
+  /*
+  let cmd = 'convert ' + src;
+  if (src.endsWith('.png')) {
+    cmd += ' -define png:color-type=2 ' + dest;
+  }
+  else {
+    cmd += ' -colorspace RGB ' + dest;
+  }
+  return execute(cmd); */
+}
+
+//--------------------------------------
+// REPLACE
+
+/**
+ * Replace a color in an image.
+ * @param {string} src Source
+ * @param {string} targetColor The color you want to change. (Valid color format string used in Image Magick)
+ * @param {string} desiredColor The color that will replace the target color. (Valid color format string used in Image Magick)
+ * @param {number} fuzz (Optional) A value between 0 and 100 that determines which other colors similar to the target color will be removed. (The higher the value, the more colors will disappear)
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Replace(src, targetColor, desiredColor, fuzz, dest) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to replace color: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(targetColor);
+  if (error)
+    return Promise.reject(`Failed to replace color: target color is ${error}`);
+
+  error = VALIDATE.IsStringInput(desiredColor);
+  if (error)
+    return Promise.reject(`Failed to replace color: desired color is ${error}`);
+
+  error = VALIDATE.IsInteger(fuzz);
+  if (fuzz != null && error)
+    return Promise.reject(`Failed to replace color: fuzz is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to replace color: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [
+      src,
+      '-alpha', 'on',
+      '-channel', 'rgba'
+    ];
+
+    if (fuzz && fuzz > 0)
+      args.push('-fuzz', `${fuzz}%`);
+    args.push('-fill', desiredColor, '-opaque', targetColor, outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to replace color: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to replace color: ${error}`);
+  });
+}
+
+//---------------------------------------
+// MAKE TRANSPARENT
+
+/**
+ * Make an image transparent.
+ * @param {string} src Source
+ * @param {number} percent A value between 0 and 100 that determines how transparent the image will be. The higher the value, the more transparent the image becomes.
+ * @param {string} outputPath The path where the image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function MakeTransparent(src, percent, outputPath) { // percent refers to opacity. (i.e. percent = 25 --> image will be 75% transparent)
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to make transparent: source is ${error}`);
+
+  error = VALIDATE.IsInteger(percent);
+  if (fuzz != null && error)
+    return Promise.reject(`Failed to make transparent: fuzz is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to make transparent: output path is ${error}`);
+
+
+  return new Promise((resolve, reject) => {
+    let opacity = 100 - percent;
+
+    if (opacity < 0)
+      opacity = 0;
+    else if (opacity > 100)
+      opacity = 100;
+
+    let args = [
+      src,
+      '-alpha', 'on',
+      '-channel', 'a',
+      '-evaluate', 'set', `${opacity}%`,
+      outputPath
+    ];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to make transparent: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to make transparent: ${error}`);
+  });
+}
+
+
+
+
 //------------------------------
 // EXPORTS
 
 exports.CreateUsingRGBIntegers = Color.CreateUsingRGBIntgers;
 exports.CreateUsingPercents = Color.CreateUsingPercents;
 exports.CreateUsingRGBHexString = Color.CreateUsingRGBHexString;
-
+exports.Negate = Negate;
+exports.Colorize = Colorize;
+exports.ToGrayScale = ToGrayScale;
+exports.ToRGB = ToRGB;
+exports.Replace = Replace;
+exports.MakeTransparent = MakeTransparent;
