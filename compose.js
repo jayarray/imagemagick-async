@@ -68,7 +68,7 @@ function Composite(filepaths, gravity, outputPath) {
  * Create a GIF from the provided filepath list (in ther order provided) and other properties.
  * @param {Canvas} canvas Canvas object
  * @param {Array<string>} filepaths List of filepaths
- * @param {number} loop (Optional) The number of times the GIF animation is to cycle before stopping. If omitted, the default is 0 (infinite loop). Valid loop values are from 0 to infinity.
+ * @param {number} loop (Optional) The number of times the GIF animation is to cycle before stopping. The default value is 0 (infinite loop). Valid loop values are from 0 to infinity.
  * @param {number} delay The delay time measured in 1/100th of a seconds at a time.
  * @param {string} dispose (Optional) Determines what the following images should do with the previous results of the GIF animation. Default is 'Undefined'.
  * @param {string} outputPath The path where the GIF will be rendered.
@@ -77,7 +77,8 @@ function Composite(filepaths, gravity, outputPath) {
 function Gif(canvas, filepaths, loop, delay, dispose, outputPath) {
   let minLoopValue = 0;
 
-  if (canvas.constructor.name != 'Canvas')
+  let parentClass = Object.getPrototypeOf(o.constructor).name;
+  if (parentClass != 'Canvas')
     return Promise.reject(`Failed to create GIF: canvas is an invalid type`);
 
   let error = VALIDATE.IsArray(filepaths);
