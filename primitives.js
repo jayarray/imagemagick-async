@@ -88,7 +88,7 @@ class Bezier extends Primitive {
       VALIDATE.IsArray(points) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
@@ -109,6 +109,7 @@ class Circle extends Primitive {
    * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick)
    */
   constructor(center, edge, strokeColor, strokeWidth, fillColor) {
+    super();
     this.center_ = center;
     this.edge_ = edge;
     this.strokeColor_ = strokeColor;
@@ -147,7 +148,7 @@ class Circle extends Primitive {
       edge.constructor.name != 'Coordinates' ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
@@ -171,6 +172,7 @@ class Ellipse extends Primitive {
    * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen)
    */
   constructor(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
+    super();
     this.center_ = center;
     this.width_ = width;
     this.height_ = height;
@@ -217,7 +219,7 @@ class Ellipse extends Primitive {
       VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(fillColor) ||
       VALIDATE.IsInteger(angleStart) ||
       VALIDATE.IsInteger(angleEnd)
@@ -232,7 +234,7 @@ class Ellipse extends Primitive {
 //--------------------------------
 // LINE
 
-class Line {
+class Line extends Primitive {
   /**
    * @param {Coordinates} start Start coordinates
    * @param {Coordinates} end End coordinates
@@ -240,6 +242,7 @@ class Line {
    * @param {number} width Width of line. As number increases, so does the width.
    */
   constructor(start, end, color, width) {
+    super();
     this.start_ = start;
     this.end_ = end;
     this.color_ = color;
@@ -275,7 +278,7 @@ class Line {
       end.constructor.name != 'Coordinates' ||
       VALIDATE.IsStringInput(color) ||
       VALIDATE.IsInteger(width) ||
-      VALIDATE.IsIntegerInRange(width, DIMENSION_MIN, null)
+      VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null)
     )
       return null;
 
@@ -286,7 +289,7 @@ class Line {
 //--------------------------------
 // PATH
 
-class Path {
+class Path extends Primitive {
   /** 
   * @param {Array<Coordinates>} points A list of coordinates to be connected by a line in the order provided.
   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick)
@@ -295,6 +298,7 @@ class Path {
   * @param {boolean} isClosed Set to true if you wish to connect the last point back to the first one (if not done already). Else, set to false.
   */
   constructor(points, strokeColor, strokeWidth, fillColor, isClosed) {
+    super();
     this.points_ = points;
     this.strokeColor_ = strokeColor;
     this.strokeWidth_ = strokeWidth;
@@ -338,7 +342,7 @@ class Path {
       VALIDATE.IsArray(points) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(fillColor) ||
       (isClosed === true || isClosed === false)
     )
@@ -351,13 +355,14 @@ class Path {
 //--------------------------------
 // POINT
 
-class Point {
+class Point extends Primitive {
   /**
    * @param {number} x X-coordinate
    * @param {number} y Y-coordinate
    * @param {string} color Valid color format string used in Image Magick.
    */
   constructor(x, y, color) {
+    super();
     this.x_ = x;
     this.y_ = y;
     this.color_ = color;
@@ -396,7 +401,7 @@ class Point {
 //--------------------------------
 // TEXT
 
-class Text {
+class Text extends Primitive {
   /**
    * @param {string} string String containing text.
    * @param {string} font Font name
@@ -407,6 +412,7 @@ class Text {
    * @param {string} fillColor The color to fill the text with.  (Valid color format string used in Image Magick)
    */
   constructor(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor) {
+    super();
     this.string_ = string;
     this.font_ = font;
     this.pointSize_ = pointSize;
@@ -452,7 +458,7 @@ class Text {
       VALIDATE.IsStringInput(gravity) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
