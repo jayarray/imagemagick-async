@@ -359,48 +359,25 @@ class Color {
    * @param {number} g Green integer value between 0 and 255.
    * @param {number} b Blue integer value between 0 and 255.
    * @param {number} a Alpha float value between 0 (fully transparent) and 225 (fully opaque).
-   * @returns {Promise<Color>} Returns a promise. If it resolves, it returns a Color object. Otherwise, it returns an error.
+   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
    */
   static CreateUsingRGBIntgers(r, g, b, a) {
-    // Validate r
-    let error = VALIDATE.IsInteger(r);
-    if (error)
-      return Promise.reject(`Failed to create Color object: r is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(r, RGB_MIN, RGB_8_BIT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: r is ${error}`);
-
-    // Validate g
-    error = VALIDATE.IsInteger(g);
-    if (error)
-      return Promise.reject(`Failed to create Color object: g is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(g, RGB_MIN, RGB_8_BIT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: g is ${error}`);
-
-    // Validate b
-    error = VALIDATE.IsInteger(b);
-    if (error)
-      return Promise.reject(`Failed to create Color object: b is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(b, RGB_MIN, RGB_8_BIT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: b is ${error}`);
-
-    // Validate a
-    error = VALIDATE.IsInteger(a);
-    if (error)
-      return Promise.reject(`Failed to create Color object: a is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(a, RGB_MIN, RGB_8_BIT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: a is ${error}`);
+    // Validate rgb values
+    if (
+      VALIDATE.IsInteger(r) ||
+      VALIDATE.IsIntegerInRange(r, RGB_MIN, RGB_8_BIT_MAX) ||
+      VALIDATE.IsInteger(g) ||
+      VALIDATE.IsIntegerInRange(g, RGB_MIN, RGB_8_BIT_MAX) ||
+      VALIDATE.IsInteger(b) ||
+      VALIDATE.IsIntegerInRange(b, RGB_MIN, RGB_8_BIT_MAX) ||
+      VALIDATE.IsInteger(a) ||
+      VALIDATE.IsIntegerInRange(a, RGB_MIN, RGB_8_BIT_MAX)
+    )
+      return null;
 
     // Create object
     let hexStr = RGBAIntegersToHexString(r, g, b, a);
-    return Promise.resolve(new Color(hexStr));
+    return new Color(hexStr);
   }
 
   /**
@@ -409,61 +386,37 @@ class Color {
    * @param {number} g Green float value between 0 and 100.
    * @param {number} b Blue float value between 0 and 100.
    * @param {number} a Alpha float value between 0 (fully transparent) and 100 (fully opaque).
-   * @returns {Promise<Color>} Returns a promise. If it resolves, it returns a Color object. Otherwise, it returns an error.
+   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
    */
   static CreateUsingPercents(r, g, b, a) {
-    // Validate r
-    let error = VALIDATE.IsNumber(r);
-    if (error)
-      return Promise.reject(`Failed to create Color object: r is ${error}`);
-
-    error = VALIDATE.IsNumberInRange(r, PERCENT_MIN, PERCENT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: r is ${error}`);
-
-    // Validate g
-    error = VALIDATE.IsNumber(g);
-    if (error)
-      return Promise.reject(`Failed to create Color object: g is ${error}`);
-
-    error = VALIDATE.IsNumberInRange(g, PERCENT_MIN, PERCENT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: g is ${error}`);
-
-    // Validate b
-    error = VALIDATE.IsNumber(b);
-    if (error)
-      return Promise.reject(`Failed to create Color object: b is ${error}`);
-
-    error = VALIDATE.IsNumberInRange(b, PERCENT_MIN, PERCENT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: b is ${error}`);
-
-    // Validate a
-    error = VALIDATE.IsNumber(a);
-    if (error)
-      return Promise.reject(`Failed to create Color object: a is ${error}`);
-
-    error = VALIDATE.IsNumberInRange(a, PERCENT_MIN, PERCENT_MAX);
-    if (error)
-      return Promise.reject(`Failed to create Color object: a is ${error}`);
+    // Validate percent values
+    if (
+      VALIDATE.IsNumber(r) ||
+      VALIDATE.IsNumberInRange(r, PERCENT_MIN, PERCENT_MAX) ||
+      VALIDATE.IsNumber(g) ||
+      VALIDATE.IsNumberInRange(g, PERCENT_MIN, PERCENT_MAX) ||
+      VALIDATE.IsNumber(b) ||
+      VALIDATE.IsNumberInRange(b, PERCENT_MIN, PERCENT_MAX) ||
+      VALIDATE.IsNumber(a) ||
+      VALIDATE.IsNumberInRange(a, PERCENT_MIN, PERCENT_MAX)
+    )
+      return null;
 
     // Create object
     let hexStr = RGBAPercentsToHexString(r, g, b, a);
-    return Promise.resolve(new Color(hexStr));
+    return new Color(hexStr);
   }
 
   /**
    * Create a Color object using RGB hex string.
    * @param {string} hexStr Must follow one of the following formats: #rgb, #rrggbb, #rrggbbaa, #rrrrggggbbbb, #rrrrggggbbbbaaaa.
-   * @returns {Promise<Color>} Returns a promise. If it resolves, it returns a Color object. Otherwise, it returns an error.
+   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
    */
   static CreateUsingRGBHexString(hexStr) {
-    let error = FormatValidator(hexStr);
-    if (error)
-      return Promise.reject(`Failed to create Color object: hex string ${error}`);
+    if (FormatValidator(hexStr))
+      return null;
 
-    return Promise.resolve(new Color(hexStr));
+    return new Color(hexStr);
   }
 }
 
