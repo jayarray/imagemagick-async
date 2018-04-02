@@ -2,6 +2,7 @@ let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //------------------------------------
+// COMPARE
 
 /**
  * Render an image that highlights the differences between two images. (Compares src2 to src1)
@@ -53,6 +54,8 @@ function Compare(src1, src2, highlightColor, lowlightColor, outputPath) {
   });
 }
 
+//------------------------------------
+// DIFFERENCE
 
 /**
  * Render an image that shows the differences between two images by utilizing brightness to correlate how major the changes are. The brighter the color, the more major the difference is. (Compares src2 to src1)
@@ -91,6 +94,8 @@ function Difference(src1, src2, outputPath) {
   });
 }
 
+//------------------------------------
+// AUTO LEVEL
 
 /**
  * Render an image whose colors are normalized (brightened). Makes really dark compare/difference images easier to analyze.
