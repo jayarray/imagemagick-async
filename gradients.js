@@ -5,15 +5,14 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 // CONSTANTS
 
 const DIMENSIONS_MIN = 1;
-const WIDTH_MIN = 1;
 
 //-------------------------------
 // VECTOR
 
-class Vector {
+class Vector extends Primitive {
   /**
-   * @param {Coordinates} start Starting point of vector.
-   * @param {coordinates} end Ending point of vector.
+   * @param {Coordinates} start Start coordinates
+   * @param {Coordinates} end End coordinates
    */
   constructor(start, end) {
     this.start_ = start;
@@ -21,32 +20,33 @@ class Vector {
   }
 
   /**
-   * Create a Vector object witht he specified properties.
+   * Create a Vector object with the specified properties.
    * @param {Coordinates} start Start coordinates 
    * @param {Coordinates} end End coordinates
-   * @returns {Promise<Vector>} Returns a promise. If it resolves, it return an object. Otherwise, it returns an error.
+   * @returns {Vector} Returns a Vector object. If inputs are invalid, it returns null.
    */
   static Create(start, end) {
-    if (start.constructor.name != 'Coordinates')
-      return Promise.reject(`Failed to create vector: start is not valid type.`);
+    if (
+      start.constructor.name != 'Coordinates' ||
+      end.constructor.name != 'Coordinates'
+    )
+      return null;
 
-    if (end.constructor.name != 'Coordinates')
-      return Promise.reject(`Failed to create vector: end is not valid type.`);
-
-    Promise.resolve(new Vector(start, end));
+    return new Vector(start, end);
   }
 }
 
 //----------------------------------
 // BOUNDING BOX
 
-class BoundingBox {
+class BoundingBox extends Primitive {
   /**
+   * @param {Coordinates} center The center of the bounding box.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels) 
-   * @param {Coordinates} center Coordinates for the center of the bounding box.
    */
   constructor(center, width, height) {
+    super();
     this.center_ = center;
     this.width_ = width;
     this.height_ = height;
@@ -56,7 +56,7 @@ class BoundingBox {
    * @returns {string} Returns a string representation of the bounding box args.
    */
   String() {
-    return `${this.width_}x${this.height_}+${this.center_.x}+${this.center_.y}`;
+    return `${this.width_}x${this.height_}+${this.center_.x + this.xOffset_}+${this.center_.y + this.yOffset_}`;
   }
 
   /**
@@ -64,29 +64,19 @@ class BoundingBox {
    * @param {Coordinates} center Coordinates for the center of the bounding box.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @returns {Promise<BoundingBox>} Returns a Promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   * @returns {BoundingBox} Returns a BoundingBox object. If inputs are invalid, it returns null.
    */
   static Create(center, width, height) {
-    if (center.constructor.name != 'Coordinates')
-      return Promise.reject(`Failed to create bounding box: center is invalid type.`);
+    if (
+      center.constructor.name != 'Coordinates' ||
+      VALIDATE.IsNumber(width) ||
+      VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsNumber(height) ||
+      VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null)
+    )
+      return null;
 
-    let error = VALIDATE.IsNumber(width);
-    if (error)
-      return Promise.reject(`Failed to create bounding box: width is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null);
-    if (error)
-      return Promise.reject(`Failed to create bounding box: width is ${error}`);
-
-    error = VALIDATE.IsNumber(height);
-    if (error)
-      return Promise.reject(`Failed to create bounding box: height is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null);
-    if (error)
-      return Promise.reject(`Failed to create bounding box: height is ${error}`);
-
-    return Promise.resolve(new BoundingBox(center, width, height));
+    return new BoundingBox(center, width, height);
   }
 }
 
@@ -94,6 +84,15 @@ class BoundingBox {
 // LINEAR GRADIENT
 
 class LinearGradient {
+  /**
+   * @param {string} startColor Start color for linear gradient.
+   * @param {string} endColor End color for linear gradient.
+   * @param {Vector} vector Vector that defines where the gradient will move through.
+   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
+   * @param {BoundingBox} boundingBox Limits the gradient to a larger or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
+   * @param {string} direction Specifies the direction of the linear gradient towards the top/bottom/left/right or diagonal corners. Valid values are: NorthWest, North, Northeast, West, East, SouthWest, South, SouthEast.
+   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
+   */
   constructor(startColor, endColor, vector, angle, boundingBox, direction, extent) {
     this.startColor_ = startColor;
     this.endColor_ = endColor;
@@ -124,39 +123,24 @@ class LinearGradient {
    * @param {string} endColor End color for linear gradient.
    * @param {Vector} vector Vector that defines where the gradient will move through.
    * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
-   * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
+   * @param {BoundingBox} boundingBox Limits the gradient to a larger or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
    * @param {string} direction Specifies the direction of the linear gradient towards the top/bottom/left/right or diagonal corners. Valid values are: NorthWest, North, Northeast, West, East, SouthWest, South, SouthEast.
    * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
-   * @returns {Promise<LinearGradient>} Returns a Promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   * @returns {LinearGradient} Returns a LinearGradient object. If inputs are invalid, it returns null.
    */
-  Create(startColor, endColor, vector, angle, boundingBox, direction, extent) {
-    let error = VALIDATE.IsStringInput(startColor);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: start color is ${error}`);
+  static Create(startColor, endColor, vector, angle, boundingBox, direction, extent) {
+    if (
+      VALIDATE.IsStringInput(startColor) ||
+      VALIDATE.IsStringInput(endColor) ||
+      vector.constructor.name != 'Vector' ||
+      VALIDATE.IsInteger(angle) ||
+      boundingBox.constructor.name != 'BoundingBox' ||
+      VALIDATE.IsStringInput(direction) ||
+      VALIDATE.IsStringInput(extent)
+    )
+      return null;
 
-    error = VALIDATE.IsStringInput(endColor);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: end color is ${error}`);
-
-    if (vector.constructor.name != 'Vector')
-      return Promise.reject(`Failed to draw linear gradient: vector is invalid type.`);
-
-    error = VALIDATE.IsInteger(angle);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: start color is ${error}`);
-
-    if (boundingBox.constructor.name != 'BoundingBox')
-      return Promise.reject(`Failed to draw linear gradient: bounding box is invalid type.`);
-
-    error = VALIDATE.IsStringInput(direction);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: direction is ${error}`);
-
-    error = VALIDATE.IsStringInput(extent);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: extent is ${error}`);
-
-    return Promise.resolve(new LinearGradient(startColor, endColor, vector, angle, boundingBox, direction, extent));
+    return new LinearGradient(startColor, endColor, vector, angle, boundingBox, direction, extent);
   }
 }
 
@@ -239,48 +223,24 @@ class RadialGradient {
    * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
    * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
    * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
-   * @returns {Promise<RadialGradiant>} Returns a Promise. If it resolves, it returns an object. Otherwise, it returns an error.
+   * @returns {RadialGradient} Returns a RadialGradient object. If inputs are invalid, it returns null.
    */
-  Create(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
-    let error = VALIDATE.IsStringInput(startColor);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: start color is ${error}`);
+  static Create(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
+    if (
+      VALIDATE.IsStringInput(startColor) ||
+      VALIDATE.IsStringInput(endColor) ||
+      center.constructor.name != 'Coordinates' ||
+      VALIDATE.IsInteger(radialWidth) ||
+      VALIDATE.IsIntegerInRange(radialWidth, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsInteger(radialHeight) ||
+      VALIDATE.IsIntegerInRange(radialHeight, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsInteger(angle) ||
+      boundingBox.constructor.name != 'BoundingBox' ||
+      VALIDATE.IsStringInput(extent)
+    )
+      return null;
 
-    error = VALIDATE.IsStringInput(endColor);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: end color is ${error}`);
-
-    if (center.constructor.name != 'Coordinates')
-      return Promise.reject(`Failed to draw linear gradient: center is invalid type.`);
-
-    error = VALIDATE.IsInteger(radialWidth);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: radial width is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(radialWidth, DIMENSIONS_MIN, null);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: radial width is ${error}`);
-
-    error = VALIDATE.IsInteger(radialHeight);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: radial height is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(radialHeight, DIMENSIONS_MIN, null);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: radial height is ${error}`);
-
-    error = VALIDATE.IsInteger(angle);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: angle is ${error}`);
-
-    if (boundingBox.constructor.name != 'BoundingBox')
-      return Promise.reject(`Failed to draw linear gradient: bounding box is invalid type.`);
-
-    error = VALIDATE.IsStringInput(extent);
-    if (error)
-      return Promise.reject(`Failed to create linear gradient: extent is ${error}`);
-
-    return Promise.resolve(new RadialGradient(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent));
+    return new RadialGradient(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent);
   }
 }
 
@@ -319,6 +279,4 @@ function DrawRadialGradient(canvas, radialGradient, dest) {
 exports.CreateVector = Vector.Create;
 exports.CreateBoundingBox = BoundingBox.Create;
 exports.CreateLinearGradient = LinearGradient.Create;
-exports.DrawLinearGradient = DrawLinearGradient;
 exports.CreateRadialGradient = RadialGradient.Create;
-exports.DrawRadialGradient = DrawRadialGradient;
