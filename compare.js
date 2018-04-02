@@ -98,7 +98,7 @@ function Difference(src1, src2, outputPath) {
  * @param {string} outputPath The path where the resulting image will be rendered.
  * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
  */
-function Normalize(src, outputPath) {
+function AutoLevel(src, outputPath) {
   let error = VALIDATE.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to normalize image: source is ${error}`);
@@ -125,4 +125,3 @@ function Normalize(src, outputPath) {
 
 exports.Compare = Compare;
 exports.Difference = Difference;
-exports.Normalize = Normalize;
