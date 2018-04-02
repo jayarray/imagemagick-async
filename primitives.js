@@ -1,3 +1,4 @@
+let VALIDATE = require('./validate.js');
 let COORDINATES = require('./coordinates.js');
 
 //----------------------------------
