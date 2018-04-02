@@ -138,36 +138,36 @@ class LinearGradient extends Gradient {
       args.push(`gradient:direction=${this.direction_}`);
 
     if (this.extent_)
-      args.push(`gradient: extent = ${this.extent_}`);
+      args.push(`gradient:extent=${this.extent_}`);
 
     if (this.extent_)
-      args.push(`gradient: extent = ${this.extent_}`);
+      args.push(`gradient:extent=${this.extent_}`);
 
-    args.push(`gradient: '${this.startColor_}-${this.endColor_}'`);
+    args.push(`gradient:'${this.startColor_}-${this.endColor_}'`);
 
     return args;
   }
 
   /**
    * Create a LinearGradient object with the specified properties.
-   * @param {string} startColor Start color for linear gradient.
-   * @param {string} endColor End color for linear gradient.
-   * @param {Vector} vector Vector that defines where the gradient will move through.
-   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
-   * @param {BoundingBox} boundingBox Limits the gradient to a larger or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
-   * @param {string} direction Specifies the direction of the linear gradient towards the top/bottom/left/right or diagonal corners. Valid values are: NorthWest, North, Northeast, West, East, SouthWest, South, SouthEast.
-   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
+   * @param {string} startColor Start color for linear gradient. (Required)
+   * @param {string} endColor End color for linear gradient. (Required)
+   * @param {Vector} vector Vector that defines where the gradient will move through. (Optional)
+   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
+   * @param {BoundingBox} boundingBox Limits the gradient to a larger or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background. (Optional)
+   * @param {string} direction Specifies the direction of the linear gradient towards the top/bottom/left/right or diagonal corners. Valid values are: NorthWest, North, Northeast, West, East, SouthWest, South, SouthEast. (Optional)
+   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
    * @returns {LinearGradient} Returns a LinearGradient object. If inputs are invalid, it returns null.
    */
   static Create(startColor, endColor, vector, angle, boundingBox, direction, extent) {
     if (
       VALIDATE.IsStringInput(startColor) ||
       VALIDATE.IsStringInput(endColor) ||
-      vector.constructor.name != 'Vector' ||
-      VALIDATE.IsInteger(angle) ||
-      boundingBox.constructor.name != 'BoundingBox' ||
-      VALIDATE.IsStringInput(direction) ||
-      VALIDATE.IsStringInput(extent)
+      (vector != null && vector.constructor.name != 'Vector') ||
+      (angle != null && VALIDATE.IsInteger(angle)) ||
+      (boundingBox != null && boundingBox.constructor.name != 'BoundingBox') ||
+      (direction != null && VALIDATE.IsStringInput(direction)) ||
+      (extent != null && VALIDATE.IsStringInput(extent))
     )
       return null;
 
@@ -180,14 +180,14 @@ class LinearGradient extends Gradient {
 
 class RadialGradient extends Gradient {
   /**
-   * @param {string} startColor Start color of the gradient.
-   * @param {string} endColor End color of the gradient.
-   * @param {Coordinates} center Coordinates for the center of the radial gradient. 
-   * @param {number} radialWidth Width of the radial gradient.
-   * @param {number} radialHeight Height of the radial gradient.
-   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
-   * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
-   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
+   * @param {string} startColor Start color of the gradient. (Required)
+   * @param {string} endColor End color of the gradient. (Required)
+   * @param {Coordinates} center Coordinates for the center of the radial gradient. (Optional)
+   * @param {number} radialWidth Width of the radial gradient. (Optional)
+   * @param {number} radialHeight Height of the radial gradient. (Optional)
+   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
+   * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background. (Optional)
+   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
    */
   constructor(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
     this.startColor_ = startColor;
@@ -205,41 +205,58 @@ class RadialGradient extends Gradient {
    * @returns {Array<string|number>} Returns an array of arguments. 
    */
   Args() {
-    return [
-      '-define',
-      `gradient: center = ${this.center_.String()}`,
-      `gradient: radii = ${this.radialWidth_}, ${this.radialHeight_}`,
-      `gradient: angle = ${this.angle_}`,
-      `gradient: bounding - box=${this.boundingBox_.String()}`,
-      `gradient: extent = ${this.extent_}`,
-      `radial - gradient: '${this.startColor_}-${this.endColor_}'`
-    ];
+    let args = ['-define'];
+
+    if (this.center_)
+      args.push(`gradient:center=${this.center_.String()}`);
+
+    if (this.radialWidth_ && this.radialHeight_)
+      args.push(`gradient:radii=${this.radialWidth_}, ${this.radialHeight_}`);
+    else {
+      if (this.radialWidth_)
+        args.push(`gradient:radii=${this.radialWidth_}, ${this.radialWidth_}`);
+      else
+        args.push(`gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
+    }
+
+    if (this.angle_)
+      args.push(`gradient:angle=${this.angle_}`);
+
+    if (this.boundingBox_)
+      args.push(`gradient:bounding-box=${this.boundingBox_.String()}`);
+
+    if (this.extent_)
+      args.push(`gradient:extent=${this.extent_}`);
+
+    args.push(`radial-gradient:'${this.startColor_}-${this.endColor_}'`);
+
+    return args;
   }
 
   /**
    * Create a RadialGradient object with the specified properties.
-   * @param {string} startColor Start color of the gradient.
-   * @param {string} endColor End color of the gradient.
-   * @param {Coordinates} center Coordinates for the center of the radial gradient. 
-   * @param {number} radialWidth Width of the radial gradient.
-   * @param {number} radialHeight Height of the radial gradient.
-   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up).
-   * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background.
-   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum.
+   * @param {string} startColor Start color of the gradient. (Required)
+   * @param {string} endColor End color of the gradient. (Required)
+   * @param {Coordinates} center Coordinates for the center of the radial gradient. (Optional)
+   * @param {number} radialWidth Width of the radial gradient. (Optional)
+   * @param {number} radialHeight Height of the radial gradient. (Optional)
+   * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
+   * @param {BoundingBox} boundingBox Limits the gradient to a lrager or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background. (Optional)
+   * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
    * @returns {RadialGradient} Returns a RadialGradient object. If inputs are invalid, it returns null.
    */
   static Create(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
     if (
       VALIDATE.IsStringInput(startColor) ||
       VALIDATE.IsStringInput(endColor) ||
-      center.constructor.name != 'Coordinates' ||
-      VALIDATE.IsInteger(radialWidth) ||
+      (center != null && center.constructor.name != 'Coordinates') ||
+      (radialWidth != null && VALIDATE.IsInteger(radialWidth)) ||
       VALIDATE.IsIntegerInRange(radialWidth, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsInteger(radialHeight) ||
+      (radialHeight != null && VALIDATE.IsInteger(radialHeight)) ||
       VALIDATE.IsIntegerInRange(radialHeight, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsInteger(angle) ||
-      boundingBox.constructor.name != 'BoundingBox' ||
-      VALIDATE.IsStringInput(extent)
+      (angle != null && VALIDATE.IsInteger(angle)) ||
+      (boundingBox != null && boundingBox.constructor.name != 'BoundingBox') ||
+      (extent != null && VALIDATE.IsStringInput(extent))
     )
       return null;
 
