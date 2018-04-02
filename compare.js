@@ -130,3 +130,4 @@ function AutoLevel(src, outputPath) {
 
 exports.Compare = Compare;
 exports.Difference = Difference;
+exports.AutoLevel = AutoLevel;
