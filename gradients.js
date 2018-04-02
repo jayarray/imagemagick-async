@@ -46,7 +46,6 @@ class BoundingBox {
    * @param {number} height Height (in pixels) 
    */
   constructor(center, width, height) {
-    super();
     this.center_ = center;
     this.width_ = width;
     this.height_ = height;
@@ -109,6 +108,7 @@ class LinearGradient extends Gradient {
    * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
    */
   constructor(startColor, endColor, vector, angle, boundingBox, direction, extent) {
+    super();
     this.startColor_ = startColor;
     this.endColor_ = endColor;
     this.vector_ = vector;
@@ -123,26 +123,41 @@ class LinearGradient extends Gradient {
    * @returns {Array<string|number>} Returns an array of arguments. 
    */
   Args() {
-    let args = ['-define'];
+    let args = [];
+    let optionCount = 0;
 
-    if (this.vector_)
+    if (this.vector_) {
       args.push(`gradient:vector=${this.vector_.start_.String()},${this.vector_.end_.String()}`);
+      optionCount++;
+    }
 
-    if (this.angle_)
+    if (this.angle_) {
       args.push(`gradient:angle=${this.angle_}`);
+      optionCount++;
+    }
 
-    if (this.boundingBox_)
+    if (this.boundingBox_) {
       args.push(`gradient:bounding-box=${this.boundingBox_.String()}`);
+      optionCount++;
+    }
 
-    if (this.direction_)
+    if (this.direction_) {
       args.push(`gradient:direction=${this.direction_}`);
+      optionCount++;
+    }
 
-    if (this.extent_)
+    if (this.extent_) {
       args.push(`gradient:extent=${this.extent_}`);
+      optionCount++;
+    }
 
-    if (this.extent_)
+    if (this.extent_) {
       args.push(`gradient:extent=${this.extent_}`);
+      optionCount++;
+    }
 
+    if (optionCount > 0)
+      args = ['-define'].concat(args);
     args.push(`gradient:'${this.startColor_}-${this.endColor_}'`);
 
     return args;
@@ -190,6 +205,7 @@ class RadialGradient extends Gradient {
    * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
    */
   constructor(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
+    super();
     this.startColor_ = startColor;
     this.endColor_ = endColor;
     this.center_ = center;
@@ -205,29 +221,43 @@ class RadialGradient extends Gradient {
    * @returns {Array<string|number>} Returns an array of arguments. 
    */
   Args() {
-    let args = ['-define'];
+    let args = [];
+    let optionCount = 0;
 
-    if (this.center_)
+    if (this.center_) {
       args.push(`gradient:center=${this.center_.String()}`);
-
-    if (this.radialWidth_ && this.radialHeight_)
-      args.push(`gradient:radii=${this.radialWidth_}, ${this.radialHeight_}`);
-    else {
-      if (this.radialWidth_)
-        args.push(`gradient:radii=${this.radialWidth_}, ${this.radialWidth_}`);
-      else
-        args.push(`gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
+      optionCount++;
     }
 
-    if (this.angle_)
+    if (this.radialWidth_ || this.radialHeight_) {
+      if (this.radialWidth_ && this.radialHeight_)
+        args.push(`gradient:radii=${this.radialWidth_}, ${this.radialHeight_}`);
+      else {
+        if (this.radialWidth_)
+          args.push(`gradient:radii=${this.radialWidth_}, ${this.radialWidth_}`);
+        else
+          args.push(`gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
+      }
+      optionCount++;
+    }
+
+    if (this.angle_) {
       args.push(`gradient:angle=${this.angle_}`);
+      optionCount++;
+    }
 
-    if (this.boundingBox_)
+    if (this.boundingBox_) {
       args.push(`gradient:bounding-box=${this.boundingBox_.String()}`);
+      optionCount++;
+    }
 
-    if (this.extent_)
+    if (this.extent_) {
       args.push(`gradient:extent=${this.extent_}`);
+      optionCount++;
+    }
 
+    if (optionCount > 0)
+      args = ['-define'].concat(args);
     args.push(`radial-gradient:'${this.startColor_}-${this.endColor_}'`);
 
     return args;
