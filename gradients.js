@@ -81,9 +81,24 @@ class BoundingBox {
 }
 
 //----------------------------------
+// GRADIENT
+
+class Gradient {
+  constructor() {
+  }
+
+  /** 
+   * @returns {Array<string|number>} Returns an array of arguments. 
+   */
+  Args() {
+    // Override
+  }
+}
+
+//----------------------------------
 // LINEAR GRADIENT
 
-class LinearGradient {
+class LinearGradient extends Gradient {
   /**
    * @param {string} startColor Start color for linear gradient.
    * @param {string} endColor End color for linear gradient.
@@ -104,6 +119,7 @@ class LinearGradient {
   }
 
   /** 
+   * @override
    * @returns {Array<string|number>} Returns an array of arguments. 
    */
   Args() {
@@ -147,7 +163,7 @@ class LinearGradient {
 //------------------------------------
 // RADIAL GRADIENT
 
-class RadialGradient {
+class RadialGradient extends Gradient {
   /**
    * @param {string} startColor Start color of the gradient.
    * @param {string} endColor End color of the gradient.
@@ -170,7 +186,8 @@ class RadialGradient {
   }
 
   /** 
-   * @returns {Array<string|number>} 
+   * @override
+   * @returns {Array<string|number>} Returns an array of arguments. 
    */
   Args() {
     return [
