@@ -158,7 +158,7 @@ class LinearGradient extends Gradient {
 
     if (optionCount > 0)
       args = ['-define'].concat(args);
-    args.push(`gradient:'${this.startColor_}-${this.endColor_}'`);
+    args.push(`gradient:${this.startColor_}-${this.endColor_}`);
 
     return args;
   }
@@ -258,7 +258,7 @@ class RadialGradient extends Gradient {
 
     if (optionCount > 0)
       args = ['-define'].concat(args);
-    args.push(`radial-gradient:'${this.startColor_}-${this.endColor_}'`);
+    args.push(`radial-gradient:${this.startColor_}-${this.endColor_}`);
 
     return args;
   }
