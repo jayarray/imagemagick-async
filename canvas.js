@@ -10,7 +10,7 @@ const DIMENSION_MIN = 1;
 // ERROR CHECK
 
 function GetParentClass(o) {
-  return Object.getPrototypeOf(o.constructor).name
+  return Object.getPrototypeOf(o.constructor).name;
 }
 
 function AllObjectsArePrimitiveType(arr) {
