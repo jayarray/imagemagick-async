@@ -87,7 +87,7 @@ class Bezier extends Primitive {
       VALIDATE.IsArray(points) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, WIDTH_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
@@ -146,7 +146,7 @@ class Circle extends Primitive {
       edge.constructor.name != 'Coordinates' ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, WIDTH_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
@@ -216,7 +216,7 @@ class Ellipse extends Primitive {
       VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, WIDTH_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
       VALIDATE.IsStringInput(fillColor) ||
       VALIDATE.IsInteger(angleStart) ||
       VALIDATE.IsInteger(angleEnd)
@@ -274,7 +274,7 @@ class Line {
       end.constructor.name != 'Coordinates' ||
       VALIDATE.IsStringInput(color) ||
       VALIDATE.IsInteger(width) ||
-      VALIDATE.IsIntegerInRange(width, WIDTH_MIN, null)
+      VALIDATE.IsIntegerInRange(width, DIMENSION_MIN, null)
     )
       return null;
 
@@ -337,7 +337,7 @@ class Path {
       VALIDATE.IsArray(points) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, WIDTH_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
       VALIDATE.IsStringInput(fillColor) ||
       (isClosed === true || isClosed === false)
     )
@@ -451,7 +451,7 @@ class Text {
       VALIDATE.IsStringInput(gravity) ||
       VALIDATE.IsStringInput(strokeColor) ||
       VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, WIDTH_MIN, null) ||
+      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSION_MIN, null) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
