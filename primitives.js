@@ -16,8 +16,8 @@ class Primitive {
 
   /**
    * Set x and y offsets.
-   * @param {*} x 
-   * @param {*} y 
+   * @param {number} x X-offset
+   * @param {number} y Y-offset
    */
   Offset(x, y) {
     this.xOffset_ = x;
@@ -459,6 +459,8 @@ class Text {
     return new Text(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor);
   }
 }
+
+
 
 //--------------------------------
 // EXPORTS
