@@ -459,3 +459,14 @@ class Text {
     return new Text(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor);
   }
 }
+
+//--------------------------------
+// EXPORTS
+
+exports.CreateBezier = Bezier.Create;
+exports.CreateCircle = Circle.Create;
+exports.CreateEllipse = Ellipse.Create;
+exports.CreateLine = Line.Create;
+exports.CreatePath = Path.Create;
+exports.CreatePoint = Point.Create;
+exports.CreateText = Text.Create;
