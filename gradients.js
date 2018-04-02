@@ -9,7 +9,7 @@ const DIMENSIONS_MIN = 1;
 //-------------------------------
 // VECTOR
 
-class Vector extends Primitive {
+class Vector {
   /**
    * @param {Coordinates} start Start coordinates
    * @param {Coordinates} end End coordinates
@@ -39,7 +39,7 @@ class Vector extends Primitive {
 //----------------------------------
 // BOUNDING BOX
 
-class BoundingBox extends Primitive {
+class BoundingBox {
   /**
    * @param {Coordinates} center The center of the bounding box.
    * @param {number} width Width (in pixels)
@@ -56,7 +56,7 @@ class BoundingBox extends Primitive {
    * @returns {string} Returns a string representation of the bounding box args.
    */
   String() {
-    return `${this.width_}x${this.height_}+${this.center_.x + this.xOffset_}+${this.center_.y + this.yOffset_}`;
+    return `${this.width_}x${this.height_}+${this.center_.x}+${this.center_.y}`;
   }
 
   /**
@@ -144,35 +144,6 @@ class LinearGradient {
   }
 }
 
-/**
- * Render linear gradient to the specified destination.
- * @param {Canvas} canvas Canvas object
- * @param {LinearGradient} linearGradient LinearGradient object
- * @param {string} dest Destination
- * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
- */
-function DrawLinearGradient(canvas, linearGradient, dest) {
-  if (canvas.constructor.name != 'Canvas')
-    return Promise.reject(`Failed to draw linear gradient: canvas is invalid type.`);
-
-  if (linearGradient.constructor.name != 'LinearGradient')
-    return Promise.reject(`Failed to draw linear gradient: linear gradient is invalid type.`);
-
-  let error = VALIDATE.IsStringInput(dest);
-  if (error)
-    return Promise.reject(`Failed to draw linear gradient: dest is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    LOCAL_COMMAND.Execute('convert', canvas.Args().concat(linearGradient.Args()).concat(dest)).then(output => {
-      if (output.stderr) {
-        reject(`Failed to draw linear gradient: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to draw linear gradient: ${error}`);
-  });
-}
-
 //------------------------------------
 // RADIAL GRADIENT
 
@@ -242,35 +213,6 @@ class RadialGradient {
 
     return new RadialGradient(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent);
   }
-}
-
-/**
- * Render linear gradient to the specified destination.
- * @param {Canvas} canvas Canvas object
- * @param {LinearGradient} linearGradient LinearGradient object
- * @param {string} dest Destination
- * @returns {Promise} Returns a promise that resolves if successful, and fails otherwise.
- */
-function DrawRadialGradient(canvas, radialGradient, dest) {
-  if (canvas.constructor.name != 'Canvas')
-    return Promise.reject(`Failed to draw linear gradient: canvas is invalid type.`);
-
-  if (radialGradient.constructor.name != 'RadialGradient')
-    return Promise.reject(`Failed to draw linear gradient: radial gradient is invalid type.`);
-
-  let error = VALIDATE.IsStringInput(dest);
-  if (error)
-    return Promise.reject(`Failed to draw linear gradient: dest is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    LOCAL_COMMAND.Execute('convert', canvas.Args().concat(linearGradient.Args()).concat(dest)).then(output => {
-      if (output.stderr) {
-        reject(`Failed to draw linear gradient: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to draw linear gradient: ${error}`);
-  });
 }
 
 //-----------------------------------
