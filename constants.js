@@ -14,3 +14,9 @@ const GRAVITY_VALUES = ['Northwest',
   'West',
   'East'
 ];
+
+//------------------------------
+// EXPORTS
+
+exports.DISPOSE_VALUES = DISPOSE_VALUES;
+exports.GRAVITY_VALUES = GRAVITY_VALUES;
