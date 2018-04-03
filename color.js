@@ -674,9 +674,6 @@ function MakeTransparent(src, percent, outputPath) { // percent refers to opacit
   });
 }
 
-
-
-
 //------------------------------
 // EXPORTS
 
