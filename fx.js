@@ -43,7 +43,7 @@ function Swirl(src, degrees, outputPath) {
 /**
  * Apply implode effect to an image.
  * @param {string} src Source
- * @param {number} factor Value between 0 (non-inclusive) and 1 (non-inclusive) that affects how much implosion is effect is applied. Values larger than or equal to 1 result in all pixels being "sucked into oblivion".
+ * @param {number} factor Implosions have values between 0 and 1 (and anything greater than 1 sucks pixels into oblivion). Explosions have values between 0 and -1 (and anything less than -1 distorts pixels outward). 
  * @param {string} outputPath The path where the resulting image will be rendered to.
  * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
  */
