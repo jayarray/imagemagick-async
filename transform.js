@@ -2,7 +2,7 @@ let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //-----------------------------------------
-// ROLL HORIZONTAL
+// ROLL
 
 /**
  * Roll the image horizontally.
@@ -44,9 +44,6 @@ function RollHorizontal(src, pixels, outputPath) {
   });
 }
 
-//-----------------------------------------
-// ROLL VERTICAL
-
 /**
  * Roll the image vertically.
  * @param {string} src Source
@@ -86,9 +83,6 @@ function RollVertical(src, pixels, dest) {
     }).catch(error => `Failed to roll image vertically: ${error}`);
   });
 }
-
-//-----------------------------------------
-// ROLL BI-DIRECTIONAL
 
 /**
  * Roll the image vertically.
@@ -145,127 +139,611 @@ function RollBiDirectional(src, horizontalPixels, verticalPixels, outputPath) {
 //-----------------------------------------
 // MIRROR
 
-
+/**
+ * Create a mirror image flipped horizontally.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
 function MirrorHorizontal(src, outputPath) {
-  let args = [src, '-flop', outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to mirror image horizontally: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to mirror image horizontally: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-flop', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to mirror image horizontally: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to mirror image horizontally: ${error}`);
+  });
 }
 
+/**
+ * Create a mirror image flipped vertically.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
 function MirrorVertical(src, dest) {
-  let args = [src, '-flip', outputPath]; i
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to mirror image vertically: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to mirror image vertically: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-flip', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to mirror image vertically: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to mirror image vertically: ${error}`);
+  });
 }
 
-function MirrorTranspose(src, dest)  // Top-Left To Bottom-Right
-{
-  let args = [src, '-transpose', outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+/**
+ * Create a mirror image flipped top-left to bottom-right.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Transpose(src, dest) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to transpose image: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to transpose image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-transpose', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to transpose image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to transpose image: ${error}`);
+  });
 }
 
-function MirrorTransverse(src, dest)  // Bottom-Left To Top-Right
-{
-  let args = [src, '-transverse', outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+/**
+ * Create a mirror image flipped bottom-left to top-right.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Transverse(src, dest) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to transverse image: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to transverse image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-transverse', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to transverse image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to transverse image: ${error}`);
+  });
 }
 
 //-------------------------------
 //  OFFSET
 
+/**
+ * Shift an image relative to the start and end coordinates. Shift is computed as: Xshift = x1 - x0 and Yshift = y1 - y0.
+ * @param {string} src Source
+ * @param {number} x0 Start X-coordinate
+ * @param {number} y0 Start Y-coordinate
+ * @param {number} x1 End X-coordinate
+ * @param {number} y1 End Y-coordinate
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
 function Offset(src, x0, y0, x1, y1, outputPath) {
-  let args = [
-    src,
-    '-virtual-pixel', 'transparent',
-    '-distort', 'Affine', `${x0},${y0} ${x1},${y1}`,  // If this fails, split into two strings
-    outputPath
-  ];
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to offset image: source is ${error}`);
 
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  error = VALIDATE.IsInteger(x0);
+  if (error)
+    return Promise.reject(`Failed to offset image: x0 is ${error}`);
+
+  error = VALIDATE.IsInteger(y0);
+  if (error)
+    return Promise.reject(`Failed to offset image: y0 is ${error}`);
+
+  error = VALIDATE.IsInteger(x1);
+  if (error)
+    return Promise.reject(`Failed to offset image: x1 is ${error}`);
+
+  error = VALIDATE.IsInteger(y1);
+  if (error)
+    return Promise.reject(`Failed to offset image: y1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to offset image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [
+      src,
+      '-virtual-pixel', 'transparent',
+      '-distort', 'Affine', `${x0},${y0} ${x1},${y1}`,  // If this fails, split into two strings
+      outputPath
+    ];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to offset image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to offset image: ${error}`);
+  });
 }
 
 //-----------------------------
-// ROTATE AROUND CENTER
+// ROTATE
 
-function rotateAroundCenter(src, degrees, outputPath) {
-  let args = ['-distort', 'SRT', degrees, src, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+/**
+ * Rotate an image around the center.
+ * @param {string} src Source
+ * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
+function RotateAroundCenter(src, degrees, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to rotate image around center: source is ${error}`);
+
+  error = VALIDATE.IsInteger(degrees);
+  if (error)
+    return Promise.reject(`Failed to rotate image around center: degrees is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to rotate image around center: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-distort', 'SRT', degrees, src, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to rotate image around center: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to rotate image around center: ${error}`);
+  });
 }
 
-//-----------------------------
-// ROTATE AROUND POINT
+/**
+ * Rotate an image around a point.
+ * @param {string} src Source
+ * @param {numbers} x X-coordinate of the point.
+ * @param {numbers} y Y-ccordinate of the point.
+ * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
+function RotateAroundPoint(src, x, y, degrees, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to rotate image around point: source is ${error}`);
 
-function rotateAroundPoint(src, x, y, degrees, outputPath) {
-  let args = ['-distort', 'SRT', `${x},${y} ${degrees}`, src, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  error = VALIDATE.IsInteger(x);
+  if (error)
+    return Promise.reject(`Failed to rotate image around point: x is ${error}`);
+
+  error = VALIDATE.IsInteger(y);
+  if (error)
+    return Promise.reject(`Failed to rotate image around point: y is ${error}`);
+
+  error = VALIDATE.IsInteger(degrees);
+  if (error)
+    return Promise.reject(`Failed to rotate image around point: degrees is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to rotate image around point: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-distort', 'SRT', `${x},${y} ${degrees}`, src, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to rotate image around point: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to rotate image around point: ${error}`);
+  });
 }
 
 //--------------------------------------
-// RESIZE
+// RESIZE 
 
-// Ignore aspect ratio and distort image to the size specified.  \!
+/**
+ * Resize image while ignoring aspect ratio and distort image to the size specified.
+ * @param {string} src Source
+ * @param {number} width Width (in pixels)
+ * @param {number} height Height (in pixels)i
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizeIgnoreAspectRatio(src, width, height, outputPath) {
-  let args = [src, '-resize', `${width}x${height}!`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsNumber(width);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(width, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumber(height);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(height, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${width}x${height}!`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
-// Apply to images greater than the size given.  \>
+/**
+ * Resize image and only shrink images that are smaller than the given size.
+ * @param {string} src Source
+ * @param {number} width Width (in pixels)
+ * @param {number} height Height (in pixels)i
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizeOnlyShrinkLarger(src, width, height, outputPath) {
-  let args = [src, '-resize', `${width}x${height}>`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsNumber(width);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(width, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumber(height);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(height, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${width}x${height}>`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
-// Only enlarges images that are smaller than the given size.  \<
+/**
+ * Resize image and only enlarge images that are smaller than the given size.
+ * @param {string} src Source
+ * @param {number} width Width (in pixels)
+ * @param {number} height Height (in pixels)i
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizeOnlyEnlargeSmaller(src, width, height, outputPath) {
-  let args = [src, '-resize', `${width}x${height}<`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsNumber(width);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(width, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumber(height);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(height, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${width}x${height}<`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
-// Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.  ^
+/**
+ * Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.
+ * @param {string} src Source
+ * @param {number} width Width (in pixels)
+ * @param {number} height Height (in pixels)i
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizeFillGivenArea(src, width, height, outputPath) {
-  let args = [src, '-resize', `${width}x${height}^`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsNumber(width);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(width, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: width is ${error}`);
+
+  error = VALIDATE.IsNumber(height);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(height, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: height is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${width}x${height}^`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
-// Scale image by amount specified.  %
+/**
+ * Resize image by the specified percentage.
+ * @param {string} src Source
+ * @param {number} percent Percent for increasing/decreasing the size. Minimum value is 0.
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizePercentage(src, percent, outputPath) {
-  let args = [src, '-resize', `${percent}%`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsNumber(percent);
+  if (error)
+    return Promise.reject(`Failed to resize image: percent is ${error}`);
+
+  error = VALIDATE.IsNumberInRange(percent, 0, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: percent is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${percent}%`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
-// Resize image to contain no more than a certain number of pixels.  @
+/**
+ * Resize image to contain no more than a certain number of pixels.
+ * @param {string} src Source
+ * @param {number} pixels the number of pixels (greater than 0) that the image should have.
+ * @param {string} outputPath the path that the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
+ */
 function ResizePixelCountLimit(src, pixels, outputPath) {
-  let args = [src, '-resize', `${pixels}@`, outputPath];
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to resize image: source is ${error}`);
+
+  error = VALIDATE.IsInteger(pixels);
+  if (error)
+    return Promise.reject(`Failed to resize image: pixels is ${error}`);
+
+  error = VALIDATE.IsIntegerInRange(pixels, 1, null);
+  if (error)
+    return Promise.reject(`Failed to resize image: pixels is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to resize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-resize', `${pixels}@`, outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to resize image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to resize image: ${error}`);
+  });
 }
 
 //--------------------------------
 // CROP
 
-function Crop(src, width, height, xOffset, yOffset, keepVirtualCanvas, outputPath) {
-  let args = [src, '-crop'];
+/**
+ * Crop an image starting from (x,y) with specified width and height.
+ * @param {string} src Source
+ * @param {number} width Width (in pixels)
+ * @param {number} height Height (in pixels)
+ * @param {number} x X-coordinate of the top-left corner of the crop area.
+ * @param {number} y Y-coordinate of the top-left corner of the crop area.
+ * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space).
+ */
+function Crop(src, width, height, x, y, removeVirtualCanvas, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to crop image: source is ${error}`);
 
-  let cropStr = `${width}x${height}`;
+  error = VALIDATE.IsInteger(width);
+  if (error)
+    return Promise.reject(`Failed to crop image: width is ${error}`);
 
-  if (xOffset >= 0)
-    cropStr += `+${xOffset}`;
-  else
-    cropStr += `-${Math.abs(xOffset)}`;
+  error = VALIDATE.IsIntegerInRange(width, 0, null);
+  if (error)
+    return Promise.reject(`Failed to crop image: width is ${error}`);
 
-  if (yOffset >= 0)
-    cropStr += `+${yOffset}`;
-  else
-    cropStr += `-${Math.abs(yOffset)}`;
-  args.push(cropStr)
+  error = VALIDATE.IsInteger(height);
+  if (error)
+    return Promise.reject(`Failed to crop image: height is ${error}`);
 
-  if (!keepVirtualCanvas)
-    args.push('+repage');
-  args.push(outputPath);
+  error = VALIDATE.IsIntegerInRange(height, 0, null);
+  if (error)
+    return Promise.reject(`Failed to crop image: height is ${error}`);
 
-  LOCAL_COMMAND.Execute('convert', args).then().catch();
+  error = VALIDATE.IsInteger(x);
+  if (error)
+    return Promise.reject(`Failed to crop image: x is ${error}`);
+
+  error = VALIDATE.IsInteger(y);
+  if (error)
+    return Promise.reject(`Failed to crop image: y is ${error}`);
+
+  let isBoolean = removeVirtualCanvas === false || removeVirtualCanvas === true;
+  if (!isBoolean)
+    return Promise.reject(`Failed to crop image: removeVirtualCanvas is not a boolean value`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to crop image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-crop'];
+
+    let cropStr = `${width}x${height}`;
+
+    if (xOffset >= 0)
+      cropStr += `+${xOffset}`;
+    else
+      cropStr += `-${Math.abs(xOffset)}`;
+
+    if (yOffset >= 0)
+      cropStr += `+${yOffset}`;
+    else
+      cropStr += `-${Math.abs(yOffset)}`;
+    args.push(cropStr)
+
+    if (removeVirtualCanvas)
+      args.push('+repage');
+    args.push(outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to crop image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to crop image: ${error}`);
+  });
 }
 
 //-----------------------------------
 // EXPORTS
 
+exports.Crop = Crop;
+exports.MirrorHorizontal = MirrorHorizontal;
+exports.MirrorVertical = MirrorVertical;
+exports.Offset = Offset;
+exports.ResizeFillGivenArea = ResizeFillGivenArea;
+exports.ResizeIgnoreAspectRatio = ResizeIgnoreAspectRatio;
+exports.ResizeOnlyEnlargeSmaller = ResizeOnlyEnlargeSmaller;
+exports.ResizeOnlyShrinkLarger = ResizeOnlyShrinkLarger;
+exports.ResizePercentage = ResizePercentage;
+exports.ResizePixelCountLimit = ResizePixelCountLimit;
 exports.RollHorizontal = RollHorizontal;
 exports.RollVertical = RollVertical;
 exports.RollBiDirectional = RollBiDirectional;
+exports.RotateAroundCenter = RotateAroundCenter;
+exports.RotateAroundPoint = RotateAroundPoint;
+exports.Transpose = Transpose;
+exports.Transverse = Transverse;
+
