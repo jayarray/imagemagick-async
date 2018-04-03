@@ -1,6 +1,11 @@
 exports.Canvas = require('./canvas.js');
 exports.Color = require('./color.js');
+exports.Compose = require('./compose.js');
 exports.Coordinates = require('./coordinates.js');
-exports.Gradients = require('./gradients.js');
+exports.Cut = require('./cut.js');
+exports.Filter = require('./filter.js');
+exports.Fx = require('./fx.js');
+exports.Gradient = require('./gradient.js');
 exports.Identify = require('./identify.js');
 exports.Primitives = require('./primitives.js');
+exports.Transform = require('./transform.js');
