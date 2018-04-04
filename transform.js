@@ -657,7 +657,8 @@ function ResizePixelCountLimit(src, pixels, outputPath) {
  * @param {number} height Height (in pixels)
  * @param {number} x X-coordinate of the top-left corner of the crop area.
  * @param {number} y Y-coordinate of the top-left corner of the crop area.
- * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space).
+ * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
  */
 function Crop(src, width, height, x, y, removeVirtualCanvas, outputPath) {
   let error = VALIDATE.IsStringInput(src);
@@ -701,15 +702,15 @@ function Crop(src, width, height, x, y, removeVirtualCanvas, outputPath) {
 
     let cropStr = `${width}x${height}`;
 
-    if (xOffset >= 0)
-      cropStr += `+${xOffset}`;
+    if (x >= 0)
+      cropStr += `+${x}`;
     else
-      cropStr += `-${Math.abs(xOffset)}`;
+      cropStr += `-${Math.abs(x)}`;
 
-    if (yOffset >= 0)
-      cropStr += `+${yOffset}`;
+    if (y >= 0)
+      cropStr += `+${y}`;
     else
-      cropStr += `-${Math.abs(yOffset)}`;
+      cropStr += `-${Math.abs(y)}`;
     args.push(cropStr)
 
     if (removeVirtualCanvas)
