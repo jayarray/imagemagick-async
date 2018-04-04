@@ -138,7 +138,292 @@ function Gif(canvas, filepaths, loop, delay, dispose, outputPath) {
   });
 }
 
+//--------------------------------------
+// MULTIPLY
+
+/**
+ * Overlay colors of image with white background onto the other. Overlaying colors attenuate to black. That is, this operation only darkens colors (never lightens them). NOTE: Black will result in black.
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function MultiplyMakeWhiteTransparent(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to multiply images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to multiply images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to multiply images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-compose', 'Multiply', src1, src2, '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to multiply images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to multiply images: ${error}`);
+  });
+}
+
+/**
+ * Overlay colors of image with black background onto the other. Overlaying colors attenuate to white. That is, this operation only lightens colors (never darkens them). NOTE: White will result in white.
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function MultiplyMakeBlackTransparent(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to multiply images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to multiply images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to multiply images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-compose', 'Screen', src1, src2, '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to multiply images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to multiply images: ${error}`);
+  });
+}
+
+//--------------------------------------
+// ADD
+
+/**
+ * Blend the images equally. All overlapping pixel colors are added together. 
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Add(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to add images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to add images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to add images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-compose', 'plus', src1, src2, '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to add images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to add images: ${error}`);
+  });
+}
+
+//--------------------------------------
+// SUBTRACT
+
+/**
+ * Subtract one image from the other: src1 - src2. Overlapping pixel colors are subtracted.
+ * @param {string} src1 Source 1 (minuend)
+ * @param {string} src2 Source 2 (subtrahend)
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Subtract(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to subtract images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to subtract images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to subtract images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = ['-compose', 'minus', src1, src2, '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to subtract images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to subtract images: ${error}`);
+  });
+}
+
+//--------------------------------------
+// SET THEORY
+
+/**
+ * Get the union of pixels. If images are colored, intersecting pixel colors are added. (Best used with black and white images/masks)
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Union(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to get the union of images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to get the union of images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to get the union of images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2, '-compose', 'Lighten', '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get the union of images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to get the union of images: ${error}`);
+  });
+}
+
+/**
+ * Get the intersection of pixels. If images are colored, the intersecting pixels are blacked out. (Best used with black and white images/masks)
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Intersection(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to get the intersection of images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to get the intersection of images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to get the intersection of images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2, '-compose', 'Darken', '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get the intersection of images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to get the intersection of images: ${error}`);
+  });
+}
+
+/**
+ * Get the difference (XOR) of pixels. If images are colored, it produces same result as the Union operator. (Best used with black and white images/masks)
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Difference(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to get the difference of images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to get the difference of images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to get the difference of images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2, '-compose', 'Difference', '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get the difference of images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to get the difference of images: ${error}`);
+  });
+}
+
+/**
+ * Get the exclusion (relative complement) of pixels. Results in A-B => Everything in A that is NOT in B. If the images are colored, the result is src2 overlapping src1. (Best used with black and white images/masks)
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function Exclusion(src1, src2, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to get the exclusion of images: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to get the exclusion of images: source 2 is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to get the exclusion of images: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2, '-compose', 'Minus_Src', '-composite', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get the exclusion of images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to get the exclusion of images: ${error}`);
+  });
+}
+
 //---------------------------------------
 // EXPORTS
 
-exports.Draw = Draw;
+exports.Composite = Composite;
+exports.Gif = Gif;
+exports.MultiplyMakeBlackTransparent = MultiplyMakeBlackTransparent;
+exports.MultiplyMakeWhiteTransparent = MultiplyMakeWhiteTransparent;
+exports.Add = Add;
+exports.Subtract = Subtract;
+exports.Union = Union;
+exports.Intersection = Intersection;
+exports.Difference = Difference;
+exports.Exclusion = Exclusion;
