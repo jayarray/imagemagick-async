@@ -467,8 +467,6 @@ class Text extends Primitive {
   }
 }
 
-
-
 //--------------------------------
 // EXPORTS
 
