@@ -414,16 +414,117 @@ function Exclusion(src1, src2, outputPath) {
   });
 }
 
+//--------------------------------------
+// MASKS
+
+/**
+ * Make specific pixels fully transparent. That is, the pixels in src2 that match those in src1 will become transparent.
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {number} fuzz (Optional) Value between 1 and 100 that helps group similar colors together. (Small values help with slight color variations)
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function ChangeMask(src1, src2, fuzz, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to change mask: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to change mask: source 2 is ${error}`);
+
+  if (fuzz) {
+    error = VALIDATE.IsNumber(fuzz);
+    if (error)
+      return Promise.reject(`Failed to change mask: fuzz is ${error}`);
+
+    error = VALIDATE.IsNumberInRange(fuzz, 1, 100);
+    if (error)
+      return Promise.reject(`Failed to change mask: fuzz is ${error}`);
+  }
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to change mask: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2];
+
+    if (fuzz)
+      args.push('-fuzz', `${fuzz}%`);
+    args.push('-compose', 'ChangeMask', '-composite', outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to change mask: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to change mask: ${error}`);
+  });
+}
+
+/**
+ * Get an image showing the similarities between two images.
+ * @param {string} src1 Source 1
+ * @param {string} src2 Source 2
+ * @param {number} fuzz (Optional) Value between 1 and 100 that helps group similar colors together. (Small values help with slight color variations)
+ * @param {string} outputPath The path where the resulting image will be rendered to.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function UnchangedPixels(src1, src2, fuzz, outputPath) {
+  let error = VALIDATE.IsStringInput(src1);
+  if (error)
+    return Promise.reject(`Failed to get unchanged pixels: source 1 is ${error}`);
+
+  error = VALIDATE.IsStringInput(src2);
+  if (error)
+    return Promise.reject(`Failed to get unchanged pixels: source 2 is ${error}`);
+
+  if (fuzz) {
+    error = VALIDATE.IsNumber(fuzz);
+    if (error)
+      return Promise.reject(`Failed to get unchanged pixels: fuzz is ${error}`);
+
+    error = VALIDATE.IsNumberInRange(fuzz, 1, 100);
+    if (error)
+      return Promise.reject(`Failed to get unchanged pixels: fuzz is ${error}`);
+  }
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to get unchanged pixels: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src1, src2];
+
+    if (fuzz)
+      args.push('-fuzz', `${fuzz}%`);
+    args.push('-compose', 'ChangeMask', '-composite', '-channel', 'A', '-negate', outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to get unchanged pixels: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to get unchanged pixels: ${error}`);
+  });
+}
+
 //---------------------------------------
 // EXPORTS
 
-exports.Composite = Composite;
-exports.Gif = Gif;
-exports.MultiplyMakeBlackTransparent = MultiplyMakeBlackTransparent;
-exports.MultiplyMakeWhiteTransparent = MultiplyMakeWhiteTransparent;
 exports.Add = Add;
-exports.Subtract = Subtract;
-exports.Union = Union;
-exports.Intersection = Intersection;
+exports.ChangeMask = ChangeMask;
+exports.Composite = Composite;
 exports.Difference = Difference;
 exports.Exclusion = Exclusion;
+exports.Gif = Gif;
+exports.Intersection = Intersection;
+exports.MultiplyMakeBlackTransparent = MultiplyMakeBlackTransparent;
+exports.MultiplyMakeWhiteTransparent = MultiplyMakeWhiteTransparent;
+exports.Subtract = Subtract;
+exports.Union = Union;
+exports.UnchangedPixels = UnchangedPixels;
