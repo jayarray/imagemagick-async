@@ -674,9 +674,84 @@ function MakeTransparent(src, percent, outputPath) { // percent refers to opacit
   });
 }
 
+//----------------------------
+// CHANNELS
+
+/**
+ * @returns {Promise<Array<string>>} Returns a Promise. If it resolves, it returns a list of channel names. Otherwise, it returns an error.
+ */
+function Channels() {
+  let args = ['-list', 'channel']; // convert:  prints newline delimited list of channels
+
+  LOCAL_COMMAND.Execute('convert', args).then(output => {
+    if (output.stderr) {
+      reject(`Failed to make transparent: ${output.stderr}`);
+      return;
+    }
+
+    let names = output.stdout.split('\n').filter(line => line && line != '' && line.trim() != '').map(line => line.trim());
+    resolve(names);
+  }).catch(error => `Failed to make transparent: ${error}`);
+}
+
+//-------------------------------
+// ADJUST CHANNEL
+
+/**
+ * Adjust RGBA channels.
+ * @param {string} channel A valid Image Magick channel.
+ * @param {string|number} value Can be an rgba value 0-255 or a percent string (e.g. 10%, 15%, etc).
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function AdjustChannel(src, channel, value, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to adjust channel: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(channel);
+  if (error)
+    return Promise.reject(`Failed to adjust channel: channel is ${error}`);
+
+  if (typeof value == 'string') {
+    error = VALIDATE.IsStringInput(value);
+    if (error)
+      return Promise.reject(`Failed to adjust channel: value is ${error}`);
+  }
+  else if (typeof value == 'number') {
+    error = VALIDATE.IsInteger(value);
+    if (error)
+      return Promise.reject(`Failed to adjust channel: value is ${error}`);
+
+    error = VALIDATE.IsIntegerInRange(value);
+    if (error)
+      return Promise.reject(`Failed to adjust channel: value is ${error}`);
+  }
+  else
+    return Promise.reject(`Failed to adjust channel: value must be an integer or a string`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to adjust channel: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-alpha', 'set', '-channel', channel, '-evaluate', 'set', value, outputPath];
+
+    console.log(`CMD: convert ${args.join(' ')}`);
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to adjust channel: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to adjust channel: ${error}`);
+  });
+}
+
 //------------------------------
 // EXPORTS
 
+exports.AdjustChannel = AdjustChannel;
+exports.Channels = Channels;
 exports.CreateUsingRGBIntegers = Color.CreateUsingRGBIntgers;
 exports.CreateUsingPercents = Color.CreateUsingPercents;
 exports.CreateUsingRGBHexString = Color.CreateUsingRGBHexString;
