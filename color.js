@@ -582,7 +582,7 @@ function ToRGB(src, outputPath) {
  * @param {string} outputPath The path where the image will be rendered to.
  * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
  */
-function Replace(src, targetColor, desiredColor, fuzz, dest) {
+function Replace(src, targetColor, desiredColor, fuzz, outputPath) {
   let error = VALIDATE.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to replace color: source is ${error}`);
