@@ -38,10 +38,10 @@ class Primitive {
 
 class Bezier extends Primitive {
   /**
-   * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through.
-   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.)
-   * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick)
+   * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through. (Required)
+   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
+   * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick) (Optional)
    */
   constructor(points, strokeColor, strokeWidth, fillColor) {
     super();
@@ -67,29 +67,35 @@ class Bezier extends Primitive {
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the bezier curve.
   */
   Args() {
-    return [
-      '-fill', this.fillColor_,
-      '-stroke', this.strokeColor_,
-      '-strokewidth', this.strokeWidth_,
-      '-draw', `bezier ${this.PointsToString()}`
-    ];
+    let args = [];
+
+    if (this.fillColor_)
+      args.push('-fill', this.fillColor_);
+
+    if (this.strokeColor_)
+      args.push('-stroke', this.strokeColor_);
+
+    if (this.strokeWidth_)
+      args.push('-strokewidth', this.strokeWidth_);
+
+    args.push('-draw', `bezier ${this.PointsToString()}`);
+    return args;
   }
 
   /**
    * Create a Bezier object with the specified properties.
-   * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through.
-   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.)
-   * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick)
+   * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through. (Required)
+   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
+   * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick) (Optional)
    * @returns {Bezier} Returns a Bezier object. If inputs are invalid, it returns null.
    */
   static Create(points, strokeColor, strokeWidth, fillColor) {
     if (
       VALIDATE.IsArray(points) ||
-      VALIDATE.IsStringInput(strokeColor) ||
-      VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsStringInput(fillColor)
+      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
+      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
+      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor))
     )
       return null;
 
@@ -102,11 +108,11 @@ class Bezier extends Primitive {
 
 class Circle extends Primitive {
   /**
-   * @param {Coordinates} center Coordinates for center of circle.
-   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.)
-   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.)
-   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick)
+   * @param {Coordinates} center Coordinates for center of circle. (Required)
+   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.) (RequireD)
+   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.) (Optional)
+   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick) (Optional)
    */
   constructor(center, edge, strokeColor, strokeWidth, fillColor) {
     super();
@@ -122,33 +128,39 @@ class Circle extends Primitive {
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the circle.
   */
   Args() {
+    args = [];
+
+    if (this.fillColor_)
+      args.push('-fill', this.fillColor_);
+
+    if (this.strokeColor_)
+      args.push('-stroke', this.strokeColor_);
+
+    if (this.strokeWidth_)
+      args.push('-strokewidth', this.strokeWidth_);
+
     let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
     let edge = COORDINATES.Create(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
+    args.push('-draw', `circle ${center.String()} ${edge.String()}`);
 
-    return [
-      '-fill', this.fillColor_,
-      '-stroke', this.strokeColor_,
-      '-strokewidth', this.strokeWidth_,
-      '-draw', `circle ${center.String()} ${edge.String()}`
-    ];
+    return args;
   }
 
   /**
    * Create a Circle object using the specified properties.
-   * @param {Coordinates} center Coordinates for center of circle.
-   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.)
-   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.)
-   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick)
+   * @param {Coordinates} center Coordinates for center of circle. (Required)
+   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.) (Required)
+   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.) (Optional)
+   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick) (Optional)
    * @returns {Circle} Returns a Circle object. If inputs are invalid, it returns null.
    */
   static Create(center, edge, strokeColor, strokeWidth, fillColor) {
     if (
       center.constructor.name != 'Coordinates' ||
       edge.constructor.name != 'Coordinates' ||
-      VALIDATE.IsStringInput(strokeColor) ||
-      VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
+      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
+      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
       VALIDATE.IsStringInput(fillColor)
     )
       return null;
@@ -162,14 +174,14 @@ class Circle extends Primitive {
 
 class Ellipse extends Primitive {
   /**
-   * @param {Coordinates} center Coordinates for the center of the ellipse.
-   * @param {number} width Width of of ellipse (in pixels).
-   * @param {number} height Height of ellipse (in pixels.).
-   * @param {string} strokeColor The outline color of the ellipse. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth Width of the outline of the ellipse. (Larger value produces a thicker line).
-   * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick)
-   * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen)
-   * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen)
+   * @param {Coordinates} center Coordinates for the center of the ellipse. (Required)
+   * @param {number} width Width of of ellipse (in pixels). (Required)
+   * @param {number} height Height of ellipse (in pixels.). (Required)
+   * @param {string} strokeColor The outline color of the ellipse. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth Width of the outline of the ellipse. (Larger value produces a thicker line). (Optional)
+   * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen) (Optional)
+   * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen) (Optional)
    */
   constructor(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
     super();
@@ -188,26 +200,41 @@ class Ellipse extends Primitive {
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the ellipse.
   */
   Args() {
+    let args = [];
+
+    if (this.fillColor_)
+      args.push('-fill', this.fillColor_);
+
+    if (this.strokeColor_)
+      args.push('-stroke', this.strokeColor_);
+
+    if (this.strokeWidth_)
+      args.push('-strokewidth', this.strokeWidth_);
+
     let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
 
-    return [
-      '-fill', this.fillColor_,
-      '-stroke', this.strokeColor_,
-      '-strokewidth', this.strokeWidth_,
-      '-draw', `ellipse ${center.String()} ${Math.floor(this.width_ / 2)},${Math.floor(this.height_ / 2)} ${this.angleStart_},${this.angleEnd_}`
-    ];
+    let angleStart = 0;
+    let angleEnd = 360;
+
+    if (this.angleStart_ && this.angleEnd_) {
+      angleStart = this.angleStart_;
+      angleEnd = this.angleEnd_;
+    }
+
+    args.push('-draw', `ellipse ${center.String()} ${Math.floor(this.width_ / 2)},${Math.floor(this.height_ / 2)} ${angleStart},${angleEnd}`);
+    return args;
   }
 
   /**
    * Create an Eliipse object with the specified properties.
-   * @param {Coordinates} center Coordinates for the center of the ellipse.
-   * @param {number} width Width of of ellipse (in pixels).
-   * @param {number} height Height of ellipse (in pixels.).
-   * @param {string} strokeColor The outline color of the ellipse. (Valid color format string used in Image Magick)
-   * @param {number} strokeWidth Width of the outline of the ellipse. (Larger value produces a thicker line).
-   * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick)
-   * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen)
-   * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen)
+   * @param {Coordinates} center Coordinates for the center of the ellipse. (Required)
+   * @param {number} width Width of of ellipse (in pixels). (Required)
+   * @param {number} height Height of ellipse (in pixels.). (Required)
+   * @param {string} strokeColor The outline color of the ellipse. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} strokeWidth Width of the outline of the ellipse. (Larger value produces a thicker line). (Optional)
+   * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick) (Optional)
+   * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen) (Optional)
+   * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen) (Optional)
    * @returns {Ellipse} Returns an Ellipse object. If inputs are invalid, it returns null.
    */
   static Create(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
@@ -217,12 +244,11 @@ class Ellipse extends Primitive {
       VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null) ||
       VALIDATE.IsInteger(height) ||
       VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsStringInput(strokeColor) ||
-      VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsStringInput(fillColor) ||
-      VALIDATE.IsInteger(angleStart) ||
-      VALIDATE.IsInteger(angleEnd)
+      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
+      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
+      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
+      (!VALIDATE.IsInstance(angleStart) && VALIDATE.IsInteger(angleStart)) ||
+      (!VALIDATE.IsInstance(angleEnd) && VALIDATE.IsInteger(angleEnd))
     )
       return null;
 
@@ -232,7 +258,7 @@ class Ellipse extends Primitive {
 
 
 //--------------------------------
-// LINE
+// LINE  // (CONT HERE)
 
 class Line extends Primitive {
   /**
