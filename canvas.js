@@ -198,7 +198,7 @@ class GradientCanvas extends Canvas {
    * Create a GradientCanvas object with the specified gradient.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {string} gradient A LinearGradient or RadialGradient object.
+   * @param {LinearGradient|RadialGradient} gradient A LinearGradient or RadialGradient object.
    * @returns {GradientCanvas} Returns a GradientCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, gradient) {
