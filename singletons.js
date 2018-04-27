@@ -6,16 +6,16 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 class Label {
   /**
-   * @param {number} width (Optional) Width (in pixels)
-   * @param {number} height (Optional) Height (in pixels)
+   * @param {number} width Width in pixels. (Optional) 
+   * @param {number} height Height in pixels. (Optional) 
    * @param {string} text Text string
-   * @param {string} font (Optional) Font name
-   * @param {number} strokeWidth (Optional) Thickness of the text outline.
-   * @param {string} strokeColor (Optional) The color of the text outline.
-   * @param {string} fillColor (Optional) The color inside of the text outline.
-   * @param {string} underColor (Optional) The color under the text. (Different than background color).
-   * @param {string} backgroundColor (Optional) The background color for the entire label.
-   * @param {string} gravity (Optional) Gravity of the text.
+   * @param {string} font Font name (Optional) 
+   * @param {number} strokeWidth Thickness of the text outline. (Optional) 
+   * @param {string} strokeColor The color of the text outline. (Optional) 
+   * @param {string} fillColor The color inside of the text outline. (Optional) 
+   * @param {string} underColor The color under the text. (Different than background color). (Optional) 
+   * @param {string} backgroundColor The background color for the entire label. (Optional) 
+   * @param {string} gravity Gravity of the text. (Optional) 
    */
   constructor(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
     this.width_ = width;
@@ -84,30 +84,30 @@ class Label {
 
   /**
    * Create a Label object with the specified properties.
-   * @param {number} width (Optional) Width (in pixels)
-   * @param {number} height (Optional) Height (in pixels)
+   * @param {number} width Width in pixels. (Optional) 
+   * @param {number} height Height in pixels. (Optional) 
    * @param {string} text Text string
-   * @param {string} font (Optional) Font name
-   * @param {number} strokeWidth (Optional) Thickness of the text outline.
-   * @param {string} strokeColor (Optional) The color of the text outline.
-   * @param {string} fillColor (Optional) The color inside of the text outline.
-   * @param {string} underColor (Optional) The color under the text. (Different than background color).
-   * @param {string} backgroundColor (Optional) The background color for the entire label.
-   * @param {string} gravity (Optional) Gravity of the text.
+   * @param {string} font Font name (Optional) 
+   * @param {number} strokeWidth Thickness of the text outline. (Optional) 
+   * @param {string} strokeColor The color of the text outline. (Optional) 
+   * @param {string} fillColor The color inside of the text outline. (Optional) 
+   * @param {string} underColor The color under the text. (Different than background color). (Optional) 
+   * @param {string} backgroundColor The background color for the entire label. (Optional) 
+   * @param {string} gravity Gravity of the text. (Optional) 
    * @returns {Label} Returns a Label object. If inputs are invalid, it returns null.
    */
   static Create(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
     if (
-      VALIDATE.IsInteger(width) ||
-      VALIDATE.IsInteger(height) ||
+      (!VALIDATE.IsInstance(width) && (VALIDATE.IsInteger(width) || VALID.IsIntegerInRange(width, 1, null))) ||
+      (!VALIDATE.IsInstance(height) && (VALIDATE.IsInteger(height) || VALID.IsIntegerInRange(height, 1, null))) ||
       VALIDATE.IsStringInput(text) ||
-      VALIDATE.IsStringInput(font) ||
-      VALIDATE.IsInteger(strokeWidth) ||
-      VALIDATE.IsStringInput(strokeColor) ||
-      VALIDATE.IsStringInput(fillColor) ||
-      VALIDATE.IsStringInput(underColor) ||
-      VALIDATE.IsStringInput(backgroundColor) ||
-      VALIDATE.IsStringInput(gravity)
+      (!VALID.IsInstance(font) && VALIDATE.IsStringInput(font)) ||
+      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALID.IsIntegerInRange(strokeWidth, 1, null))) ||
+      (!VALID.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
+      (!VALID.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
+      (!VALID.IsInstance(underColor) && VALIDATE.IsStringInput(underColor)) ||
+      (!VALID.IsInstance(backgroundColor) && VALIDATE.IsStringInput(backgroundColor)) ||
+      (!VALID.IsInstance(gravity) && VALIDATE.IsStringInput(gravity))
     )
       return null;
 
