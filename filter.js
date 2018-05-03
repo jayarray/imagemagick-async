@@ -228,8 +228,9 @@ function PencilSketch(src, radius, sigma, angle, outputPath) {
       outputPath
     ];
 
+    /*
     if (hasTransparency)
-      args.push('-channel', 'RGBA');
+      args.push('-channel', 'RGBA'); */
     args.push('-blur', `${radius}x${sigma}`, outputPath);
 
     LOCAL_COMMAND.Execute('convert', args).then(output => {
