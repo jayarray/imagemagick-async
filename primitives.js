@@ -9,7 +9,7 @@ class Primitive {
   constructor() {
   }
 
-  /** 
+  /**
    * @param {number} xOffset
    * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
@@ -59,7 +59,7 @@ class Bezier extends Primitive {
     if (this.fillColor_)
       args.push('-fill', this.fillColor_); // Applies fill color to areas where the curve is above or below the line computed between the start and end point.
     else
-      args.push('-fill', 'none'); // Outputs lines only (default)
+      args.push('-fill', 'none'); // Outputs lines only
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
@@ -80,7 +80,7 @@ class Bezier extends Primitive {
    * @returns {Bezier} Returns a Bezier object. If inputs are invalid, it returns null.
    */
   static Create(points, strokeColor, strokeWidth, fillColor) {
-    if (!VALIDATE.IsInstance(strokeWidth) && VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))
+    if (strokeWidth && VALIDATE.IsIntegerInRange(strokeWidth, CONSTANTS.MIN_WIDTH, null))
       return null;
 
     return new Bezier(points, strokeColor, strokeWidth, fillColor);
@@ -109,13 +109,17 @@ class Circle extends Primitive {
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the circle.
   */
-  Args() {
+  Args(xOffset, yOffset) {
     args = [];
 
     if (this.fillColor_)
       args.push('-fill', this.fillColor_);
+    else
+      args.push('-fill', 'none'); // Prevents default black fill color
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
@@ -123,8 +127,8 @@ class Circle extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
-    let edge = COORDINATES.Create(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
+    let center = COORDINATES.Create(this.center_.x_ + xOffset_, this.center_.y_ + yOffset_);
+    let edge = COORDINATES.Create(this.edge_.x_ + xOffset_, this.edge_.y_ + yOffset_);
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);
 
     return args;
@@ -140,13 +144,7 @@ class Circle extends Primitive {
    * @returns {Circle} Returns a Circle object. If inputs are invalid, it returns null.
    */
   static Create(center, edge, strokeColor, strokeWidth, fillColor) {
-    if (
-      center.constructor.name != 'Coordinates' ||
-      edge.constructor.name != 'Coordinates' ||
-      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
-      VALIDATE.IsStringInput(fillColor)
-    )
+    if (strokeWidth && VALIDATE.IsIntegerInRange(strokeWidth, CONSTANTS.MIN_WIDTH, null))
       return null;
 
     return new Circle(center, edge, strokeColor, strokeWidth, fillColor);
