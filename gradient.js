@@ -1,10 +1,6 @@
 let VALIDATE = require('./validate.js');
+let CONSTANTS = require('./constants.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
-//---------------------------------
-// CONSTANTS
-
-const DIMENSIONS_MIN = 1;
 
 //-------------------------------
 // VECTOR
@@ -69,9 +65,9 @@ class BoundingBox {
     if (
       center.constructor.name != 'Coordinates' ||
       VALIDATE.IsNumber(width) ||
-      VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsIntegerInRange(width, CONSTANTS.MIN_WIDTH, null) ||
       VALIDATE.IsNumber(height) ||
-      VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null)
+      VALIDATE.IsIntegerInRange(height, CONSTANTS.MIN_HEIGHT, null)
     )
       return null;
 
@@ -124,40 +120,32 @@ class LinearGradient extends Gradient {
    */
   Args() {
     let args = [];
-    let optionCount = 0;
 
     if (this.vector_) {
-      args.push(`gradient:vector=${this.vector_.start_.String()},${this.vector_.end_.String()}`);
+      args.push('-define', `gradient:vector=${this.vector_.start_.String()},${this.vector_.end_.String()}`);
       optionCount++;
     }
 
     if (this.angle_) {
-      args.push(`gradient:angle=${this.angle_}`);
+      args.push('-define', `gradient:angle=${this.angle_}`);
       optionCount++;
     }
 
     if (this.boundingBox_) {
-      args.push(`gradient:bounding-box=${this.boundingBox_.String()}`);
+      args.push('-define', `gradient:bounding-box=${this.boundingBox_.String()}`);
       optionCount++;
     }
 
     if (this.direction_) {
-      args.push(`gradient:direction=${this.direction_}`);
+      args.push('-define', `gradient:direction=${this.direction_}`);
       optionCount++;
     }
 
     if (this.extent_) {
-      args.push(`gradient:extent=${this.extent_}`);
+      args.push('-define', `gradient:extent=${this.extent_}`);
       optionCount++;
     }
 
-    if (this.extent_) {
-      args.push(`gradient:extent=${this.extent_}`);
-      optionCount++;
-    }
-
-    if (optionCount > 0)
-      args = ['-define'].concat(args);
     args.push(`gradient:${this.startColor_}-${this.endColor_}`);
 
     return args;
@@ -222,42 +210,39 @@ class RadialGradient extends Gradient {
    */
   Args() {
     let args = [];
-    let optionCount = 0;
 
     if (this.center_) {
-      args.push(`gradient:center=${this.center_.String()}`);
+      args.push('-define', `gradient:center=${this.center_.String()}`);
       optionCount++;
     }
 
     if (this.radialWidth_ || this.radialHeight_) {
       if (this.radialWidth_ && this.radialHeight_)
-        args.push(`gradient:radii=${this.radialWidth_}, ${this.radialHeight_}`);
+        args.push('-define', `gradient:radii=${this.radialWidth_}, ${this.radialHeight_}`);
       else {
         if (this.radialWidth_)
-          args.push(`gradient:radii=${this.radialWidth_}, ${this.radialWidth_}`);
+          args.push('-define', `gradient:radii=${this.radialWidth_}, ${this.radialWidth_}`);
         else
-          args.push(`gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
+          args.push('-define', `gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
       }
       optionCount++;
     }
 
     if (this.angle_) {
-      args.push(`gradient:angle=${this.angle_}`);
+      args.push('-define', `gradient:angle=${this.angle_}`);
       optionCount++;
     }
 
     if (this.boundingBox_) {
-      args.push(`gradient:bounding-box=${this.boundingBox_.String()}`);
+      args.push('-define', `gradient:bounding-box=${this.boundingBox_.String()}`);
       optionCount++;
     }
 
     if (this.extent_) {
-      args.push(`gradient:extent=${this.extent_}`);
+      args.push('-define', `gradient:extent=${this.extent_}`);
       optionCount++;
     }
 
-    if (optionCount > 0)
-      args = ['-define'].concat(args);
     args.push(`radial-gradient:${this.startColor_}-${this.endColor_}`);
 
     return args;
@@ -281,9 +266,9 @@ class RadialGradient extends Gradient {
       VALIDATE.IsStringInput(endColor) ||
       (center != null && center.constructor.name != 'Coordinates') ||
       (radialWidth != null && VALIDATE.IsInteger(radialWidth)) ||
-      VALIDATE.IsIntegerInRange(radialWidth, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsIntegerInRange(radialWidth, CONSTANTS.MIN_WIDTH, null) ||
       (radialHeight != null && VALIDATE.IsInteger(radialHeight)) ||
-      VALIDATE.IsIntegerInRange(radialHeight, DIMENSIONS_MIN, null) ||
+      VALIDATE.IsIntegerInRange(radialHeight, CONSTANTS.MIN_HEIGHT, null) ||
       (angle != null && VALIDATE.IsInteger(angle)) ||
       (boundingBox != null && boundingBox.constructor.name != 'BoundingBox') ||
       (extent != null && VALIDATE.IsStringInput(extent))
