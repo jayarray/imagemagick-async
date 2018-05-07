@@ -333,11 +333,17 @@ class Path extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let pointsStr = `M ${this.PointsToString()}`;
-    if (this.isClosed_)
-      pointsStr += ' Z';
+    let pointStringArr = this.PointsToString(xOffset, yOffset).split(' ');
 
-    args.push('-draw', `path '${pointsStr}'`);
+    let drawString = `path 'M ${pointStringArr[0]} L ${pointStringArr[1]}`;
+    if (pointStrings.length > 2)
+      drawString += ` ${pointStringArr.slice(2).join(' ')}`;
+
+    if (this.isClosed_)
+      drawString += ' Z';
+    drawString += `'`;
+
+    args.push('-draw', drawString);
     return args;
   }
 
@@ -439,7 +445,7 @@ class Text extends Primitive {
     let args = [];
 
     if (this.fillColor_)
-      args.push('-fill', this.fillColor_);
+      args.push('-fill', this.fillColor_); // Default color is black
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
