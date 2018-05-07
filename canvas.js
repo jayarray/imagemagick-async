@@ -1,26 +1,6 @@
 let VALIDATE = require('./validate.js');
+let CONSTANTS = require('./constants.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
-//----------------------------------
-// CONSTANTS
-
-const DIMENSION_MIN = 1;
-
-//-----------------------------------
-// ERROR CHECK
-
-function GetParentClass(o) {
-  return Object.getPrototypeOf(o.constructor).name;
-}
-
-function AllObjectsArePrimitiveType(arr) {
-  for (let i = 0; i < arr.length; ++i) {
-    let parentClass = GetParentClass(arr[i].primitive_);
-    if (parentClass != 'Primitive')
-      return false;
-  }
-  return true;
-}
 
 //-----------------------------------
 // ELEMENT
@@ -33,42 +13,63 @@ class Element {
   }
 
   Args() {
-    this.primitive_.Offset(this.xOffset_, this.yOffset_); // Apply offsets
-    return this.primitive_.Args();
+    return this.primitive_.Args(this.xOffset_, this.yOffset_);
   }
 }
-
 
 //-----------------------------------
 // CANVAS
 
 class Canvas {
-  constructor(width, height) {
+  constructor() {
     this.elements_ = [];
   }
 
   /**
    * Add primitive types to the canvas.
-   * @param {Primitive} primitive A primitive type
-   * @param {number} xOffset X-offset
-   * @param {number} yOffset Y-offset
+   * @param {Primitive} primitive
+   * @param {number} xOffset
+   * @param {number} yOffset
    */
   Add(primitive, xOffset, yOffset) {
     this.elements_.push(new Element(primitive, xOffset, yOffset));
   }
 
   /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  GetArgs_() {
+    return []; // Override
+  }
+
+  /**
    * @param {string} outputPath The location where the image will be rendered.
+   * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
    */
   Draw(outputPath) {
-    // Override
+    let error = VALIDATE.IsStringInput(outputPath);
+    if (error)
+      return Promise.reject(`Failed to draw canvas: output path is ${error}`);
+
+    return new Promise((resolve, reject) => {
+      // Add canvas args
+      let args = this.GetArgs_().concat(outputPath);
+
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
+        if (output.stderr) {
+          reject(`Failed to draw canvas: ${output.stderr}`);
+          return;
+        }
+        resolve();
+      }).catch(error => `Failed to draw canvas: ${error}`);
+    });
   }
 }
 
 //----------------------------------------
-// PLAIN CANVAS
+// COLOR CANVAS
 
-class PlainCanvas extends Canvas {
+class ColorCanvas extends Canvas {
   /**
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
@@ -83,60 +84,29 @@ class PlainCanvas extends Canvas {
 
   /**
    * @override
-   * @param {string} outputPath The location where the image will be rendered.
-   * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it will return an error.
+   * @returns {Array<string|number>} Returns an array of arguments.
    */
-  Draw(outputPath) {
-    let error = VALIDATE.IsStringInput(outputPath);
-    if (error)
-      return Promise.reject(`Failed to draw canvas: output path is ${error}`);
-
-    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
-      return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
-
-    return new Promise((resolve, reject) => {
-      // Add canvas args
-      let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
-
-      // Add args for all elements on canvas
-      if (this.elements_.length == 0) {
-        args.push(outputPath);
-      }
-      else {
-        this.elements_.forEach(element => {
-          args = args.concat(element.Args());
-        });
-        args.push(outputPath);
-      }
-
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
-        if (output.stderr) {
-          reject(`Failed to draw canvas: ${output.stderr}`);
-          return;
-        }
-        resolve();
-      }).catch(error => `Failed to draw canvas: ${error}`);
-    });
+  GetArgs_() {
+    return ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
   }
 
   /**
-   * Create a PlainCanvas object with the specified properties.
+   * Create a Colorcanvas object with the specified properties.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
    * @param {string} color The color of the canvas. (Valid color format string used in Image Magick)
-   * @returns {PlainCanvas} Returns a PlainCanvas object. If inputs are invalid, it returns null.
+   * @returns {ColorCanvas} Returns a PlainCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, color) {
-    if (
-      VALIDATE.IsInteger(width) ||
-      VALIDATE.IsIntegerInRange(width, DIMENSION_MIN, null) ||
+    if (VALIDATE.IsInteger(width) ||
+      VALIDATE.IsIntegerInRange(width, CONSTANTS.MIN_WIDTH, null) ||
       VALIDATE.IsInteger(height) ||
-      VALIDATE.IsIntegerInRange(height, DIMENSION_MIN, null) ||
-      VALIDATE.IsStringInput(color)
-    )
+      VALIDATE.IsIntegerInRange(height, CONSTANTS.MIN_HEIGHT, null) ||
+      VALIDATE.IsStringInput(color)) {
       return null;
+    }
 
-    return new PlainCanvas(width, height, color);
+    return new ColorCanvas(width, height, color);
   }
 }
 
@@ -145,9 +115,9 @@ class PlainCanvas extends Canvas {
 
 class GradientCanvas extends Canvas {
   /**
-   * @param {number} width Width (in pixels)
-   * @param {number} height Height (in pixels)
-   * @param {string} gradient A LinearGradient or RadialGradient object.
+   * @param {number} width in pixels
+   * @param {number} height in pixels
+   * @param {LinearGradient|RadialGradient} gradient
    */
   constructor(width, height, gradient) {
     super();
@@ -158,47 +128,24 @@ class GradientCanvas extends Canvas {
 
   /**
    * @override
-   * @param {string} outputPath The location where the image will be rendered.
-   * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it will return an error.
+   * @returns {Array<string|number>} Returns an array of arguments.
    */
-  Draw(outputPath) {
-    let error = VALIDATE.IsStringInput(outputPath);
-    if (error)
-      return Promise.reject(`Failed to draw canvas: output path is ${error}`);
+  GetArgs_() {
+    let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
-    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
-      return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
-
-    return new Promise((resolve, reject) => {
-      // Add canvas and gradient args
-      let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
-
-      // Add args for all elements on canvas
-      if (this.elements_.length == 0) {
-        args.push(outputPath);
-      }
-      else {
-        this.elements_.forEach(element => {
-          args = args.concat(element.Args());
-        });
-        args.push(outputPath);
-      }
-
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
-        if (output.stderr) {
-          reject(`Failed to draw canvas: ${output.stderr}`);
-          return;
-        }
-        resolve();
-      }).catch(error => `Failed to draw canvas: ${error}`);
+    // Add args for all elements on canvas
+    this.elements_.forEach(element => {
+      args = args.concat(element.Args());
     });
+
+    return args;
   }
 
   /**
    * Create a GradientCanvas object with the specified gradient.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {LinearGradient|RadialGradient} gradient A LinearGradient or RadialGradient object.
+   * @param {Gradient} gradient
    * @returns {GradientCanvas} Returns a GradientCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, gradient) {
@@ -222,42 +169,16 @@ class ImageCanvas extends Canvas {
     this.src_ = src;
   }
 
-  /**
-   * @override
-   * @param {string} outputPath The location where the image will be rendered.
-   * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it will return an error.
-   */
-  Draw(outputPath) {
-    let error = VALIDATE.IsStringInput(outputPath);
-    if (error)
-      return Promise.reject(`Failed to draw canvas: output path is ${error}`);
+  /** @override */
+  GetArgs_() {
+    let args = [this.src_];
 
-    if (this.elements_.length > 0 && !AllObjectsArePrimitiveType(this.elements_))
-      return Promise.reject(`Failed to draw canvas: canvas contains non-primitive types.`);
-
-    return new Promise((resolve, reject) => {
-      // Include all elements on the canvas
-      let args = [this.src_];
-
-      // Add args for all elements on canvas
-      if (this.elements_.length == 0) {
-        args.push(outputPath);
-      }
-      else {
-        this.elements_.forEach(element => {
-          args = args.concat(element.Args());
-        });
-        args.push(outputPath);
-      }
-
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
-        if (output.stderr) {
-          reject(`Failed to draw canvas: ${output.stderr}`);
-          return;
-        }
-        resolve();
-      }).catch(error => `Failed to draw canvas: ${error}`);
+    // Add args for all elements on canvas
+    this.elements_.forEach(element => {
+      args = args.concat(element.Args());
     });
+
+    return args;
   }
 
   /**
@@ -275,6 +196,6 @@ class ImageCanvas extends Canvas {
 //--------------------------------
 // EXPORTS
 
-exports.CreatePlainCanvas = PlainCanvas.Create;
+exports.CreateColorCanvas = ColorCanvas.Create;
 exports.CreateGradientCanvas = GradientCanvas.Create;
 exports.CreateImageCanvas = ImageCanvas.Create;
