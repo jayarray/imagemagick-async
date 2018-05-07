@@ -80,7 +80,7 @@ class Bezier extends Primitive {
    * @returns {Bezier} Returns a Bezier object. If inputs are invalid, it returns null.
    */
   static Create(points, strokeColor, strokeWidth, fillColor) {
-    if (strokeWidth && VALIDATE.IsIntegerInRange(strokeWidth, CONSTANTS.MIN_WIDTH, null))
+    if (!points || points.length < 3)
       return null;
 
     return new Bezier(points, strokeColor, strokeWidth, fillColor);
@@ -144,7 +144,7 @@ class Circle extends Primitive {
    * @returns {Circle} Returns a Circle object. If inputs are invalid, it returns null.
    */
   static Create(center, edge, strokeColor, strokeWidth, fillColor) {
-    if (strokeWidth && VALIDATE.IsIntegerInRange(strokeWidth, CONSTANTS.MIN_WIDTH, null))
+    if (!center || !edge)
       return null;
 
     return new Circle(center, edge, strokeColor, strokeWidth, fillColor);
@@ -179,13 +179,17 @@ class Ellipse extends Primitive {
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the ellipse.
   */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.fillColor_)
       args.push('-fill', this.fillColor_);
+    else
+      args.push('-fill', 'none'); // Prevents default black fill color
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
@@ -193,7 +197,7 @@ class Ellipse extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
+    let center = COORDINATES.Create(this.center_.x_ + xOffset_, this.center_.y_ + yOffset_);
 
     let angleStart = this.angleStart_ || 0;
     let angleEnd = this.angleEnd_ || 360;
@@ -215,18 +219,7 @@ class Ellipse extends Primitive {
    * @returns {Ellipse} Returns an Ellipse object. If inputs are invalid, it returns null.
    */
   static Create(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
-    if (
-      center.constructor.name != 'Coordinates' ||
-      VALIDATE.IsInteger(width) ||
-      VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null) ||
-      VALIDATE.IsInteger(height) ||
-      VALIDATE.IsIntegerInRange(height, DIMENSIONS_MIN, null) ||
-      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
-      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
-      (!VALIDATE.IsInstance(angleStart) && VALIDATE.IsInteger(angleStart)) ||
-      (!VALIDATE.IsInstance(angleEnd) && VALIDATE.IsInteger(angleEnd))
-    )
+    if (!center || !width || !height)
       return null;
 
     return new Ellipse(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd);
@@ -254,9 +247,11 @@ class Line extends Primitive {
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the line.
    */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.color_)
@@ -265,8 +260,8 @@ class Line extends Primitive {
     if (this.width_)
       args.push('-strokewidth', this.width_);
 
-    let start = COORDINATES.Create(this.start_.x_ + this.xOffset_, this.start_.y_ + this.yOffset_);
-    let end = COORDINATES.Create(this.end_.x_ + this.xOffset_, this.end_.y_ + this.yOffset_);
+    let start = COORDINATES.Create(this.start_.x_ + xOffset_, this.start_.y_ + yOffset_);
+    let end = COORDINATES.Create(this.end_.x_ + xOffset_, this.end_.y_ + yOffset_);
     args.push('-draw', `line ${start.String()} ${end_.String()}`);
 
     return args;
@@ -281,12 +276,7 @@ class Line extends Primitive {
    * @returns {Line} Returns an Line object. If inputs are invalid, it returns null.
    */
   static Create(start, end, color, width) {
-    if (
-      start.constructor.name != 'Coordinates' ||
-      end.constructor.name != 'Coordinates' ||
-      (!VALIDATE.IsInstance(color) && VALIDATE.IsStringInput(color)) ||
-      (!VALIDATE.IsInstance(width) && (VALIDATE.IsInteger(width) || VALIDATE.IsIntegerInRange(width, DIMENSIONS_MIN, null)))
-    )
+    if (!start || !end)
       return null;
 
     return new Line(start, end, color, width);
@@ -314,25 +304,28 @@ class Path extends Primitive {
   }
 
   /** 
+   * Get a list of points in string form that have the X and Y offsets applied to them.
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {string} Returns a space-delimited string representing all points in the path.
    */
-  PointsToString() {
-    // Apply offset to all points
-    let offsetPoints = this.points_.map(point => COORDINATES.Create(point.x_ + this.xOffset_, point.y_ + this.yOffset_));
-
-    // Convert points to strings
-    return this.offsetPoints.map(point => point.String()).join(' ');
+  PointsToString(xOffset, yOffset) {
+    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset_, point.y_ + yOffset_).String()).join(' ');
   }
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the path.
    */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.fillColor_)
       args.push('-fill', this.fillColor_);
+    else
+      args.push('-fill', 'none'); // Prevents default black fill color
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
@@ -358,13 +351,7 @@ class Path extends Primitive {
    * @returns {Path} Returns a Path object. If inputs are invalid, it returns null.
    */
   static Create(points, strokeColor, strokeWidth, fillColor, isClosed) {
-    if (
-      VALIDATE.IsArray(points) ||
-      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
-      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
-      (isClosed === true || isClosed === false)
-    )
+    if (!points || points.length < 2)
       return null;
 
     return new Path(points, strokeColor, strokeWidth, fillColor, isClosed);
@@ -389,15 +376,17 @@ class Point extends Primitive {
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the point.
    */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.color_)
-      args.push('-fill', this.color_);
+      args.push('-fill', this.color_); // Default color is black
 
-    args.push('-draw', `point ${this.x_ + this.xOffset_},${this.y_ + this.yOffset_}`);
+    args.push('-draw', `point ${this.x_ + xOffset_},${this.y_ + yOffset_}`);
     return args;
   }
 
@@ -409,11 +398,7 @@ class Point extends Primitive {
    * @returns {Point} Returns a Path object. If inputs are invalid, it returns null.
    */
   static Create(x, y, color) {
-    if (
-      VALIDATE.IsInteger(x) ||
-      VALIDATE.IsInteger(y) ||
-      (!VALIDATE.IsInstance(color) && VALIDATE.IsStringInput(color))
-    )
+    if (!x || !y)
       return null;
 
     return new Point(x, y, color);
@@ -446,9 +431,11 @@ class Text extends Primitive {
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the point.
    */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.fillColor_)
@@ -469,7 +456,7 @@ class Text extends Primitive {
     if (this.gravity_)
       args.push('-gravity', this.gravity_);
 
-    args.push('-draw', `text ${this.xOffset_},${this.yOffset_} '${this.string_}'`);
+    args.push('-draw', `text ${xOffset_},${yOffset_} '${this.string_}'`);
     return args;
   }
 
@@ -485,15 +472,7 @@ class Text extends Primitive {
    * @returns {Text} Returns a Text object. If inputs are invalid, it returns null.
    */
   static Create(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor) {
-    if (
-      VALIDATE.IsStringInput(string) ||
-      (!VALIDATE.IsInstance(font) && VALIDATE.IsStringInput(font)) ||
-      (!VALIDATE.IsInstance(pointSize) && (VALIDATE.IsInteger(pointSize) || VALIDATE.IsIntegerInRange(pointSize, DIMENSIONS_MIN, null))) ||
-      (!VALIDATE.IsInstance(gravity) && VALIDATE.IsStringInput(gravity)) ||
-      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
-      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor))
-    )
+    if (!string)
       return null;
 
     return new Text(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor);
