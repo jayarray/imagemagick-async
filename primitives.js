@@ -1,34 +1,20 @@
 let VALIDATE = require('./validate.js');
+let CONSTANTS = require('./constants.js');
 let COORDINATES = require('./coordinates.js');
-
-//----------------------------------
-// CONSTANTS
-
-const DIMENSIONS_MIN = 1;
 
 //---------------------------------
 // PRIMITIVE (Base class)
 
 class Primitive {
   constructor() {
-    this.xOffset_ = 0;
-    this.yOffset_ = 0;
-  }
-
-  /**
-   * Set x and y offsets.
-   * @param {number} x X-offset
-   * @param {number} y Y-offset
-   */
-  Offset(x, y) {
-    this.xOffset_ = x;
-    this.yOffset_ = y;
   }
 
   /** 
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
    */
-  Args() {
+  Args(xOffset, yOffset) {
     // Override
   }
 }
@@ -52,25 +38,28 @@ class Bezier extends Primitive {
   }
 
   /** 
+   * Get a list of points in string form that have the X and Y offsets applied to them.
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {string} Returns a space-delimited string representing all points in the bezier curve.
    */
-  PointsToString() {
-    // Apply offset to all points
-    let offsetPoints = this.points_.map(point => COORDINATES.Create(point.x_ + this.xOffset_, point.y_ + this.yOffset_));
-
-    // Convert points to strings
-    return this.offsetPoints.map(point => point.String()).join(' ');
+  PointsToString(xOffset, yOffset) {
+    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset_, point.y_ + yOffset_).String()).join(' ');
   }
 
   /** 
    * @override
+   * @param {number} xOffset
+   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the bezier curve.
   */
-  Args() {
+  Args(xOffset, yOffset) {
     let args = [];
 
     if (this.fillColor_)
-      args.push('-fill', this.fillColor_);
+      args.push('-fill', this.fillColor_); // Applies fill color to areas where the curve is above or below the line computed between the start and end point.
+    else
+      args.push('-fill', 'none'); // Outputs lines only (default)
 
     if (this.strokeColor_)
       args.push('-stroke', this.strokeColor_);
@@ -78,7 +67,7 @@ class Bezier extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    args.push('-draw', `bezier ${this.PointsToString()}`);
+    args.push('-draw', `bezier ${this.PointsToString(xOffset, yOffset)}`);
     return args;
   }
 
@@ -91,12 +80,7 @@ class Bezier extends Primitive {
    * @returns {Bezier} Returns a Bezier object. If inputs are invalid, it returns null.
    */
   static Create(points, strokeColor, strokeWidth, fillColor) {
-    if (
-      VALIDATE.IsArray(points) ||
-      (!VALIDATE.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))) ||
-      (!VALIDATE.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor))
-    )
+    if (!VALIDATE.IsInstance(strokeWidth) && VALIDATE.IsIntegerInRange(strokeWidth, DIMENSIONS_MIN, null))
       return null;
 
     return new Bezier(points, strokeColor, strokeWidth, fillColor);
@@ -191,7 +175,7 @@ class Ellipse extends Primitive {
     this.strokeColor_ = strokeColor;
     this.strokeWidth_ = strokeWidth;
     this.fillColor_ = fillColor;
-    this.angleStart_ = angleStart; //Starts at 3 o'clock position (on screen) and goes clockwise
+    this.angleStart_ = angleStart;
     this.angleEnd_ = angleEnd;
   }
 
@@ -213,13 +197,8 @@ class Ellipse extends Primitive {
 
     let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
 
-    let angleStart = 0;
-    let angleEnd = 360;
-
-    if (this.angleStart_ && this.angleEnd_) {
-      angleStart = this.angleStart_;
-      angleEnd = this.angleEnd_;
-    }
+    let angleStart = this.angleStart_ || 0;
+    let angleEnd = this.angleEnd_ || 360;
 
     args.push('-draw', `ellipse ${center.String()} ${Math.floor(this.width_ / 2)},${Math.floor(this.height_ / 2)} ${angleStart},${angleEnd}`);
     return args;
