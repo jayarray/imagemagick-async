@@ -73,7 +73,7 @@ class Label {
   Draw(outputPath) {
     return new Promise((resolve, reject) => {
       let args = this.Args().concat(outputPath);
-      
+
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to draw label: ${output.stderr}`);
