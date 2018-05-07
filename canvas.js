@@ -98,13 +98,8 @@ class ColorCanvas extends Canvas {
    * @returns {ColorCanvas} Returns a PlainCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, color) {
-    if (VALIDATE.IsInteger(width) ||
-      VALIDATE.IsIntegerInRange(width, CONSTANTS.MIN_WIDTH, null) ||
-      VALIDATE.IsInteger(height) ||
-      VALIDATE.IsIntegerInRange(height, CONSTANTS.MIN_HEIGHT, null) ||
-      VALIDATE.IsStringInput(color)) {
+    if (width < CONSTANTS.MIN_WIDTH || height < CONSTANTS.MIN_HEIGHT)
       return null;
-    }
 
     return new ColorCanvas(width, height, color);
   }
@@ -149,8 +144,7 @@ class GradientCanvas extends Canvas {
    * @returns {GradientCanvas} Returns a GradientCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, gradient) {
-    let parentClass = GetParentClass(gradient);
-    if (parentClass != 'Gradient')
+    if (width < CONSTANTS.MIN_WIDTH || height < CONSTANTS.MIN_HEIGHT || !gradient)
       return null;
 
     return new GradientCanvas(width, height, gradient);
