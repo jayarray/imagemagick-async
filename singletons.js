@@ -6,9 +6,9 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 class Label {
   /**
+   * @param {string} text Text string
    * @param {number} width Width in pixels. (Optional) 
    * @param {number} height Height in pixels. (Optional) 
-   * @param {string} text Text string
    * @param {string} font Font name (Optional) 
    * @param {number} strokeWidth Thickness of the text outline. (Optional) 
    * @param {string} strokeColor The color of the text outline. (Optional) 
@@ -17,10 +17,10 @@ class Label {
    * @param {string} backgroundColor The background color for the entire label. (Optional) 
    * @param {string} gravity Gravity of the text. (Optional) 
    */
-  constructor(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  constructor(text, width, height, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+    this.text_ = text;
     this.width_ = width;
     this.height_ = height;
-    this.text_ = text;
     this.font_ = font;
     this.strokeWidth_ = strokeWidth;
     this.strokeColor_ = strokeColor;
@@ -72,7 +72,9 @@ class Label {
    */
   Draw(outputPath) {
     return new Promise((resolve, reject) => {
-      LOCAL_COMMAND.Execute('convert', this.Args().concat(outputPath)).then(output => {
+      let args = this.Args().concat(outputPath);
+      
+      LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to draw label: ${output.stderr}`);
           return;
