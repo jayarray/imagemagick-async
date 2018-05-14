@@ -52,6 +52,7 @@ class Negate extends Modifier {
 
 class Colorize extends Modifier {
   constructor(src, fillColor, percent) {
+    super();
     this.src_ = src;
     this.fillColor_ = fillColor;
     this.percent_ = percent;
@@ -68,6 +69,7 @@ class Colorize extends Modifier {
 
 class ToGrayscale extends Modifier {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -82,6 +84,7 @@ class ToGrayscale extends Modifier {
 
 class ToRGB extends Modifier {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -96,6 +99,7 @@ class ToRGB extends Modifier {
 
 class Replace extends Modifier {
   constructor(src, targetColor, desiredColor, fuzz) {
+    super();
     this.src_ = src;
     this.targetColor_ = targetColor;
     this.desiredColor_ = desiredColor;
@@ -113,6 +117,7 @@ class Replace extends Modifier {
 
 class MakeTransparent extends Modifier {
   constructor(src, percent) {
+    super();
     this.src_ = src;
     this.percent_ = percent;
   }
@@ -128,6 +133,7 @@ class MakeTransparent extends Modifier {
 
 class AdjustChannel extends Modifier {
   constructor(src, channel, value) {
+    super();
     this.src_ = src;
     this.channel_ = channel;
     this.value_ = value;
@@ -144,6 +150,7 @@ class AdjustChannel extends Modifier {
 
 class AutoLevel extends Modifier {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -161,6 +168,7 @@ class AutoLevel extends Modifier {
 
 class Blur extends Modifier {
   constructor(src, radius, sigma, hasTransparency) {
+    super();
     this.src_ = src;
     this.radius_ = radius;
     this.sigma_ = sigma;
@@ -184,6 +192,7 @@ class Blur extends Modifier {
 
 class OilPainting extends Modifier {
   constructor(src, paintValue) {
+    super();
     this.src_ = src;
     this.paintValue_ = paintValue;
   }
@@ -199,6 +208,7 @@ class OilPainting extends Modifier {
 
 class CharcoalSketch extends Modifier {
   constructor(src, charcoalValue) {
+    super();
     this.src_ = src;
     this.charcoalValue_ = charcoalValue;
   }
@@ -214,6 +224,7 @@ class CharcoalSketch extends Modifier {
 
 class ColoringBookSketch extends Modifier {
   constructor(src, isHeavilyShaded) {
+    super();
     this.src_ = src;
     this.isHeavilyShaded_ = isHeavilyShaded;
   }
@@ -235,6 +246,7 @@ class ColoringBookSketch extends Modifier {
 
 class PencilSketch extends Modifier {
   constructor(src, radius, sigma, angle) {
+    super();
     this.src_ = src;
     this.radius_ = radius;
     this.sigma_ = sigma;
@@ -262,6 +274,7 @@ class PencilSketch extends Modifier {
 
 class Swirl extends Modifier {
   constructor(src, degrees) {
+    super();
     this.src_ = src;
     this.degrees_ = degrees;
   }
@@ -277,6 +290,7 @@ class Swirl extends Modifier {
 
 class Implode extends Modifier {
   constructor(src, factor) {
+    super();
     this.src_ = src;
     this.factor_ = factor;
   }
@@ -292,6 +306,7 @@ class Implode extends Modifier {
 
 class Wave extends Modifier {
   constructor(src, amplitude, frequency) {
+    super();
     this.src_ = src;
     this.amplitude_ = amplitude;
     this.frequency_ = frequency;
