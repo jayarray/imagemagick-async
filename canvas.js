@@ -10,6 +10,7 @@ class Element {
     this.primitive_ = primitive;
     this.xOffset_ = xOffset;
     this.yOffset_ = yOffset;
+    this.modifiers_ = []; // Add effects, filters, or any image modifiers to this list.
   }
 
   Args() {
@@ -87,7 +88,14 @@ class ColorCanvas extends Canvas {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
-    return ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
+    let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
+
+    // Add args for all elements on canvas
+    this.elements_.forEach(element => {
+      args = args.concat(element.Args());
+    });
+
+    return args;
   }
 
   /**
