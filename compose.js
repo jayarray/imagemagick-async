@@ -38,7 +38,6 @@ function Composite(filepaths, gravity, outputPath) {
     // Add gravity
     if (gravity)
       args.push('-gravity', gravity);
-    args.push(outputPath);
 
     // Add first 2 paths
     args.push(filepaths[0], filepaths[1]);
