@@ -44,7 +44,7 @@ class Bezier extends Primitive {
    * @returns {string} Returns a space-delimited string representing all points in the bezier curve.
    */
   PointsToString(xOffset, yOffset) {
-    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset_, point.y_ + yOffset_).String()).join(' ');
+    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset, point.y_ + yOffset).String()).join(' ');
   }
 
   /** 
@@ -127,8 +127,8 @@ class Circle extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + xOffset_, this.center_.y_ + yOffset_);
-    let edge = COORDINATES.Create(this.edge_.x_ + xOffset_, this.edge_.y_ + yOffset_);
+    let center = COORDINATES.Create(this.center_.x_ + xOffset, this.center_.y_ + yOffset);
+    let edge = COORDINATES.Create(this.edge_.x_ + xOffset, this.edge_.y_ + yOffset);
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);
 
     return args;
@@ -197,7 +197,7 @@ class Ellipse extends Primitive {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + xOffset_, this.center_.y_ + yOffset_);
+    let center = COORDINATES.Create(this.center_.x_ + xOffset, this.center_.y_ + yOffset);
 
     let angleStart = this.angleStart_ || 0;
     let angleEnd = this.angleEnd_ || 360;
@@ -260,8 +260,8 @@ class Line extends Primitive {
     if (this.width_)
       args.push('-strokewidth', this.width_);
 
-    let start = COORDINATES.Create(this.start_.x_ + xOffset_, this.start_.y_ + yOffset_);
-    let end = COORDINATES.Create(this.end_.x_ + xOffset_, this.end_.y_ + yOffset_);
+    let start = COORDINATES.Create(this.start_.x_ + xOffset, this.start_.y_ + yOffset);
+    let end = COORDINATES.Create(this.end_.x_ + xOffset, this.end_.y_ + yOffset);
     args.push('-draw', `line ${start.String()} ${end_.String()}`);
 
     return args;
@@ -310,7 +310,7 @@ class Path extends Primitive {
    * @returns {string} Returns a space-delimited string representing all points in the path.
    */
   PointsToString(xOffset, yOffset) {
-    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset_, point.y_ + yOffset_).String()).join(' ');
+    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset, point.y_ + yOffset).String()).join(' ');
   }
 
   /** 
@@ -392,7 +392,7 @@ class Point extends Primitive {
     if (this.color_)
       args.push('-fill', this.color_); // Default color is black
 
-    args.push('-draw', `point ${this.x_ + xOffset_},${this.y_ + yOffset_}`);
+    args.push('-draw', `point ${this.x_ + xOffset},${this.y_ + yOffset}`);
     return args;
   }
 
@@ -462,7 +462,7 @@ class Text extends Primitive {
     if (this.gravity_)
       args.push('-gravity', this.gravity_);
 
-    args.push('-draw', `text ${xOffset_},${yOffset_} '${this.string_}'`);
+    args.push('-draw', `text ${xOffset},${yOffset} '${this.string_}'`);
     return args;
   }
 
