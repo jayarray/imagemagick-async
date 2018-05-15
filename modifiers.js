@@ -3,6 +3,7 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 //----------------------------------
 // MODIFIER
 
+// REMOVE src from modifier. Should be part of Render method.
 class Modifier {
   constructor() {
   }
@@ -17,7 +18,7 @@ class Modifier {
   /**
    * @returns {Array<string|number>} Returns an array of arguments needed for executing the modifier command.
    */
-  Render(outputPath) {
+  Render(inputPath, outputPath) {
     return new Promise((resolve, reject) => {
       let args = this.Args().concat(outputPath);
 
