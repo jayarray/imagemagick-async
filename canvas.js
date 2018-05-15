@@ -1,6 +1,10 @@
 let VALIDATE = require('./validate.js');
 let CONSTANTS = require('./constants.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+let LINUX_COMMANDS = require('linux-commands-async');
+let PATH = require('path');
+
+let Layer = require('./layer.js').Layer;
 
 //-----------------------------------
 // ELEMENT
@@ -13,6 +17,10 @@ class Element {
     this.modifiers_ = []; // Add effects, filters, or any image modifiers to this list.
   }
 
+  AddModifier(mod) {
+    this.modifiers_.push(mod);
+  }
+
   Args() {
     return this.primitive_.Args(this.xOffset_, this.yOffset_);
   }
@@ -21,8 +29,9 @@ class Element {
 //-----------------------------------
 // CANVAS
 
-class Canvas {
+class Canvas extends Layer {
   constructor() {
+    super();
     this.elements_ = [];
   }
 
@@ -47,7 +56,7 @@ class Canvas {
    * @param {string} outputPath The location where the image will be rendered.
    * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
    */
-  Draw(outputPath) {
+  Render(outputPath) {
     let error = VALIDATE.IsStringInput(outputPath);
     if (error)
       return Promise.reject(`Failed to draw canvas: output path is ${error}`);
@@ -64,6 +73,22 @@ class Canvas {
         resolve();
       }).catch(error => `Failed to draw canvas: ${error}`);
     });
+  }
+
+  /**
+   * @override
+   * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+   */
+  RenderLayers_() {
+    // TO DO
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'canvas';
   }
 }
 
