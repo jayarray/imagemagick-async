@@ -7,42 +7,11 @@ let PATH = require('path');
 let Layer = require('./layer.js').Layer;
 
 //-----------------------------------
-// ELEMENT
-
-class Element {
-  constructor(primitive, xOffset, yOffset) {
-    this.primitive_ = primitive;
-    this.xOffset_ = xOffset;
-    this.yOffset_ = yOffset;
-    this.modifiers_ = []; // Add effects, filters, or any image modifiers to this list.
-  }
-
-  AddModifier(mod) {
-    this.modifiers_.push(mod);
-  }
-
-  Args() {
-    return this.primitive_.Args(this.xOffset_, this.yOffset_);
-  }
-}
-
-//-----------------------------------
-// CANVAS
+// CANVAS (Interface)
 
 class Canvas extends Layer {
   constructor() {
     super();
-    this.elements_ = [];
-  }
-
-  /**
-   * Add primitive types to the canvas.
-   * @param {Primitive} primitive
-   * @param {number} xOffset
-   * @param {number} yOffset
-   */
-  Add(primitive, xOffset, yOffset) {
-    this.elements_.push(new Element(primitive, xOffset, yOffset));
   }
 
   /**
@@ -73,14 +42,6 @@ class Canvas extends Layer {
         resolve();
       }).catch(error => `Failed to draw canvas: ${error}`);
     });
-  }
-
-  /**
-   * @override
-   * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
-   */
-  RenderLayers_() {
-    // TO DO
   }
 
   /**
@@ -206,6 +167,14 @@ class ImageCanvas extends Canvas {
     });
 
     return args;
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'file';
   }
 
   /**
