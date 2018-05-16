@@ -15,11 +15,17 @@ class Node {
   Layer() {
     return this.layer_;
   }
+
+  Type() {
+    return this.layer_.layer.Type();
+  }
 }
 
 //----------------------------
 
 function GetLayerHierarchy(layer) {
+  let flatList = [];
+
   let nodes = layer.layers_.map(l => new Node(l));
 
   let stack = [];
@@ -28,6 +34,7 @@ function GetLayerHierarchy(layer) {
   while (stack && stack.length > 0) {
     // Get next node
     let currNode = stack.pop();
+    flatList.push(currNode);
 
     // Add children to parent
     let children = currNode.Layer().layer.layers_.map(l => new Node(l));
@@ -37,10 +44,10 @@ function GetLayerHierarchy(layer) {
     stack = stack.concat(children.reverse());
   }
 
-  return nodes;
+  return { nodes: nodes.reverse(), flatlist: flatList };
 }
 
-//-----------------------------
+//----------------------------
 
 function HierarchyToString(nodes, indent) {
   let string = '';
@@ -55,7 +62,7 @@ function HierarchyToString(nodes, indent) {
 
     // Add children to parent
     let children = currNode.Layer().layer.layers_.map(l => new Node(l));
-    string += HierarchyToString(children, indent + 2);
+    string += HierarchyToString(children, indent + 1);
   }
 
   return string;
@@ -64,14 +71,9 @@ function HierarchyToString(nodes, indent) {
 //-----------------------------
 
 function Analyze(layer) {
-  console.log(`CURRENT_TYPE: ${layer.Type()}`);
-
-  let layerInfo = [];
-
-  let nodes = GetLayerHierarchy(layer);
-  let hStr = HierarchyToString(nodes, 1);
-
-  console.log(hStr);
+  let hierarchy = GetLayerHierarchy(layer);
+  let hStr = `${layer.Type()}\n${HierarchyToString(hierarchy.nodes, 1)}`;
+  return { hierarchy: hierarchy, string: hStr };
 }
 
 //--------------------------
