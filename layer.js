@@ -1,115 +1,56 @@
-//---------------------------------
-// LAYER (Base class)
+let CANVAS = require('./canvas.js');
+let PRIMITIVES = require('./primitives.js');
 
-class Layer {
-  constructor() {
-    this.layers_ = [];
-  }
+//------------------------------------------
 
-  /**
-   * Add a layer to this layer.
-   * @param {Layer} layer 
-   * @param {number} xOffset 
-   * @param {number} yOffset 
-   */
-  Draw(layer, x, y) {
-    this.layers_.push({ layer: layer, x: x, y: y });
-  }
-
-  /**
-   * Write layer to disk.
-   * @param {string} outputPath 
-   */
-  Render(outputPath) {
-    // Override
-  }
-
-  /**
-   * Render all layers into one.
-   */
-  RenderLayers_() {
-    // TO DO
-  }
-
-  /**
-   * @returns {string} Returns the type of layer.
-   */
-  Type() {
-    // Override
-  }
+/**
+ * Create a color canvas layer.
+ * @param {number} width 
+ * @param {number} height 
+ * @param {string} color Hex string
+ * @returns {Layer} Returns a Layer object.
+ */
+function FromColor(width, height, color) {
+  return CANVAS.CreateColorCanvas(width, height, color);
 }
 
-//---------------------------------------
-// FILE
-
-class FileLayer extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @override
-   * @param {string} outputPath 
-   */
-  Render(outputPath) {
-    // TO DO
-  }
-
-  /**
-   * @override
-   */
-  Type() {
-    return 'file';
-  }
+/**
+ * Create a gradient canvas layer.
+ * @param {number} width 
+ * @param {number} height 
+ * @param {Gradient} gradient 
+ * @returns {Layer} Returns a Layer object.
+ */
+function FromGradient(width, height, gradient) {
+  return CANVAS.CreateGradientCanvas(width, height, gradient);
 }
 
-//---------------------------------------
-// PRIMITIVE
-
-class Primitive extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @override
-   */
-  Render(outputPath) {
-
-  }
-
-  /**
-   * @override
-   */
-  Type() {
-    return 'primitive';
-  }
+/**
+ * Create an image canvas layer.
+ * @param {string} path Image location
+ * @returns {Layer} Returns a Layer object.
+ */
+function FromPath(path) {
+  return CANVAS.CreateImageCanvas(path);
 }
 
-//---------------------------------------
-// MODS
-
-class Mod extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @override
-   */
-  Render(outputPath) {
-
-  }
-
-  /**
-   * @override
-   */
-  Type() {
-    return 'mod';
-  }
+/**
+ * Create a line.
+ * @param {Coordinates} start 
+ * @param {Coordinates} end 
+ * @param {string} color Hex string
+ * @param {number} width 
+ * @returns {Layer} Returns a Layer object.
+ */
+function Line(start, end, color, width) {
+  return PRIMITIVES.CreateLine(start, end, color, width);
 }
 
-//--------------------------------------
+//-------------------------------
 // EXPORTS
 
-exports.Layer = Layer;
+exports.FromColor = FromColor;
+exports.FromGradient = FromGradient;
+exports.FromPath = FromPath;
+
+exports.Line = Line;
