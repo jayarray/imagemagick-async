@@ -1,12 +1,16 @@
 let VALIDATE = require('./validate.js');
 let CONSTANTS = require('./constants.js');
 let COORDINATES = require('./coordinates.js');
+let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+
+let Layer = require('./layerbase.js').Layer;
 
 //---------------------------------
 // PRIMITIVE (Base class)
 
-class Primitive {
+class Primitive extends Layer {
   constructor() {
+    super();
   }
 
   /**
@@ -16,6 +20,14 @@ class Primitive {
    */
   Args(xOffset, yOffset) {
     // Override
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'primitive';
   }
 }
 
@@ -225,7 +237,6 @@ class Ellipse extends Primitive {
     return new Ellipse(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd);
   }
 }
-
 
 //--------------------------------
 // LINE
