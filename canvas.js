@@ -22,29 +22,6 @@ class Canvas extends Layer {
   }
 
   /**
-   * @param {string} outputPath The location where the image will be rendered.
-   * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
-   */
-  Render(outputPath) {
-    let error = VALIDATE.IsStringInput(outputPath);
-    if (error)
-      return Promise.reject(`Failed to draw canvas: output path is ${error}`);
-
-    return new Promise((resolve, reject) => {
-      // Add canvas args
-      let args = this.GetArgs_().concat(outputPath);
-
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
-        if (output.stderr) {
-          reject(`Failed to draw canvas: ${output.stderr}`);
-          return;
-        }
-        resolve();
-      }).catch(error => `Failed to draw canvas: ${error}`);
-    });
-  }
-
-  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */
