@@ -4,7 +4,7 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 let LINUX_COMMANDS = require('linux-commands-async');
 let PATH = require('path');
 
-let Layer = require('./layer.js').Layer;
+let Layer = require('./layerbase.js').Layer;
 
 //-----------------------------------
 // CANVAS (Interface)
@@ -74,14 +74,7 @@ class ColorCanvas extends Canvas {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
-    let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
-
-    // Add args for all elements on canvas
-    this.elements_.forEach(element => {
-      args = args.concat(element.Args());
-    });
-
-    return args;
+    return ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
   }
 
   /**
@@ -120,14 +113,7 @@ class GradientCanvas extends Canvas {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
-    let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
-
-    // Add args for all elements on canvas
-    this.elements_.forEach(element => {
-      args = args.concat(element.Args());
-    });
-
-    return args;
+    return ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
   }
 
   /**
@@ -159,14 +145,7 @@ class ImageCanvas extends Canvas {
 
   /** @override */
   GetArgs_() {
-    let args = [this.src_];
-
-    // Add args for all elements on canvas
-    this.elements_.forEach(element => {
-      args = args.concat(element.Args());
-    });
-
-    return args;
+    return [this.src_];
   }
 
   /**
