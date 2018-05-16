@@ -75,10 +75,7 @@ class Layer {
 
       this.RenderLayers_(parentDir).then(filepaths => {
         // Create composite
-        COMPOSE.Composite(filepaths, null, outputPath).then(output => {
-          if (output.stderr) {
-            reject(`ERROR: ${output.stderr}`);
-          }
+        COMPOSE.Composite(filepaths, null, outputPath).then(success => {
           // Clean up temp files
           LINUX_COMMANDS.Remove.Files(filepaths, LOCAL_COMMAND).then(success => {
             resolve();
