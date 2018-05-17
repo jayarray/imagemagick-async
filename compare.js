@@ -1,57 +1,79 @@
 let VALIDATE = require('./validate.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+let Layer = require('./layerbase.js').Layer;
 
 //------------------------------------
+// COMPARISON (base class)
+
+class Comparison extends Layer {
+  constructor() {
+    super();
+  }
+
+  /**
+   * @param {number} xOffset
+   * @param {number} yOffset
+   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
+   */
+  Args() {
+    // Override
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'mod';
+  }
+}
+
+//-------------------------------------
 // COMPARE
 
-/**
- * Render an image that highlights the differences between two images. (Compares src2 to src1)
- * @param {string} src1 Source 1
- * @param {string} src2 Source 2
- * @param {string} highlightColor Highlight color. This color will represent the differences between the two images.
- * @param {string} lowlightColor (Optional) Lowlight color. This color serves as a background for the highlight color. Omitting it results in the image from src1 being displayed in the background.
- * @param {string} outputPath The path where the resulting image will be rendered.
- * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
- */
-function Compare(src1, src2, highlightColor, lowlightColor, outputPath) {
-  let error = VALIDATE.IsStringInput(src1);
-  if (error)
-    return Promise.reject(`Failed to compare images: source 1 is ${error}`);
+class Compare extends Comparison {
+  constructor(src1, src2, highlightColor, lowlightColor) {
+    super();
+    this.src1_ = src;
+    this.src2_ = src2;
+    this.highlightColor_ = highlightColor;
+    this.lowlightColor_ = lowlightColor;
+  }
 
-  error = VALIDATE.IsStringInput(src2);
-  if (error)
-    return Promise.reject(`Failed to compare images: source 2 is ${error}`);
+  /** 
+   * @override
+   * @returns {Array<string|number>} Returns an array of arguments.
+  */
+  Args() {
+    let args = [this.src1_, this.src2_, '-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.highlightColor_];
 
-  error = VALIDATE.IsStringInput(highlightColor);
-  if (error)
-    return Promise.reject(`Failed to compare images: highlight color is ${error}`);
+    if (this.lowlightColor_)
+      args.push('-lowlight-color', this.lowlightColor_);
 
-  error = VALIDATE.IsStringInput(lowlightColor);
-  if (lowlightColor != null && error)
-    return Promise.reject(`Failed to compare images: lowlight color is ${error}`);
+    return args;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to compare images: output path is ${error}`);
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the comparison.
+   */
+  Command() {
+    return 'compare';
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [
-      '-metric', 'AE',
-      '-fuzz', '5%',
-      src1, src2,
-      '-highlight-color', highlightColor,
-      '-lowlight-color', lowlightColor,
-      outputPath
-    ];
+  /**
+   * Create a Compare object. Creates an image that highlights the differences between two images. Compares src2 to src1.
+   * @param {string} src1
+   * @param {string} src2
+   * @param {string} highlightColor Highlight color. This color shows the differences between the two images.
+   * @param {string} lowlightColor (Optional) Lowlight color. This color serves as a background for the highlight color. Omitting it results in the image from src1 being displayed in the background.
+   * @returns {Compare} Returns a Compare object. If inputs are invalid, it returns null.
+   */
+  static Create(src1, src2, highlightColor, lowlightColor) {
+    if (!src1 || !src2 || !highlightColor)
+      return null;
 
-    LOCAL_COMMAND.Execute('compare', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to compare images: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to compare images: ${error}`);
-  });
+    return new Compare(src1, src2, highlightColor, lowlightColor);
+  }
 }
 
 //------------------------------------
@@ -64,70 +86,45 @@ function Compare(src1, src2, highlightColor, lowlightColor, outputPath) {
  * @param {string} outputPath The path where the resulting image will be rendered.
  * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
  */
-function Difference(src1, src2, outputPath) {
-  let error = VALIDATE.IsStringInput(src1);
-  if (error)
-    return Promise.reject(`Failed to compare image: source 1 is ${error}`);
+class Difference extends Comparison {
+  constructor(src1, src2) {
+    super();
+    this.src1_ = src1;
+    this.src2_ = src2;
+  }
 
-  error = VALIDATE.IsStringInput(src2);
-  if (error)
-    return Promise.reject(`Failed to compare images: source 2 is ${error}`);
+  /** 
+   * @override
+   * @returns {Array<string|number>} Returns an array of arguments.
+  */
+  Args() {
+    let args = [src1, src2, '-compose', 'difference'];
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to compare images: output path is ${error}`);
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the comparison.
+   */
+  Command() {
+    return 'composite';
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [
-      src1, src2,
-      '-compose', 'difference',
-      outputPath
-    ];
+  /**
+   * Create a Difference object. Renders an image that shows the differences between two images by utilizing brightness to correlate how major the changes are. The brighter the color, the more major the difference is. Compares src2 to src1.
+   * @param {string} src1
+   * @param {string} src2
+   * @returns {Difference} Returns a Difference object. If inputs are invalid, it returns null.
+   */
+  static Create(src1, src2) {
+    if (!src1 || !src2)
+      return null;
 
-    LOCAL_COMMAND.Execute('composite', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to compare images: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to compare images: ${error}`);
-  });
-}
-
-//------------------------------------
-// AUTO LEVEL
-
-/**
- * Render an image whose colors are normalized (brightened). Makes really dark compare/difference images easier to analyze.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered.
- * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
- */
-function AutoLevel(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to normalize image: source is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to normalize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-auto-level', outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to compare images: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to compare images: ${error}`);
-  });
+    return new Difference(src1, src2);
+  }
 }
 
 //----------------------------------
 // EXPORTS
 
-exports.Compare = Compare;
-exports.Difference = Difference;
-exports.AutoLevel = AutoLevel;
+exports.CreateCompareMod = Compare.Create;
+exports.CreateDifferenceMod = Difference.Create;
