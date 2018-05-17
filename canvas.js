@@ -12,9 +12,20 @@ let Layer = require('./layerbase.js').Layer;
 class Canvas extends Layer {
   constructor() {
     super();
+    this.primitiveTuples = [];
+  }
+
+  AddPrimitiveTuple(p, xOffset, yOffset) {
+    this.primitiveTuples.push({ primitive: p, xOffset: xOffset, yOffset: yOffset });
+  }
+
+  PrimitiveTuples() {
+    return this.primitiveTuples;
   }
 
   /**
+   * Get list of arguments required to draw the canvas.
+   * @param {Array<Primitive>} primitives
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
@@ -51,7 +62,13 @@ class ColorCanvas extends Canvas {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
-    return ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
+    let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
+
+    if (this.PrimitiveTuples().length > 0) {
+      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    }
+
+    return args;
   }
 
   /**
@@ -90,7 +107,13 @@ class GradientCanvas extends Canvas {
    * @returns {Array<string|number>} Returns an array of arguments.
    */
   GetArgs_() {
-    return ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
+    let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
+
+    if (this.PrimitiveTuples().length > 0) {
+      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    }
+
+    return args;
   }
 
   /**
@@ -122,7 +145,13 @@ class ImageCanvas extends Canvas {
 
   /** @override */
   GetArgs_() {
-    return [this.src_];
+    let args = [this.src_];
+
+    if (this.PrimitiveTuples().length > 0) {
+      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    }
+
+    return args;
   }
 
   /**
