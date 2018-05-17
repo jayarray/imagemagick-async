@@ -1,4 +1,5 @@
 let CANVAS = require('./canvas.js');
+let COMPARE = require('./compare.js');
 let PRIMITIVES = require('./primitives.js');
 
 //------------------------------------------
@@ -57,7 +58,7 @@ function FromLabel(width, height, text, font, strokeWidth, strokeColor, fillColo
 // PRIMITIVES
 
 /**
- * Create a bezier curve.
+ * Create a bezier curve primitive.
  * @param {Array<Coordinates>} points 
  * @param {string} strokeColor 
  * @param {number} strokeWidth 
@@ -68,7 +69,7 @@ function Bezier(points, strokeColor, strokeWidth, fillColor) {
 }
 
 /**
- * Create a circle.
+ * Create a circle primitive.
  * @param {Coordinates} center 
  * @param {Coordinates} edge 
  * @param {string} strokeColor 
@@ -80,7 +81,7 @@ function Circle(center, edge, strokeColor, strokeWidth, fillColor) {
 }
 
 /**
- * Create an ellipse.
+ * Create an ellipse primitive.
  * @param {Coordinates} center 
  * @param {number} width 
  * @param {number} height 
@@ -95,7 +96,7 @@ function Ellipse(center, width, height, strokeColor, strokeWidth, fillColor, ang
 }
 
 /**
- * Create a line.
+ * Create a line primitive.
  * @param {Coordinates} start 
  * @param {Coordinates} end 
  * @param {string} color Hex string
@@ -107,7 +108,7 @@ function Line(start, end, color, width) {
 }
 
 /**
- * Create a path.
+ * Create a path primitive.
  * @param {Array<Coordinates>} points 
  * @param {string} strokeColor 
  * @param {number} strokeWidth 
@@ -119,7 +120,7 @@ function Path(points, strokeColor, strokeWidth, fillColor, isClosed) {
 }
 
 /**
- * Create a point.
+ * Create a point primitive.
  * @param {number} x 
  * @param {number} y 
  * @param {string} color 
@@ -129,7 +130,7 @@ function Point(x, y, color) {
 }
 
 /**
- * Create text.
+ * Create a text primitive.
  * @param {string} string 
  * @param {string} font 
  * @param {number} pointSize 
@@ -144,6 +145,30 @@ function Text(string, font, pointSize, gravity, strokeColor, strokeWidth, fillCo
 
 //--------------------------------
 // MODS
+
+// COMPARISON
+
+/**
+ * Create a Compare mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ * @param {string} highlightColor 
+ * @param {string} lowlightColor 
+ */
+function Compare(src1, src2, highlightColor, lowlightColor) {
+  return COMPARE.CreateCompareMod(src1, src2, highlightColor, lowlightColor);
+}
+
+/**
+ * Create a Difference mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Difference(src1, src2) {
+  return COMPARE.CreateDifferenceMod(src1, src2, highlightColor, lowlightColor);
+}
+
+// COLOR
 
 
 
@@ -163,3 +188,6 @@ exports.Line = Line;
 exports.Path = Path;
 exports.Point = Point;
 exports.Text = Text;
+
+exports.Compare = Compare;
+exports.Difference = Difference;
