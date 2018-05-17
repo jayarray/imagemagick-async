@@ -421,116 +421,129 @@ class Color {
   }
 }
 
+//--------------------------------
+// COLOR LAYER (base class)
+
+class ColorLayer extends Layer {
+  constructor() {
+    super();
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    // Override
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the mod.
+   */
+  Command() {
+    return 'convert';
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'mod';
+  }
+}
+
 //-------------------------------
 // NEGATE
 
-/**
- * Negate all the colors in an image.
- * @param {string} src Source
- * @param {string} outputPath The path where the image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Negate(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to negate colors: source is ${error}`);
+class Negate extends ColorLayer {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to negate colors: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-negate'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-negate', outputPath];
+  /**
+   * Create a Negate object. Negates all image colors.
+   * @param {string} src
+   * @returns {Negate} Returns a Negate object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to negate colors: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to negate colors: ${error}`);
-  });
+    return new Negate(src);
+  }
 }
 
 //-------------------------------
 // COLORIZE
 
-/**
- * Colorize an image. (Places a veil of color over the image.)
- * @param {string} src Source
- * @param {string} fillColor The color that will be placed over the image.
- * @param {number} percent The higher the percent, the more dominant and apparent the color becomes.
- * @param {string} outputPath The path where the image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Colorize(src, fillColor, percent, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to colorize image: source is ${error}`);
+class Colorize extends ColorLayer {
+  constructor(src, fillColor, percent) {
+    super();
+    this.src_ = src;
+    this.fillColor_ = fillColor;
+    this.percent_ = percent;
+  }
 
-  error = VALIDATE.IsStringInput(fillColor);
-  if (error)
-    return Promise.reject(`Failed to colorize image: fill color is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-fill', this.fillColor_, '-colorize', `${this.percent_}%`];
+  }
 
-  error = VALIDATE.IsInteger(percent);
-  if (error)
-    return Promise.reject(`Failed to colorize image: percent is ${error}`);
+  /**
+   * Create a Colorize object. Creates a veil of color over an image.
+   * @param {string} src
+   * @returns {Colorize} Returns a Colorize object. If inputs are invalid, it returns null.
+   */
+  static Create(src, fillColor, percent) {
+    if (!src || !fillColor || !percent)
+      return null;
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to colorize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [
-      src,
-      '-fill', fillColor,
-      '-colorize', `${percent}%`,
-      outputPath
-    ];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to colorize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to colorize image: ${error}`);
-  });
+    return new Colorize(src, fillColor, percent);
+  }
 }
 
 //-------------------------------
-// TO GRAYSCALE
+// GRAYSCALE
 
-/**
- * Convert an image to grayscale.
- * @param {string} src Source
- * @param {string} outputPath The path where the image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function ToGrayScale(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to change to grayscale: source is ${error}`);
+class GrayscaleFormat extends ColorLayer {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to change to grayscale: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-colorspace', 'Gray'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-colorspace', 'Gray', outputPath];
+  /**
+   * Create a GrayscaleFormat object. Converts an image to grayscale format.
+   * @param {string} src
+   * @returns {GrayscaleFormat} Returns a Grayscale object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to change to grayscale: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to change to grayscale: ${error}`);
-  });
+    return new GrayscaleFormat(src);
+  }
 }
 
 //------------------------------
-// TO RGB
+// RGB
 
 /**
  * Convert an image to RGB.
@@ -538,147 +551,171 @@ function ToGrayScale(src, outputPath) {
  * @param {string} outputPath The path where the image will be rendered to.
  * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
  */
-function ToRGB(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to change to RGB: source is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to change to RGB: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-colorspace', 'RGB', outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to change to RGB: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to change to RGB: ${error}`);
-  });
-
-  /*
-  let cmd = 'convert ' + src;
-  if (src.endsWith('.png')) {
-    cmd += ' -define png:color-type=2 ' + dest;
+class RgbFormat extends ColorLayer {
+  constructor(src) {
+    super();
+    this.src_ = src;
   }
-  else {
-    cmd += ' -colorspace RGB ' + dest;
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-colorspace', 'RGB'];
   }
-  return execute(cmd); */
+
+  /**
+   * Create a RgbFormat object. Converts an image to grayscale format.
+   * @param {string} src
+   * @returns {RgbFormat} Returns a RgbFormat object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
+
+    return new RgbFormat(src);
+  }
 }
 
 //--------------------------------------
 // REPLACE
 
-/**
- * Replace a color in an image.
- * @param {string} src Source
- * @param {string} targetColor The color you want to change. (Valid color format string used in Image Magick)
- * @param {string} desiredColor The color that will replace the target color. (Valid color format string used in Image Magick)
- * @param {number} fuzz (Optional) A value between 0 and 100 that determines which other colors similar to the target color will be removed. (The higher the value, the more colors will disappear)
- * @param {string} outputPath The path where the image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Replace(src, targetColor, desiredColor, fuzz, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to replace color: source is ${error}`);
+class Replace extends ColorLayer {
+  constructor(src, targetColor, desiredColor, fuzz) {
+    super();
+    this.src_ = src;
+    this.targetColor_ = targetColor;
+    this.desiredColor_ = desiredColor;
+    this.fuzz_ = fuzz;
+  }
 
-  error = VALIDATE.IsStringInput(targetColor);
-  if (error)
-    return Promise.reject(`Failed to replace color: target color is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    let args = [this.src_, '-alpha', 'on', '-channel', 'rgba'];
 
-  error = VALIDATE.IsStringInput(desiredColor);
-  if (error)
-    return Promise.reject(`Failed to replace color: desired color is ${error}`);
+    if (this.fuzz_ && this.fuzz_ > 0)
+      args.push('-fuzz', `${this.fuzz_}%`);
+    args.push('-fill', this.desiredColor_, '-opaque', this.targetColor_);
 
-  error = VALIDATE.IsInteger(fuzz);
-  if (fuzz != null && error)
-    return Promise.reject(`Failed to replace color: fuzz is ${error}`);
+    return args;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to replace color: output path is ${error}`);
+  /**
+   * Create a Replace object. Replaces one color with another.
+   * @param {string} src
+   * @param {string} targetColor The color you want to change. (Valid color format string used in Image Magick)
+   * @param {string} desiredColor The color that will replace the target color. (Valid color format string used in Image Magick)
+   * @param {number} fuzz (Optional) A value between 0 and 100 that determines which other colors similar to the target color will be removed. (The higher the value, the more colors will disappear)
+   * @returns {Replace} Returns a Replace object. If inputs are invalid, it returns null.
+   */
+  static Create(src, targetColor, desiredColor, fuzz) {
+    if (!src || !targetColor || !desiredColor)
+      return null;
 
-  return new Promise((resolve, reject) => {
-    let args = [
-      src,
-      '-alpha', 'on',
-      '-channel', 'rgba'
-    ];
-
-    if (fuzz && fuzz > 0)
-      args.push('-fuzz', `${fuzz}%`);
-    args.push('-fill', desiredColor, '-opaque', targetColor, outputPath);
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to replace color: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to replace color: ${error}`);
-  });
+    return new Replace(src, targetColor, desiredColor, fuzz);
+  }
 }
 
 //---------------------------------------
 // MAKE TRANSPARENT
 
-/**
- * Make an image transparent.
- * @param {string} src Source
- * @param {number} percent A value between 0 and 100 that determines how transparent the image will be. The higher the value, the more transparent the image becomes.
- * @param {string} outputPath The path where the image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function MakeTransparent(src, percent, outputPath) { // percent refers to opacity. (i.e. percent = 25 --> image will be 75% transparent)
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to make transparent: source is ${error}`);
+class Transparency extends ColorLayer {
+  constructor(src, percent) {
+    super();
+    this.src_ = src;
+    this.percent_ = percent;
+  }
 
-  error = VALIDATE.IsInteger(percent);
-  if (fuzz != null && error)
-    return Promise.reject(`Failed to make transparent: fuzz is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-alpha', 'on', '-channel', 'a', '-evaluate', 'set', `${this.percent_}%`];
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to make transparent: output path is ${error}`);
+  /**
+   * Create a Transparency object. Makes an image transparent.
+   * @param {string} src
+   * @param {number} percent
+   * @returns {Replace} Returns a Transparency object. If inputs are invalid, it returns null.
+   */
+  static Create(src, percent) {
+    if (!src || !percent)
+      return null;
 
+    return new Transparency(src, percent);
+  }
+}
 
-  return new Promise((resolve, reject) => {
-    let opacity = 100 - percent;
+//-------------------------------
+// CHANNEL ADJUST
 
-    if (opacity < 0)
-      opacity = 0;
-    else if (opacity > 100)
-      opacity = 100;
+class ChannelAdjust extends ColorLayer {
+  constructor(src, channel, value) {
+    super();
+    this.src_ = src;
+    this.channel_ = channel;
+    this.value_ = value;
+  }
 
-    let args = [
-      src,
-      '-alpha', 'on',
-      '-channel', 'a',
-      '-evaluate', 'set', `${opacity}%`,
-      outputPath
-    ];
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-alpha', 'set', '-channel', this.channel_, '-evaluate', 'set', this.value_];
+  }
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to make transparent: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to make transparent: ${error}`);
-  });
+  /**
+   * Create a ChannelAdjust object. Adjusts color channel saturation.
+   * @param {string} src
+   * @param {string} channel A valid Image Magick channel.
+   * @param {string|number} value Can be an rgba value 0-255 or a percent string (e.g. 10%, 15%, etc).
+   * @returns {ChannelAdjust} Returns a ChannelAdjust object. If inputs are invalid, it returns null.
+   */
+  static Create(src, channel, value) {
+    if (!src || !channel || !value)
+      return null;
+
+    return new ChannelAdjust(src, channel, value);
+  }
+}
+
+//------------------------------------
+// AUTO LEVEL
+
+class AutoLevel extends ColorLayer {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-auto-level'];
+  }
+
+  /**
+   * Create a AutoLevel object. Renders an image whose colors are normalized (brightened). Makes really dark compare/difference images easier to analyze.
+   * @param {string} src
+   * @returns {AutoLevel} Returns a AutoLevel object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
+
+    return new ChannelAdjust(src);
+  }
 }
 
 //----------------------------
 // CHANNELS
 
 /**
- * @returns {Promise<Array<string>>} Returns a Promise. If it resolves, it returns a list of channel names. Otherwise, it returns an error.
+ * @returns {Promise<Array<string>>} Returns a Promise. If it resolves, it returns a list of color channel names. Otherwise, it returns an error.
  */
 function Channels() {
   let args = ['-list', 'channel']; // convert:  prints newline delimited list of channels
@@ -694,101 +731,17 @@ function Channels() {
   }).catch(error => `Failed to make transparent: ${error}`);
 }
 
-//-------------------------------
-// ADJUST CHANNEL
-
-/**
- * Adjust RGBA channels.
- * @param {string} channel A valid Image Magick channel.
- * @param {string|number} value Can be an rgba value 0-255 or a percent string (e.g. 10%, 15%, etc).
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function AdjustChannel(src, channel, value, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to adjust channel: source is ${error}`);
-
-  error = VALIDATE.IsStringInput(channel);
-  if (error)
-    return Promise.reject(`Failed to adjust channel: channel is ${error}`);
-
-  if (typeof value == 'string') {
-    error = VALIDATE.IsStringInput(value);
-    if (error)
-      return Promise.reject(`Failed to adjust channel: value is ${error}`);
-  }
-  else if (typeof value == 'number') {
-    error = VALIDATE.IsInteger(value);
-    if (error)
-      return Promise.reject(`Failed to adjust channel: value is ${error}`);
-
-    error = VALIDATE.IsIntegerInRange(value);
-    if (error)
-      return Promise.reject(`Failed to adjust channel: value is ${error}`);
-  }
-  else
-    return Promise.reject(`Failed to adjust channel: value must be an integer or a string`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to adjust channel: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-alpha', 'set', '-channel', channel, '-evaluate', 'set', value, outputPath];
-
-    console.log(`CMD: convert ${args.join(' ')}`);
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to adjust channel: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to adjust channel: ${error}`);
-  });
-}
-
-//------------------------------------
-// AUTO LEVEL
-
-/**
- * Render an image whose colors are normalized (brightened). Makes really dark compare/difference images easier to analyze.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered.
- * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
- */
-function AutoLevel(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to normalize image: source is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to normalize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-auto-level', outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to compare images: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to compare images: ${error}`);
-  });
-}
 
 //------------------------------
 // EXPORTS
 
-exports.AdjustChannel = AdjustChannel;
+exports.CreateNegateMod = Negate.Create;
+exports.CreateColorizeMod = Colorize.Create;
+exports.CreateGrayscaleFormatMod = GrayscaleFormat.Create;
+exports.CreateRgbFormatMod = RgbFormat.Create;
+exports.CreateReplaceMod = Replace.Create;
+exports.CreateTransparencyMod = Transparency.Create;
+exports.CreateChannelAdjustMod = ChannelAdjust.Create;
+exports.CreateAutoLevelMod = AutoLevel.Create;
+
 exports.Channels = Channels;
-exports.CreateUsingRGBIntegers = Color.CreateUsingRGBIntgers;
-exports.CreateUsingPercents = Color.CreateUsingPercents;
-exports.CreateUsingRGBHexString = Color.CreateUsingRGBHexString;
-exports.Negate = Negate;
-exports.Colorize = Colorize;
-exports.ToGrayScale = ToGrayScale;
-exports.ToRGB = ToRGB;
-exports.Replace = Replace;
-exports.MakeTransparent = MakeTransparent;
