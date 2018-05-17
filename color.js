@@ -735,6 +735,8 @@ function Channels() {
 //------------------------------
 // EXPORTS
 
+exports.Color = Color;
+
 exports.CreateNegateMod = Negate.Create;
 exports.CreateColorizeMod = Colorize.Create;
 exports.CreateGrayscaleFormatMod = GrayscaleFormat.Create;
