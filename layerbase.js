@@ -105,7 +105,7 @@ class Layer {
       filepaths.push(thisFilepath);
 
       let thisArgs = GetArgs(this).concat(thisFilepath);
-      actions.push(LOCAL_COMMAND.Execute('convert', thisArgs));
+      actions.push(LOCAL_COMMAND.Execute(this.Command(), thisArgs));
 
       // Create flat list of layers
       let flatList = OPTIMIZER.Analyze(this).hierarchy.flatlist;
@@ -117,7 +117,7 @@ class Layer {
         filepaths.push(filepath);
 
         let args = GetArgs(currNode.layer_.layer).concat(filepath);
-        actions.push(LOCAL_COMMAND.Execute('convert', args));
+        actions.push(LOCAL_COMMAND.Execute(this.Command(), args));
       }
 
       // Render all layers
