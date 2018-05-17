@@ -56,6 +56,13 @@ class Layer {
   }
 
   /**
+   * Get the command used to render the layer.
+   */
+  Command() {
+    // Override (Different layers use different command keywords: i.e. 'convert <...>', 'compare <...>', etc)
+  }
+
+  /**
    * Add a layer to this layer.
    * @param {Layer} layer 
    * @param {number} xOffset 
