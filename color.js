@@ -619,7 +619,7 @@ class Replace extends ColorLayer {
 }
 
 //---------------------------------------
-// MAKE TRANSPARENT
+// TRANSPARENCY
 
 class Transparency extends ColorLayer {
   constructor(src, percent) {
