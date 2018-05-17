@@ -10,8 +10,6 @@ class Comparison extends Layer {
   }
 
   /**
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
    */
   Args() {
