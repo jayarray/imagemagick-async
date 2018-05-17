@@ -1,4 +1,5 @@
 let CANVAS = require('./canvas.js');
+let COLOR = require('./color.js');
 let COMPARE = require('./compare.js');
 let PRIMITIVES = require('./primitives.js');
 
@@ -170,8 +171,77 @@ function Difference(src1, src2) {
 
 // COLOR
 
+/**
+ * Create a Negate mod.
+ * @param {string} src 
+ */
+function Negate(src) {
+  return COLOR.CreateNegateMod(src);
+}
 
+/**
+ * Create a Colorize mod.
+ * @param {string} src 
+ * @param {string} fillColor 
+ * @param {number} percent 
+ */
+function Colorize(src, fillColor, percent) {
+  return COLOR.CreateColorizeMod(src, fillColor, percent);
+}
 
+/**
+ * Create a GrayscaleFormat mod.
+ * @param {string} src 
+ */
+function GrayscaleFormat(src) {
+  return COLOR.CreateGrayscaleFormatMod(src);
+}
+
+/**
+ * Create a RgbFormat mod.
+ * @param {string} src 
+ */
+function RgbFormat(src) {
+  return COLOR.CreateRgbFormatMod(src);
+}
+
+/**
+ * Create a Replace mod.
+ * @param {string} src 
+ * @param {string} targetColor 
+ * @param {string} desiredColor 
+ * @param {number} fuzz 
+ */
+function Replace(src, targetColor, desiredColor, fuzz) {
+  return COLOR.CreateReplaceMod(src, targetColor, desiredColor, fuzz);
+}
+
+/**
+ * Create a Transparency mod.
+ * @param {string} src 
+ * @param {number} percent 
+ */
+function Transparency(src, percent) {
+  return COLOR.CreateTransparencyMod(src, percent);
+}
+
+/**
+ * Create a ChannelAdjust mod.
+ * @param {string} src 
+ * @param {string} channel 
+ * @param {string|number} value 
+ */
+function ChannelAdjust(src, channel, value) {
+  return COLOR.CreateChannelAdjustMod(src, channel, value);
+}
+
+/**
+ * Create an AutoLevel mod.
+ * @param {string} src 
+ */
+function AutoLevel(src) {
+  return COLOR.CreateAutoLevelMod(src);
+}
 
 //-------------------------------
 // EXPORTS
@@ -191,3 +261,12 @@ exports.Text = Text;
 
 exports.Compare = Compare;
 exports.Difference = Difference;
+
+exports.Negate = Negate;
+exports.Colorize = Colorize;
+exports.GrayscaleFormat = GrayscaleFormat;
+exports.RgbFormat = RgbFormat;
+exports.Replace = Replace;
+exports.Transparency = Transparency;
+exports.ChannelAdjust = ChannelAdjust;
+exports.AutoLevel = AutoLevel;
