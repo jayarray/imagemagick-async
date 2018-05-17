@@ -143,7 +143,10 @@ class ImageCanvas extends Canvas {
     this.src_ = src;
   }
 
-  /** @override */
+  /** 
+   * @override 
+   * @returns {Array<string|number>} Returns an array of arguments.
+   * */
   GetArgs_() {
     let args = [this.src_];
 
@@ -174,9 +177,112 @@ class ImageCanvas extends Canvas {
   }
 }
 
+//----------------------------------
+// LABEL
+
+class Label extends Canvas {
+  /**
+   * @param {string} text Text string
+   * @param {number} width Width in pixels. (Optional) 
+   * @param {number} height Height in pixels. (Optional) 
+   * @param {string} font Font name (Optional) 
+   * @param {number} strokeWidth Thickness of the text outline. (Optional) 
+   * @param {string} strokeColor The color of the text outline. (Optional) 
+   * @param {string} fillColor The color inside of the text outline. (Optional) 
+   * @param {string} underColor The color under the text. (Different than background color). (Optional) 
+   * @param {string} backgroundColor The background color for the entire label. (Optional) 
+   * @param {string} gravity Gravity of the text. (Optional) 
+   */
+  constructor(text, width, height, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+    this.text_ = text;
+    this.width_ = width;
+    this.height_ = height;
+    this.font_ = font;
+    this.strokeWidth_ = strokeWidth;
+    this.strokeColor_ = strokeColor;
+    this.fillColor_ = fillColor;
+    this.underColor_ = underColor;
+    this.backgroundColor_ = backgroundColor;
+    this.gravity_ = gravity;
+  }
+
+  /** 
+   * @override
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  GetArgs_() {
+    let args = [];
+
+    if (this.width_ && this.height_)
+      args.push('-size', `${this.width_}x${this.height_}`);
+
+    if (this.backgroundColor_)
+      args.push('-background', this.backgroundColor_);
+
+    if (this.fillColor_)
+      args.push('-fill', this.backgroundColor_);
+
+    if (this.font_)
+      args.push('-font', this.font_);
+
+    if (this.strokeWidth_)
+      args.push('-strokewidth', this.strokeWidth_);
+
+    if (this.strokeColor_)
+      args.push('-stroke', this.strokeColor_);
+
+    if (this.underColor_)
+      args.push('-undercolor', this.underColor_);
+
+    if (this.gravity_)
+      args.push('-gravity', this.gravity_);
+
+    args.push(`label:${this.text_}`);
+
+    if (this.PrimitiveTuples().length > 0) {
+      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    }
+
+    return args;
+  }
+
+  /**
+   * Create a Label object with the specified properties.
+   * @param {number} width Width in pixels. (Optional) 
+   * @param {number} height Height in pixels. (Optional) 
+   * @param {string} text Text string
+   * @param {string} font Font name (Optional) 
+   * @param {number} strokeWidth Thickness of the text outline. (Optional) 
+   * @param {string} strokeColor The color of the text outline. (Optional) 
+   * @param {string} fillColor The color inside of the text outline. (Optional) 
+   * @param {string} underColor The color under the text. (Different than background color). (Optional) 
+   * @param {string} backgroundColor The background color for the entire label. (Optional) 
+   * @param {string} gravity Gravity of the text. (Optional) 
+   * @returns {Label} Returns a Label object. If inputs are invalid, it returns null.
+   */
+  static Create(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+    if (
+      (!VALIDATE.IsInstance(width) && (VALIDATE.IsInteger(width) || VALID.IsIntegerInRange(width, 1, null))) ||
+      (!VALIDATE.IsInstance(height) && (VALIDATE.IsInteger(height) || VALID.IsIntegerInRange(height, 1, null))) ||
+      VALIDATE.IsStringInput(text) ||
+      (!VALID.IsInstance(font) && VALIDATE.IsStringInput(font)) ||
+      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALID.IsIntegerInRange(strokeWidth, 1, null))) ||
+      (!VALID.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
+      (!VALID.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
+      (!VALID.IsInstance(underColor) && VALIDATE.IsStringInput(underColor)) ||
+      (!VALID.IsInstance(backgroundColor) && VALIDATE.IsStringInput(backgroundColor)) ||
+      (!VALID.IsInstance(gravity) && VALIDATE.IsStringInput(gravity))
+    )
+      return null;
+
+    return new Label(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
+  }
+}
+
 //--------------------------------
 // EXPORTS
 
 exports.CreateColorCanvas = ColorCanvas.Create;
 exports.CreateGradientCanvas = GradientCanvas.Create;
 exports.CreateImageCanvas = ImageCanvas.Create;
+exports.CreateLabelCanvas = Label.Create;
