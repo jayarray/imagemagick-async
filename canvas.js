@@ -2,7 +2,6 @@ let VALIDATE = require('./validate.js');
 let CONSTANTS = require('./constants.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 let LINUX_COMMANDS = require('linux-commands-async');
-let PATH = require('path');
 
 let Layer = require('./layerbase.js').Layer;
 
@@ -38,6 +37,14 @@ class Canvas extends Layer {
    */
   Type() {
     return 'canvas';
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the canvas.
+   */
+  Command() {
+    return 'convert';
   }
 }
 
