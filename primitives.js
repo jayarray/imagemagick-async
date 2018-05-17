@@ -35,7 +35,7 @@ class Primitive extends Layer {
    * @returns {string} Returns a string of the command used to render the primitive.
    */
   Command() {
-    return 'convert';
+    return null;
   }
 }
 
