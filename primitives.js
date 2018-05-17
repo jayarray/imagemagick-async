@@ -29,6 +29,14 @@ class Primitive extends Layer {
   Type() {
     return 'primitive';
   }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the primitive.
+   */
+  Command() {
+    return 'convert';
+  }
 }
 
 //--------------------------------
