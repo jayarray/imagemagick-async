@@ -747,6 +747,37 @@ function AdjustChannel(src, channel, value, outputPath) {
   });
 }
 
+//------------------------------------
+// AUTO LEVEL
+
+/**
+ * Render an image whose colors are normalized (brightened). Makes really dark compare/difference images easier to analyze.
+ * @param {string} src Source
+ * @param {string} outputPath The path where the resulting image will be rendered.
+ * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
+ */
+function AutoLevel(src, outputPath) {
+  let error = VALIDATE.IsStringInput(src);
+  if (error)
+    return Promise.reject(`Failed to normalize image: source is ${error}`);
+
+  error = VALIDATE.IsStringInput(outputPath);
+  if (error)
+    return Promise.reject(`Failed to normalize image: output path is ${error}`);
+
+  return new Promise((resolve, reject) => {
+    let args = [src, '-auto-level', outputPath];
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to compare images: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to compare images: ${error}`);
+  });
+}
+
 //------------------------------
 // EXPORTS
 
