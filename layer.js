@@ -1,6 +1,7 @@
 let CANVAS = require('./canvas.js');
 let COLOR = require('./color.js');
 let COMPARE = require('./compare.js');
+let COMPOSE = require('./compose.js');
 let PRIMITIVES = require('./primitives.js');
 
 //------------------------------------------
@@ -243,6 +244,89 @@ function AutoLevel(src) {
   return COLOR.CreateAutoLevelMod(src);
 }
 
+// COMPOSE
+
+/**
+ * Create a Composite mod.
+ * @param {Array<string>} filepaths 
+ * @param {string} gravity 
+ */
+function Composite(filepaths, gravity) {
+  return COMPOSE.CreateCompositeMod(filepaths, gravity);
+}
+
+/**
+ * Create a MultiplyWhiteTransparency mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function MultiplyWhiteTransparency(src1, src2) {
+  return COMPOSE.CreateMultiplyWhiteTransparencyMod(src1, src2);
+}
+
+/**
+ * Create a MultiplyBlackTransparency mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function MultiplyBlackTransparency(src1, src2) {
+  return COMPOSE.CreateMultiplyBlackTransparencyMod(src1, src2);
+}
+
+/**
+ * Create an Add mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Add(src1, src2) {
+  return COMPOSE.CreateAddMod(src1, src2);
+}
+
+/**
+ * Create a Subtract mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Subtract(src1, src2) {
+  return COMPOSE.CreateSubtractMod(src1, src2);
+}
+
+/**
+ * Create a Union mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Union(src1, src2) {
+  return COMPOSE.CreateUnionMod(src1, src2);
+}
+
+/**
+ * Create a Intersection mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Intersection(src1, src2) {
+  return COMPOSE.CreateIntersectionMod(src1, src2);
+}
+
+/**
+ * Create a Difference mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Difference(src1, src2) {
+  return COMPOSE.CreateDifferenceMod(src1, src2);
+}
+
+/**
+ * Create a Exclusion mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ */
+function Exclusion(src1, src2) {
+  return COMPOSE.CreateExclusionMod(src1, src2);
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -270,3 +354,12 @@ exports.Replace = Replace;
 exports.Transparency = Transparency;
 exports.ChannelAdjust = ChannelAdjust;
 exports.AutoLevel = AutoLevel;
+
+exports.Composite = Composite;
+exports.MultiplyWhiteTransparency = MultiplyWhiteTransparency;
+exports.MultiplyBlackTransparency = MultiplyBlackTransparency;
+exports.Add = Add;
+exports.Subtract = Subtract;
+exports.Union = Union;
+exports.Intersection = Intersection;
+exports.Difference = Difference;
