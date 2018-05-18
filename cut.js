@@ -60,8 +60,8 @@ class CutOut extends Cut {
    * @param {string} cutoutImagePath The path for the image you want to use as a mask.
    * @returns {CutOut} Returns a CutOut object. If inputs are invalid, it returns null.
    */
-  static Create(filepaths, gravity) {
-    if (!filepaths)
+  static Create(baseImagePath, cutoutImagePath) {
+    if (!baseImagePath || !cutoutImagePath)
       return null;
 
     return new CutOut(baseImagePath, cutoutImagePath);
@@ -91,11 +91,11 @@ class CutIn extends Cut {
    * @param {string} cutoutImagePath The path for the image you want to use as a mask.
    * @returns {CutIn} Returns a CutIn object. If inputs are invalid, it returns null.
    */
-  static Create(filepaths, gravity) {
-    if (!filepaths)
+  static Create(baseImagePath, cutoutImagePath) {
+    if (!baseImagePath || !cutoutImagePath)
       return null;
 
-    return new CutOut(baseImagePath, cutoutImagePath);
+    return new CutIn(baseImagePath, cutoutImagePath);
   }
 }
 
