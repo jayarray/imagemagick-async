@@ -2,6 +2,7 @@ let CANVAS = require('./canvas.js');
 let COLOR = require('./color.js');
 let COMPARE = require('./compare.js');
 let COMPOSE = require('./compose.js');
+let CUT = require('./cut.js');
 let PRIMITIVES = require('./primitives.js');
 
 //------------------------------------------
@@ -327,6 +328,26 @@ function Exclusion(src1, src2) {
   return COMPOSE.CreateExclusionMod(src1, src2);
 }
 
+// CUT
+
+/**
+ * Create a CutIn mod.
+ * @param {string} baseImagePath 
+ * @param {string} cutoutImagePath 
+ */
+function CutIn(baseImagePath, cutoutImagePath) {
+  return CUT.CreateCutInMod(baseImagePath, cutoutImagePath);
+}
+
+/**
+ * Create a CutOut mod.
+ * @param {string} baseImagePath 
+ * @param {string} cutoutImagePath 
+ */
+function CutOut(baseImagePath, cutoutImagePath) {
+  return CUT.CreateCutOutMod(baseImagePath, cutoutImagePath);
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -363,3 +384,6 @@ exports.Subtract = Subtract;
 exports.Union = Union;
 exports.Intersection = Intersection;
 exports.Difference = Difference;
+
+exports.CutIn = CutIn;
+exports.CutOut = CutOut;
