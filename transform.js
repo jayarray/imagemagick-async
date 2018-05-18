@@ -1,389 +1,293 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
+let Layer = require('./layerbase.js').Layer;
+
+//-----------------------------------
+// TRANSFORM (base class)
+
+class Transform extends Layer {
+  constructor() {
+    super();
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    // Override
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the command used to render the mod.
+   */
+  Command() {
+    return 'convert';
+  }
+
+  /**
+   * @override
+   * @returns {string} Returns a string of the type name.
+   */
+  Type() {
+    return 'mod';
+  }
+}
+
 //-----------------------------------------
 // ROLL
 
-/**
- * Roll the image horizontally.
- * @param {string} src Source
- * @param {number} pixels Number of pixels to roll horizontally. Values less than 0 will roll it to the left, and values greater than 0 will roll it to the right.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function RollHorizontal(src, pixels, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to roll image horizontally: source is ${error}`);
+class Roll extends Transform {
+  constructor(horizontal, vertical) {
+    super();
+    this.horizontal_ = horizontal;
+    this.vertical_ = vertical;
+  }
 
-  error = VALIDATE.IsInteger(pixels);
-  if (error)
-    return Promise.reject(`Failed to roll image horizontally: pixels is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to roll image horizontally: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-roll'];
-
-    if (pixels >= 0)
-      args.push(`+${pixels}+0`);
-    else
-      args.push(`-${Math.abs(pixels)}+0`);
-
-    args.push(outputPath);
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to roll image horizontally: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to roll image horizontally: ${error}`);
-  });
-}
-
-/**
- * Roll the image vertically.
- * @param {string} src Source
- * @param {number} pixels Number of pixels to roll vertically. Values less than 0 will roll it down, and values greater than 0 will roll it up.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function RollVertical(src, pixels, dest) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to roll image vertically: source is ${error}`);
-
-  error = VALIDATE.IsInteger(pixels);
-  if (error)
-    return Promise.reject(`Failed to roll image vertically: pixels is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to roll image vertically: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-roll'];
-
-    if (pixels > 0)
-      args.push(`+0-${pixels}`);
-    else
-      args.push(`+0+${Math.abs(pixels)}`);
-
-    args.push(outputPath);
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to roll image vertically: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to roll image vertically: ${error}`);
-  });
-}
-
-/**
- * Roll the image vertically.
- * @param {string} src Source
- * @param {number} horizontalPixels Number of pixels to roll horizontally. Values less than 0 will roll it to the left, and values greater than 0 will roll it to the right.
- * @param {number} verticalPixels Number of pixels to roll vertically. Values less than 0 will roll it down, and values greater than 0 will roll it up.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function RollBiDirectional(src, horizontalPixels, verticalPixels, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to roll image bi-directionally: source is ${error}`);
-
-  error = VALIDATE.IsInteger(horizontalPixels);
-  if (error)
-    return Promise.reject(`Failed to roll image bi-directionally: horizontal pixels is ${error}`);
-
-  error = VALIDATE.IsInteger(verticalPixels);
-  if (error)
-    return Promise.reject(`Failed to roll image bi-directionally: vertical pixels is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to roll image bi-directionally: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-roll'];
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    let args = [this.src_, '-roll'];
 
     let rollStr = '';
 
-    if (horizontalPixels >= 0)
-      rollStr += `+${horizontalPixels}`;
+    if (this.horizontal_ >= 0)
+      rollStr += `+${this.horizontal_}`;
     else
-      rollStr += `+${Math.abs(horizontalPixels)}`;
+      rollStr += this.horizontal_;
 
-    if (verticalPixels > 0)
-      rollStr += `-${verticalPixels}`;
+    if (this.vertical_ > 0)
+      rollStr += `-${this.vertical_}`;
     else
-      rollStr += `+${Math.abs(verticalPixels)}`;
+      rollStr += `+${Math.abs(this.vertical_)}`;
 
-    args.push(rollStr, outputPath);
+    args.push(rollStr);
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to roll image bi-directionally: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to roll image bi-directionally: ${error}`);
-  });
+    return args;
+  }
+
+  /**
+   * Create a Roll object. Rolls the image according to the given horizontal and vertical pixel values.
+   * @param {string} src
+   * @param {number} horizontal Number of pixels to roll in this direction.
+   * @param {number} vertical Number of pixels to roll in this direction.
+   * @returns {Roll} Returns a Roll object. If inputs are invalid, it returns null.
+   */
+  static Create(horizontal, vertical) {
+    if (!horizontal || !vertical)
+      return null;
+
+    return new Roll(horizontal, vertical);
+  }
 }
 
 //-----------------------------------------
 // MIRROR
 
-/**
- * Create a mirror image flipped horizontally.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function MirrorHorizontal(src, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to mirror image horizontally: source is ${error}`);
+class MirrorHorizontal extends Transform {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to mirror image horizontally: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [src, '-flop'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-flop', outputPath];
+  /**
+   * Create a MirrorHorizontal object. Creates a mirror image flipped horizontally.
+   * @param {string} src
+   * @returns {MirrorHorizontal} Returns a MirrorHorizontal object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to mirror image horizontally: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to mirror image horizontally: ${error}`);
-  });
+    return new MirrorHorizontal(src);
+  }
 }
 
-/**
- * Create a mirror image flipped vertically.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function MirrorVertical(src, dest) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to mirror image vertically: source is ${error}`);
+class MirrorVertical extends Transform {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to mirror image vertically: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [src, '-flip'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-flip', outputPath];
+  /**
+   * Create a MirrorVertical object. Creates a mirror image flipped vertically.
+   * @param {string} src
+   * @returns {MirrorVertical} Returns a MirrorVertical object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to mirror image vertically: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to mirror image vertically: ${error}`);
-  });
+    return new MirrorVertical(src);
+  }
 }
 
-/**
- * Create a mirror image flipped top-left to bottom-right.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Transpose(src, dest) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to transpose image: source is ${error}`);
+class Transpose extends Transform {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to transpose image: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [src, '-transpose'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-transpose', outputPath];
+  /**
+   * Create a Transpose object. Create a mirror image flipped top-left to bottom-right.
+   * @param {string} src
+   * @returns {Transpose} Returns a Transpose object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to transpose image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to transpose image: ${error}`);
-  });
+    return new Transpose(src);
+  }
 }
 
-/**
- * Create a mirror image flipped bottom-left to top-right.
- * @param {string} src Source
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Transverse(src, dest) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to transverse image: source is ${error}`);
+class Transverse extends Transform {
+  constructor(src) {
+    super();
+    this.src_ = src;
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to transverse image: output path is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [src, '-transverse'];
+  }
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-transverse', outputPath];
+  /**
+   * Create a Transverse object. Create a mirror image flipped bottom-left to top-right.
+   * @param {string} src
+   * @returns {Transverse} Returns a Transverse object. If inputs are invalid, it returns null.
+   */
+  static Create(src) {
+    if (!src)
+      return null;
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to transverse image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to transverse image: ${error}`);
-  });
+    return new Transverse(src);
+  }
 }
 
 //-------------------------------
 //  OFFSET
 
-/**
- * Shift an image relative to the start and end coordinates. Shift is computed as: Xshift = x1 - x0 and Yshift = y1 - y0.
- * @param {string} src Source
- * @param {number} x0 Start X-coordinate
- * @param {number} y0 Start Y-coordinate
- * @param {number} x1 End X-coordinate
- * @param {number} y1 End Y-coordinate
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
-function Offset(src, x0, y0, x1, y1, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to offset image: source is ${error}`);
+class Offset extends Transform {
+  constructor(src, x0, y0, x1, y1) {
+    super();
+    this.src_ = src;
+    this.x0_ = x0;
+    this.y0_ = y0;
+    this.x1_ = x1;
+    this.y1_ = y1;
+  }
 
-  error = VALIDATE.IsInteger(x0);
-  if (error)
-    return Promise.reject(`Failed to offset image: x0 is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.x0_},${this.y0_} ${this.x1_},${this.y1_}`];
+  }
 
-  error = VALIDATE.IsInteger(y0);
-  if (error)
-    return Promise.reject(`Failed to offset image: y0 is ${error}`);
+  /**
+   * Create an Offset object.Shift an image relative to the start and end coordinates. Shift is computed as: Xshift = x1 - x0 and Yshift = y1 - y0.
+   * @param {string} src
+   * @param {number} x0 Start X-coordinate
+   * @param {number} y0 Start Y-coordinate
+   * @param {number} x1 End X-coordinate
+   * @param {number} y1 End Y-coordinate
+   * @returns {Offset} Returns an Offset object. If inputs are invalid, it returns null.
+   */
+  static Create(src, x0, y0, x1, y1) {
+    if (!src || !x0 || !y0 || !x1 || !y1)
+      return null;
 
-  error = VALIDATE.IsInteger(x1);
-  if (error)
-    return Promise.reject(`Failed to offset image: x1 is ${error}`);
-
-  error = VALIDATE.IsInteger(y1);
-  if (error)
-    return Promise.reject(`Failed to offset image: y1 is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to offset image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [
-      src,
-      '-virtual-pixel', 'transparent',
-      '-distort', 'Affine', `${x0},${y0} ${x1},${y1}`,  // If this fails, split into two strings
-      outputPath
-    ];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to offset image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to offset image: ${error}`);
-  });
+    return new Offset(src, x0, y0, x1, y1);
+  }
 }
 
 //-----------------------------
 // ROTATE
 
-/**
- * Rotate an image around the center.
- * @param {string} src Source
- * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function RotateAroundCenter(src, degrees, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to rotate image around center: source is ${error}`);
+class RotateAroundCenter extends Transform {
+  constructor(src, degrees) {
+    super();
+    this.src_ = src;
+    this.degrees_ = degrees;
+  }
 
-  error = VALIDATE.IsInteger(degrees);
-  if (error)
-    return Promise.reject(`Failed to rotate image around center: degrees is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return ['-distort', 'SRT', this.degrees_, this.src_];
+  }
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to rotate image around center: output path is ${error}`);
+  /**
+   * Create a RotateAroundCenter object. Rotate an image around the center.
+   * @param {string} src
+   * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
+   * @returns {RotateAroundCenter} Returns a RotateAroundCenter object. If inputs are invalid, it returns null.
+   */
+  static Create(src, degrees) {
+    if (!src || !degrees)
+      return null;
 
-  return new Promise((resolve, reject) => {
-    let args = ['-distort', 'SRT', degrees, src, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to rotate image around center: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to rotate image around center: ${error}`);
-  });
+    return new RotateAroundCenter(src, degrees);
+  }
 }
 
-/**
- * Rotate an image around a point.
- * @param {string} src Source
- * @param {numbers} x X-coordinate of the point.
- * @param {numbers} y Y-ccordinate of the point.
- * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function RotateAroundPoint(src, x, y, degrees, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to rotate image around point: source is ${error}`);
+class RotateAroundPoint extends Transform {
+  constructor(src, x, y, degrees) {
+    super();
+    this.src_ = src;
+    this.x_ = x;
+    this.y_ = y;
+    this.degrees_ = degrees;
+  }
 
-  error = VALIDATE.IsInteger(x);
-  if (error)
-    return Promise.reject(`Failed to rotate image around point: x is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return ['-distort', 'SRT', `${this.x_},${this.y_} ${this.degrees_}`, this.src_];
+  }
 
-  error = VALIDATE.IsInteger(y);
-  if (error)
-    return Promise.reject(`Failed to rotate image around point: y is ${error}`);
+  /**
+   * Create a RotateAroundPoint object. Rotate an image around a point.
+   * @param {string} src
+   * @param {numbers} x X-coordinate of the point.
+   * @param {numbers} y Y-ccordinate of the point.
+   * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
+   * @returns {RotateAroundPoint} Returns a RotateAroundPoint object. If inputs are invalid, it returns null.
+   */
+  static Create(src, x, y, degrees) {
+    if (!src || !x || !y || !degrees)
+      return null;
 
-  error = VALIDATE.IsInteger(degrees);
-  if (error)
-    return Promise.reject(`Failed to rotate image around point: degrees is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to rotate image around point: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = ['-distort', 'SRT', `${x},${y} ${degrees}`, src, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to rotate image around point: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to rotate image around point: ${error}`);
-  });
+    return new RotateAroundPoint(src, x, y, degrees);
+  }
 }
 
 //--------------------------------------
