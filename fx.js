@@ -327,7 +327,7 @@ exports.CreateSwirlFx = Swirl.Create;
 exports.CreateImplodeFx = Implode.Create;
 exports.CreateWaveFx = Wave.Create;
 
-exports.CreateBlurfx = Blur.Create;
+exports.CreateBlurFx = Blur.Create;
 exports.CreateCharcoalSketchFx = CharcoalSketch.Create;
 exports.CreateColoringBookSketchFx = ColoringBookSketch.Create;
 exports.CreateOilPaintingFx = OilPainting.Create;
