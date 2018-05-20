@@ -77,7 +77,7 @@ class Composite extends Compose {
    * @returns {Composite} Returns a Composite object. If inputs are invalid, it returns null.
    */
   static Create(filepaths, gravity) {
-    if (!filepaths)
+    if (!filepaths || filepaths.length < 2)
       return null;
 
     return new Composite(filepaths, gravity);
