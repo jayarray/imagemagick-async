@@ -4,6 +4,7 @@ let COMPARE = require('./compare.js');
 let COMPOSE = require('./compose.js');
 let CUT = require('./cut.js');
 let FX = require('./fx.js');
+let TRANSFORM = require('./transform.js');
 let PRIMITIVES = require('./primitives.js');
 
 //------------------------------------------
@@ -16,7 +17,7 @@ let PRIMITIVES = require('./primitives.js');
  * @param {string} color Hex string
  * @returns {Layer} Returns a Layer object.
  */
-function FromColor(width, height, color) {
+function ColorCanvas(width, height, color) {
   return CANVAS.CreateColorCanvas(width, height, color);
 }
 
@@ -27,7 +28,7 @@ function FromColor(width, height, color) {
  * @param {Gradient} gradient 
  * @returns {Layer} Returns a Layer object.
  */
-function FromGradient(width, height, gradient) {
+function GradientCanvas(width, height, gradient) {
   return CANVAS.CreateGradientCanvas(width, height, gradient);
 }
 
@@ -36,7 +37,7 @@ function FromGradient(width, height, gradient) {
  * @param {string} path Image location
  * @returns {Layer} Returns a Layer object.
  */
-function FromPath(path) {
+function ImageCanvas(path) {
   return CANVAS.CreateImageCanvas(path);
 }
 
@@ -54,7 +55,7 @@ function FromPath(path) {
  * @param {string} gravity
  * @returns {Layer} Returns a Layer object.
  */
-function FromLabel(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+function LabelCanvas(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
   return CANVAS.CreateLabelCanvas(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
 }
 
@@ -428,6 +429,152 @@ function PencilSketch(src, radius, sigma, angle) {
   return FX.CreatePencilSketchFx(src, radius, sigma, angle);
 }
 
+// TRANSFORMS
+
+/**
+ * Create a Roll mod.
+ * @param {number} horizontal 
+ * @param {number} vertical 
+ */
+function Roll(horizontal, vertical) {
+  return TRANSFORM.CreateRollMod(horizontal, vertical);
+}
+
+/**
+ * Create a Mirror Horizontal object.
+ * @param {string} src 
+ */
+function MirrorHorizontal(src) {
+  return TRANSFORM.CreateMirrorHorizontalMod(src);
+}
+
+/**
+ * Create a Mirror Vertical object.
+ * @param {string} src 
+ */
+function MirrorVertical(src) {
+  return TRANSFORM.CreateMirrorVerticalMod(src);
+}
+
+/**
+ * Create a Transpose object.
+ * @param {string} src 
+ */
+function Transpose(src) {
+  return TRANSFORM.CreateTransposeMod(src);
+}
+
+/**
+ * Create a Transverse object.
+ * @param {string} src 
+ */
+function Transverse(src) {
+  return TRANSFORM.CreateTransverseMod(src);
+}
+
+/**
+ * Create an Offset object.
+ * @param {string} src 
+ * @param {number} x0 
+ * @param {number} y0 
+ * @param {number} x1 
+ * @param {number} y1 
+ */
+function Offset(src, x0, y0, x1, y1) {
+  return TRANSFORM.CreateOffsetMod(src, x0, y0, x1, y1);
+}
+
+/**
+ * Create a Rotate Around Center object.
+ * @param {string} src 
+ * @param {number} degrees 
+ */
+function RotateAroundCenter(src, degrees) {
+  return TRANSFORM.CreateRotateAroundCenterMod(src, degrees);
+}
+
+/**
+ * Create a Rotate Around Point object.
+ * @param {string} src 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} degrees 
+ */
+function RotateAroundPoint(src, x, y, degrees) {
+  return TRANSFORM.CreateRotateAroundPointMod(src, x, y, degrees);
+}
+
+/**
+ * Create a Resize Ignore Aspect Ratio object.
+ * @param {string} src 
+ * @param {number} width 
+ * @param {number} height 
+ */
+function ResizeIgnoreAspectRatio(src, width, height) {
+  return TRANSFORM.CreateResizeIgnoreAspectRatioMod(src, width, height);
+}
+
+/**
+ * Create a Resize Only Shrink Larger object.
+ * @param {string} src 
+ * @param {number} width 
+ * @param {number} height 
+ */
+function ResizeOnlyShrinkLarger(src, width, height) {
+  return TRANSFORM.CreateResizeOnlyShrinkLargerMod(src, width, height);
+}
+
+/**
+ * Create a Resize Only Enlarge Smaller object.
+ * @param {string} src 
+ * @param {number} width 
+ * @param {number} height 
+ */
+function ResizeOnlyEnlargeSmaller(src, width, height) {
+  return TRANSFORM.CreateResizeOnlyEnlargeSmallerMod(src, width, height);
+}
+
+/**
+ * Create a Resize Fill Given Area object.
+ * @param {string} src 
+ * @param {number} width 
+ * @param {number} height 
+ */
+function ResizeFillGivenArea(src, width, height) {
+  return TRANSFORM.CreateResizeFillGivenAreaMod(src, width, height);
+}
+
+/**
+ * Create Resize Percentage object.
+ * @param {string} src 
+ * @param {number} percent 
+ */
+function ResizePercentage(src, percent) {
+  return TRANSFORM.CreateResizePercentageMod(src, percent);
+}
+
+/**
+ * Create Resize Pixel Count Limit object.
+ * @param {string} src 
+ * @param {number} pixels 
+ */
+function ResizePixelCountLimit(src, pixels) {
+  return TRANSFORM.CreateResizePixelCountLimitMod(src, pixels);
+}
+
+/**
+ * Create Crop object.
+ * @param {string} src 
+ * @param {number} width 
+ * @param {number} height 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {boolean} removeVirtualCanvas 
+ */
+function Crop(src, width, height, x, y, removeVirtualCanvas) {
+  return TRANSFORM.CreateCropMod(src, width, height, x, y, removeVirtualCanvas);
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -476,3 +623,19 @@ exports.CharcoalSketch = CharcoalSketch;
 exports.ColoringBookSketch = ColoringBookSketch;
 exports.OilPainting = OilPainting;
 exports.PencilSketch = PencilSketch;
+
+exports.Roll = Roll;
+exports.MirrorHorizontal = MirrorHorizontal;
+exports.MirrorVertical = MirrorVertical;
+exports.Transpose = Transpose;
+exports.Transverse = Transverse;
+exports.Offset = Offset;
+exports.RotateAroundCenter = RotateAroundCenter;
+exports.RotateAroundPoint = RotateAroundPoint;
+exports.ResizeIgnoreAspectRatio = ResizeIgnoreAspectRatio;
+exports.ResizeOnlyShrinkLarger = ResizeOnlyShrinkLarger;
+exports.ResizeOnlyEnlargeSmaller = ResizeOnlyEnlargeSmaller;
+exports.ResizeFillGivenArea = ResizeFillGivenArea;
+exports.ResizePercentage = ResizePercentage;
+exports.ResizePixelCountLimit = ResizePixelCountLimit;
+exports.Crop = Crop;
