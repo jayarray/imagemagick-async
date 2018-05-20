@@ -135,29 +135,6 @@ class Layer {
   }
 }
 
-//---------------------------------------
-// MODS
-
-class Mod extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @override
-   */
-  Render(outputPath) {
-
-  }
-
-  /**
-   * @override
-   */
-  Type() {
-    return 'mod';
-  }
-}
-
 //--------------------------------------
 // EXPORTS
 
