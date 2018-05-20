@@ -293,362 +293,251 @@ class RotateAroundPoint extends Transform {
 //--------------------------------------
 // RESIZE 
 
-/**
- * Resize image while ignoring aspect ratio and distort image to the size specified.
- * @param {string} src Source
- * @param {number} width Width (in pixels)
- * @param {number} height Height (in pixels)i
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizeIgnoreAspectRatio(src, width, height, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class Resize extends Transform {
+  constructor(src, width, height) {
+    this.src_ = src;
+    this.width_ = width;
+    this.height_ = height;
+  }
 
-  error = VALIDATE.IsNumber(width);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
-
-  error = VALIDATE.IsNumberInRange(width, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
-
-  error = VALIDATE.IsNumber(height);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsNumberInRange(height, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${width}x${height}!`, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+  Args_(resizeOp) {
+    return [this.src_, '-resize', `${this.width_}x${this.height_}${resizeOp}`];
+  }
 }
 
-/**
- * Resize image and only shrink images that are smaller than the given size.
- * @param {string} src Source
- * @param {number} width Width (in pixels)
- * @param {number} height Height (in pixels)i
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizeOnlyShrinkLarger(src, width, height, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class ResizeIgnoreAspectRatio extends Resize {
+  constructor(src, width, height) {
+    super(src, width, height);
+  }
 
-  error = VALIDATE.IsNumber(width);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return this.Args_('!');
+  }
 
-  error = VALIDATE.IsNumberInRange(width, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * Create a ResizeIgnoreAspectRatio object. Resize image while ignoring aspect ratio and distort image to the size specified.
+   * @param {string} src
+   * @param {number} width
+   * @param {number} height
+   * @returns {ResizeIgnoreAspectRatio} Returns a ResizeIgnoreAspectRatio object. 
+   */
+  static Create(src, width, height) {
+    if (!src || !width || !height)
+      return null;
 
-  error = VALIDATE.IsNumber(height);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsNumberInRange(height, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${width}x${height}>`, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+    return new ResizeIgnoreAspectRatio(src, width, height);
+  }
 }
 
-/**
- * Resize image and only enlarge images that are smaller than the given size.
- * @param {string} src Source
- * @param {number} width Width (in pixels)
- * @param {number} height Height (in pixels)i
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizeOnlyEnlargeSmaller(src, width, height, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class ResizeOnlyShrinkLarger extends Resize {
+  constructor(src, width, height) {
+    super(src, width, height);
+  }
 
-  error = VALIDATE.IsNumber(width);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return this.Args_('>');
+  }
 
-  error = VALIDATE.IsNumberInRange(width, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * Create a ResizeOnlyShrinkLarger object.Resize image and only shrink images that are smaller than the given size.
+   * @param {string} src
+   * @param {number} width
+   * @param {number} height
+   * @returns {ResizeOnlyShrinkLarger} Returns a ResizeOnlyShrinkLarger object. 
+   */
+  static Create(src, width, height) {
+    if (!src || !width || !height)
+      return null;
 
-  error = VALIDATE.IsNumber(height);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsNumberInRange(height, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${width}x${height}<`, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+    return new ResizeOnlyShrinkLarger(src, width, height);
+  }
 }
 
-/**
- * Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.
- * @param {string} src Source
- * @param {number} width Width (in pixels)
- * @param {number} height Height (in pixels)i
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizeFillGivenArea(src, width, height, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class ResizeOnlyEnlargeSmaller extends Resize {
+  constructor(src, width, height) {
+    super(src, width, height);
+  }
 
-  error = VALIDATE.IsNumber(width);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return this.Args_('<');
+  }
 
-  error = VALIDATE.IsNumberInRange(width, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: width is ${error}`);
+  /**
+   * Create a ResizeOnlyEnlargeSmaller object. Resize image and only enlarge images that are smaller than the given size.
+   * @param {string} src
+   * @param {number} width
+   * @param {number} height
+   * @returns {ResizeOnlyEnlargeSmaller} Returns a ResizeOnlyEnlargeSmaller object. 
+   */
+  static Create(src, width, height) {
+    if (!src || !width || !height)
+      return null;
 
-  error = VALIDATE.IsNumber(height);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsNumberInRange(height, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: height is ${error}`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${width}x${height}^`, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+    return new ResizeOnlyEnlargeSmaller(src, width, height);
+  }
 }
 
-/**
- * Resize image by the specified percentage.
- * @param {string} src Source
- * @param {number} percent Percent for increasing/decreasing the size. Minimum value is 0.
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizePercentage(src, percent, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class ResizeFillGivenArea extends Resize {
+  constructor(src, width, height) {
+    super(src, width, height);
+  }
 
-  error = VALIDATE.IsNumber(percent);
-  if (error)
-    return Promise.reject(`Failed to resize image: percent is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return this.Args_('^');
+  }
 
-  error = VALIDATE.IsNumberInRange(percent, 0, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: percent is ${error}`);
+  /**
+   * Create a ResizeFillGivenArea object. Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.
+   * @param {string} src
+   * @param {number} width
+   * @param {number} height
+   * @returns {ResizeFillGivenArea} Returns a ResizeFillGivenArea object. 
+   */
+  static Create(src, width, height) {
+    if (!src || !width || !height)
+      return null;
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${percent}%`, outputPath];
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+    return new ResizeFillGivenArea(src, width, height);
+  }
 }
 
-/**
- * Resize image to contain no more than a certain number of pixels.
- * @param {string} src Source
- * @param {number} pixels the number of pixels (greater than 0) that the image should have.
- * @param {string} outputPath the path that the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function ResizePixelCountLimit(src, pixels, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to resize image: source is ${error}`);
+class ResizePercentage extends Transform {
+  constructor(src, percent) {
+    this.src_ = src;
+    this.percent_ = percent;
+  }
 
-  error = VALIDATE.IsInteger(pixels);
-  if (error)
-    return Promise.reject(`Failed to resize image: pixels is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-resize', `${this.percent_}%`];
+  }
 
-  error = VALIDATE.IsIntegerInRange(pixels, 1, null);
-  if (error)
-    return Promise.reject(`Failed to resize image: pixels is ${error}`);
+  /**
+   * Create a ResizePercentage object. Resize image by the specified percentage.
+   * @param {string} src
+   * @param {number} percent Percent for increasing/decreasing the size. Minimum value is 0.
+   * @returns {ResizePercentage} Returns a ResizePercentage object. 
+   */
+  static Create(src, percent) {
+    if (!src || !percent)
+      return null;
 
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to resize image: output path is ${error}`);
+    return new ResizePercentage(src, percent);
+  }
+}
 
-  return new Promise((resolve, reject) => {
-    let args = [src, '-resize', `${pixels}@`, outputPath];
+class ResizePixelCountLimit extends Transform {
+  constructor(src, pixels) {
+    this.src_ = src;
+    this.pixels_ = pixels;
+  }
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to resize image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to resize image: ${error}`);
-  });
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    return [this.src_, '-resize', `${this.pixels_}@`];
+  }
+
+  /**
+   * Create a ResizePixelCountLimit object. Resize image to contain no more than a certain number of pixels.
+   * @param {string} src
+   * @param {number} pixels the number of pixels (greater than 0) that the image should have.
+   * @returns {ResizePixelCountLimit} Returns a ResizePixelCountLimit object. 
+   */
+  static Create(src, pixels) {
+    if (!src || !pixels)
+      return null;
+
+    return new ResizePixelCountLimit(src, pixels);
+  }
 }
 
 //--------------------------------
 // CROP
 
-/**
- * Crop an image starting from (x,y) with specified width and height.
- * @param {string} src Source
- * @param {number} width Width (in pixels)
- * @param {number} height Height (in pixels)
- * @param {number} x X-coordinate of the top-left corner of the crop area.
- * @param {number} y Y-coordinate of the top-left corner of the crop area.
- * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error. 
- */
-function Crop(src, width, height, x, y, removeVirtualCanvas, outputPath) {
-  let error = VALIDATE.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to crop image: source is ${error}`);
+class Crop extends Transform {
+  constructor(src, width, height, x, y, removeVirtualCanvas) {
+    this.src_ = src;
+    this.width_ = width;
+    this.height_ = height;
+    this.x_ = x;
+    this.y_ = y;
+    this.removeVirtualCanvas = removeVirtualCanvas;
+  }
 
-  error = VALIDATE.IsInteger(width);
-  if (error)
-    return Promise.reject(`Failed to crop image: width is ${error}`);
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  Args() {
+    let args = [this.src_, '-crop'];
 
-  error = VALIDATE.IsIntegerInRange(width, 0, null);
-  if (error)
-    return Promise.reject(`Failed to crop image: width is ${error}`);
+    let cropStr = `${this.width_}x${this.height_}`;
 
-  error = VALIDATE.IsInteger(height);
-  if (error)
-    return Promise.reject(`Failed to crop image: height is ${error}`);
-
-  error = VALIDATE.IsIntegerInRange(height, 0, null);
-  if (error)
-    return Promise.reject(`Failed to crop image: height is ${error}`);
-
-  error = VALIDATE.IsInteger(x);
-  if (error)
-    return Promise.reject(`Failed to crop image: x is ${error}`);
-
-  error = VALIDATE.IsInteger(y);
-  if (error)
-    return Promise.reject(`Failed to crop image: y is ${error}`);
-
-  let isBoolean = removeVirtualCanvas === false || removeVirtualCanvas === true;
-  if (!isBoolean)
-    return Promise.reject(`Failed to crop image: removeVirtualCanvas is not a boolean value`);
-
-  error = VALIDATE.IsStringInput(outputPath);
-  if (error)
-    return Promise.reject(`Failed to crop image: output path is ${error}`);
-
-  return new Promise((resolve, reject) => {
-    let args = [src, '-crop'];
-
-    let cropStr = `${width}x${height}`;
-
-    if (x >= 0)
-      cropStr += `+${x}`;
+    if (this.x_ >= 0)
+      cropStr += `+${this.x_}`;
     else
-      cropStr += `-${Math.abs(x)}`;
+      cropStr += this.x_.toString();
 
-    if (y >= 0)
-      cropStr += `+${y}`;
+    if (this.y_ >= 0)
+      cropStr += `+${this._y}`;
     else
-      cropStr += `-${Math.abs(y)}`;
+      cropStr += this.y_.toString();
     args.push(cropStr)
 
-    if (removeVirtualCanvas)
+    if (this.removeVirtualCanvas_)
       args.push('+repage');
-    args.push(outputPath);
 
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to crop image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to crop image: ${error}`);
-  });
+    return args;
+  }
+
+  /**
+   * Create a Crop object. Crop an image starting from (x,y) with specified width and height.
+   * @param {number} width Width (in pixels)
+   * @param {number} height Height (in pixels)
+   * @param {number} x X-coordinate of the top-left corner of the crop area.
+   * @param {number} y Y-coordinate of the top-left corner of the crop area.
+   * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
+   * @returns {Crop} Returns a Crop object. 
+   */
+  static Create(src, pixels) {
+    if (!src || !width || !height || !x || !y || !removeVirtualCanvas)
+      return null;
+
+    return new Crop(src, width, height, x, y, removeVirtualCanvas);
+  }
 }
 
 //-----------------------------------
 // EXPORTS
 
-exports.Crop = Crop;
-exports.MirrorHorizontal = MirrorHorizontal;
-exports.MirrorVertical = MirrorVertical;
-exports.Offset = Offset;
-exports.ResizeFillGivenArea = ResizeFillGivenArea;
-exports.ResizeIgnoreAspectRatio = ResizeIgnoreAspectRatio;
-exports.ResizeOnlyEnlargeSmaller = ResizeOnlyEnlargeSmaller;
-exports.ResizeOnlyShrinkLarger = ResizeOnlyShrinkLarger;
-exports.ResizePercentage = ResizePercentage;
-exports.ResizePixelCountLimit = ResizePixelCountLimit;
-exports.RollHorizontal = RollHorizontal;
-exports.RollVertical = RollVertical;
-exports.RollBiDirectional = RollBiDirectional;
-exports.RotateAroundCenter = RotateAroundCenter;
-exports.RotateAroundPoint = RotateAroundPoint;
-exports.Transpose = Transpose;
-exports.Transverse = Transverse;
+exports.CreateRollMod = Roll.Create;
+exports.CreateMirrorHorizontalMod = MirrorHorizontal.Create;
+exports.CreateMirrorVerticalMod = MirrorVertical.Create;
+exports.CreateTransposeMod = Transpose.Create;
+exports.CreateTransverseMod = Transverse.Create;
+exports.CreateOffsetMod = Offset.Create;
+exports.CreateRotateAroundCenterMod = RotateAroundCenter.Create;
+exports.CreateRotateAroundPointMod = RotateAroundPoint.Create;
+exports.CreateResizeIgnoreAspectRatioMod = ResizeIgnoreAspectRatio.Create;
+exports.CreateResizeOnlyShrinkLargerMod = ResizeOnlyShrinkLarger.Create;
+exports.CreateResizeOnlyEnlargeSmallerMod = ResizeOnlyEnlargeSmaller.Create;
+exports.CreateResizeFillGivenAreaMod = ResizeFillGivenArea.Create;
+exports.CreateResizePercentageMod = ResizePercentage.Create;
+exports.CreateResizePixelCountLimitMod = ResizePixelCountLimit.Create;
+exports.CreateCropMod = Crop.Create;
 
