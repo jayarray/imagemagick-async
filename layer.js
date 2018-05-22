@@ -578,10 +578,10 @@ function Crop(src, width, height, x, y, removeVirtualCanvas) {
 //-------------------------------
 // EXPORTS
 
-exports.FromColor = FromColor;
-exports.FromGradient = FromGradient;
-exports.FromPath = FromPath;
-exports.FromLabel = FromLabel;
+exports.ColorCanvas = ColorCanvas;
+exports.GradientCanvas = GradientCanvas;
+exports.ImageCanvas = ImageCanvas;
+exports.LabelCanvas = LabelCanvas;
 
 exports.Bezier = Bezier;
 exports.Circle = Circle;
