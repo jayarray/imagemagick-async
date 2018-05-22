@@ -7,6 +7,7 @@ let LINUX_COMMANDS = require('linux-commands-async');
 // CONSTANTS
 
 const GUID_LENGTH = 32;
+const MIN_FILEPATHS = 2;
 
 //--------------------------------
 // GUID
@@ -80,13 +81,22 @@ class Layer {
       let parentDir = LINUX_COMMANDS.Path.ParentDir(outputPath);
 
       this.RenderLayers_(parentDir).then(filepaths => {
-        // Create composite
-        RenderComposite(filepaths, null, outputPath).then(success => {
-          // Clean up temp files
-          LINUX_COMMANDS.Remove.Files(filepaths, LOCAL_COMMAND).then(success => {
+        // Finish if no compositing is needed.
+        if (filepaths.length < MIN_FILEPATHS) {
+          LINUX_COMMANDS.Move.Move(filepaths[0], outputPath, LOCAL_COMMAND).then(success => {
             resolve();
+            return;
           }).catch(error => reject(error));
-        }).catch(error => reject(error));
+        }
+        else {
+          // Create composite
+          RenderComposite(filepaths, null, outputPath).then(success => {
+            // Clean up temp files
+            LINUX_COMMANDS.Remove.Files(filepaths, LOCAL_COMMAND).then(success => {
+              resolve();
+            }).catch(error => reject(error));
+          }).catch(error => reject(error));
+        }
       }).catch(error => reject(error));
     });
   }
@@ -138,9 +148,8 @@ class Layer {
 // COMPOSITE
 
 function RenderComposite(filepaths, gravity, outputPath) {
-  let minCount = 2;
-  if (filepaths.length < minCount)
-    return new Promise.reject(`Failed to create composite: ${minCount} or more filepaths required.`);
+  if (filepaths.length < MIN_FILEPATHS)
+    return Promise.reject(`Failed to create composite: ${MIN_FILEPATHS} or more filepaths required.`);
 
   return new Promise((resolve, reject) => {
     let args = [];
