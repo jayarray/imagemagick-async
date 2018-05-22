@@ -11,15 +11,15 @@ let Layer = require('./layerbase.js').Layer;
 class Canvas extends Layer {
   constructor() {
     super();
-    this.primitiveTuples = [];
+    this.primitiveTuples_ = [];
   }
 
   AddPrimitiveTuple(p, xOffset, yOffset) {
-    this.primitiveTuples.push({ primitive: p, xOffset: xOffset, yOffset: yOffset });
+    this.primitiveTuples_.push({ primitive: p, xOffset: xOffset, yOffset: yOffset });
   }
 
   PrimitiveTuples() {
-    return this.primitiveTuples;
+    return this.primitiveTuples_;
   }
 
   /**
