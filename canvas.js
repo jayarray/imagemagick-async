@@ -71,9 +71,8 @@ class ColorCanvas extends Canvas {
   GetArgs_() {
     let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
 
-    if (this.PrimitiveTuples().length > 0) {
+    if (this.PrimitiveTuples().length > 0)
       this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
-    }
 
     return args;
   }
@@ -116,9 +115,8 @@ class GradientCanvas extends Canvas {
   GetArgs_() {
     let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
-    if (this.PrimitiveTuples().length > 0) {
+    if (this.PrimitiveTuples().length > 0)
       this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
-    }
 
     return args;
   }
@@ -157,9 +155,8 @@ class ImageCanvas extends Canvas {
   GetArgs_() {
     let args = [this.src_];
 
-    if (this.PrimitiveTuples().length > 0) {
+    if (this.PrimitiveTuples().length > 0)
       this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
-    }
 
     return args;
   }
@@ -246,9 +243,8 @@ class Label extends Canvas {
 
     args.push(`label:${this.text_}`);
 
-    if (this.PrimitiveTuples().length > 0) {
+    if (this.PrimitiveTuples().length > 0)
       this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
-    }
 
     return args;
   }
