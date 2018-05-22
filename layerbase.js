@@ -85,7 +85,6 @@ class Layer {
         if (filepaths.length < MIN_FILEPATHS) {
           LINUX_COMMANDS.Move.Move(filepaths[0], outputPath, LOCAL_COMMAND).then(success => {
             resolve();
-            return;
           }).catch(error => reject(error));
         }
         else {
