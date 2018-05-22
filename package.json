@@ -1,14 +1,24 @@
 {
   "name": "imagemagick-async",
   "version": "1.0.0",
-  "description": "An API for Image Magick commands",
-  "main": "api.js",
+  "description": "",
+  "main": "test.js",
   "dependencies": {
+    "ffmpeg-async": "^1.0.2",
     "linux-commands-async": "^1.2.0"
   },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jesus Isaias Arevalo",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jayarray/imagemagick-async.git"
+  },
+  "author": "Jesus Arevalo <isa90201@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jayarray/imagemagick-async/issues"
+  },
+  "homepage": "https://github.com/jayarray/imagemagick-async#readme"
 }
