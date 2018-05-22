@@ -1,7 +1,6 @@
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 let PATH = require('path');
 let OPTIMIZER = require('./optimizer.js');
-let COMPOSE = require('./compose.js');
 let LINUX_COMMANDS = require('linux-commands-async');
 
 //--------------------------------
@@ -82,7 +81,7 @@ class Layer {
 
       this.RenderLayers_(parentDir).then(filepaths => {
         // Create composite
-        COMPOSE.Composite(filepaths, null, outputPath).then(success => {
+        RenderComposite(filepaths, null, outputPath).then(success => {
           // Clean up temp files
           LINUX_COMMANDS.Remove.Files(filepaths, LOCAL_COMMAND).then(success => {
             resolve();
@@ -133,6 +132,39 @@ class Layer {
   Type() {
     // Override
   }
+}
+
+//-------------------------------------
+// COMPOSITE
+
+function RenderComposite(filepaths, gravity, outputPath) {
+  let minCount = 2;
+  if (filepaths.length < minCount)
+    return new Promise.reject(`Failed to create composite: ${minCount} or more filepaths required.`);
+
+  return new Promise((resolve, reject) => {
+    let args = [];
+
+    if (this.gravity_)
+      args.push('-gravity', this.gravity_);
+
+    // Add first 2 paths
+    args.push(this.filepaths_[0], this.filepaths_[1]);
+
+    // Add other parts accordingly
+    for (let i = 2; i < this.filepaths_.length; ++i) {
+      args.push('-composite', this.filepaths_[i]);
+    }
+    args.push('-composite', outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to creaqte GIF: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to create GIF: ${error}`);
+  });
 }
 
 //--------------------------------------
