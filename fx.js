@@ -1,39 +1,7 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
-let Layer = require('./layerbase.js').Layer;
-
-//---------------------------------
-// FX
-
-class Fx extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'fx';
-  }
-}
+let Fx = require('./fxbaseclass.js').Fx;
 
 //---------------------------------
 // SWIRL
@@ -50,6 +18,13 @@ class Swirl extends Fx {
    */
   Args() {
     return [this.src_, '-swirl', this.degrees_];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Swirl';
   }
 
   /**
@@ -84,6 +59,13 @@ class Implode extends Fx {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Implode';
+  }
+
+  /**
    * Create an Implode object. Applies an implode effect to an image.
    * @param {string} src
    * @param {number} factor Implosions have values between 0 and 1 (and anything greater than 1 sucks pixels into oblivion). Explosions have values between 0 and -1 (and anything less than -1 distorts pixels outward). 
@@ -113,6 +95,13 @@ class Wave extends Fx {
    */
   Args() {
     return [this.src_, '-background', 'transparent', '-wave', `${this.amplitude_}x${this.frequency_}`];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Wave';
   }
 
   /**
@@ -165,6 +154,13 @@ class Blur extends Fx {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Blur';
+  }
+
+  /**
    * Create a Blur object. Applies a blur filter to an image.
    * @param {string} src 
    * @param {number} radius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
@@ -198,6 +194,13 @@ class OilPainting extends Fx {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'OilPainting';
+  }
+
+  /**
    * Create a OilPainting object. Applies an oil painting filter to an image.
    * @param {string} src 
    * @param {number} paintValue An integer value greater than 0 that determines the intensity of the filter. Higher values will make it look more abstract and more like a painting.
@@ -226,6 +229,13 @@ class CharcoalSketch extends Fx {
    */
   Args() {
     return [this.src_, '-charcoal', this.charcoalValue_];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'CharcoalSketch';
   }
 
   /**
@@ -266,6 +276,13 @@ class ColoringBookSketch extends Fx {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'ColoringBookSketch';
+  }
+
+  /**
    * Create a ColoringBookSketch object. Applies a coloring book sketch filter to an image.
    * @param {string} src 
    * @param {boolean} isHeavilyShaded Assign as true if the image has a lot of shading. False otherwise.
@@ -303,6 +320,13 @@ class PencilSketch extends Fx {
     args.push('-blur', `${this.radius_}x${this.sigma_}`);
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'PencilSketch';
   }
 
   /**
