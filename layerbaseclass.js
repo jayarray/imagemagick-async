@@ -2,38 +2,12 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 let PATH = require('path');
 let OPTIMIZER = require('./optimizer.js');
 let LINUX_COMMANDS = require('linux-commands-async');
+let GUID = require('guid.js');
 
 //--------------------------------
 // CONSTANTS
 
-const GUID_LENGTH = 32;
 const MIN_FILEPATHS = 2;
-
-//--------------------------------
-// GUID
-
-/**
- * Create a GUID.
- * @param {number} length
- * @returns {string} Returns a GUID string.
- */
-function GUID(length) {
-  let guid = '';
-
-  for (let i = 0; i < length; ++i)
-    guid += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-
-  return guid;
-}
-
-/**
- * Create a filename with GUID as name.
- * @param {number} length 
- * @param {string} extension 
- */
-function GuidFilenameGenerator(length, extension) {
-  return `${GUID(length)}.${extension}`;
-}
 
 //---------------------------------
 // ARGS
@@ -50,7 +24,7 @@ function GetArgs(layer) {
 //---------------------------------
 // LAYER (Base class)
 
-class Layer {
+class LayerBaseClass {
   constructor() {
     this.layers_ = [];
   }
@@ -136,9 +110,37 @@ class Layer {
   }
 
   /**
+   * Use this function to render an image without applying any effects or layers to it.
+   * @param {string} outputPath 
+   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
+   */
+  RenderTempFile_(outputDir, format) {
+    return new Promise((resolve, reject) => {
+      let filepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, format));
+      let cmd = this.Command();
+      let args = GetArgs(this).concat(filepath);
+
+      LOCAL_COMMAND.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+        resolve(filepath);
+      }).catch(error => reject(error));
+    });
+  }
+
+  /**
    * @returns {string} Returns the type of layer.
    */
   Type() {
+    // Override
+  }
+
+  /**
+   * @returns {string} Returns the name of the layer.
+   */
+  Name() {
     // Override
   }
 }
@@ -184,6 +186,26 @@ const PromiseSerial = funcs =>
     Promise.resolve([]));
 
 
+function ApplyEffectsInSequence(layers, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let apply = (currLayer, layers) => {
+      if (!currLayer)
+        return;
+
+      currLayer.RenderTempFile_(outputDir, format).then(filepath => {
+        resolve();
+      }).catch(error => reject(error));
+    }
+
+    apply(layers[0], layers.slice(1));
+
+    funcs.reduce((promise, func) =>
+      promise.then(result => func().then(Array.prototype.concat.bind(result))),
+      Promise.resolve([]));
+  });
+}
+
+
 /**
  * Get an ordered flat list of layers.
  * @param {Layer} layer 
@@ -194,12 +216,6 @@ function GetOrderedFlatListOfLayers(layer) {
   return layer.concat(childrenFlatList);
 }
 
-function SetSource(layer, source) {
-  if (layer.src_)
-    layer.src_ = s;
-  else if (layer.src1_)
-    layer.src1_ = s;
-}
 
 /**
  * Apply effects in sequence. (A <- B, AB <- C, ABC <- D)
@@ -301,4 +317,4 @@ function RenderMethod3(layer, outputPath) {
 //--------------------------------------
 // EXPORTS
 
-exports.Layer = Layer;
+exports.LayerBaseClass = LayerBaseClass;
