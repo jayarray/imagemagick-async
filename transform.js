@@ -1,44 +1,9 @@
-let VALIDATE = require('./validate.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
-let Layer = require('./layerbase.js').Layer;
-
-//-----------------------------------
-// TRANSFORM (base class)
-
-class Transform extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'mod';
-  }
-}
+let TransformBaseClass = require('./transformbaseclass.js').TransformBaseClass;
 
 //-----------------------------------------
 // ROLL
 
-class Roll extends Transform {
+class Roll extends TransformBaseClass {
   constructor(horizontal, vertical) {
     super();
     this.horizontal_ = horizontal;
@@ -69,6 +34,13 @@ class Roll extends Transform {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Roll';
+  }
+
+  /**
    * Create a Roll object. Rolls the image according to the given horizontal and vertical pixel values.
    * @param {string} src
    * @param {number} horizontal Number of pixels to roll in this direction.
@@ -86,7 +58,7 @@ class Roll extends Transform {
 //-----------------------------------------
 // MIRROR
 
-class MirrorHorizontal extends Transform {
+class MirrorHorizontal extends TransformBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -97,6 +69,13 @@ class MirrorHorizontal extends Transform {
    */
   Args() {
     return [src, '-flop'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'MirrorHorizontal';
   }
 
   /**
@@ -112,7 +91,7 @@ class MirrorHorizontal extends Transform {
   }
 }
 
-class MirrorVertical extends Transform {
+class MirrorVertical extends TransformBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -123,6 +102,13 @@ class MirrorVertical extends Transform {
    */
   Args() {
     return [src, '-flip'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'MirrorVertical';
   }
 
   /**
@@ -138,7 +124,7 @@ class MirrorVertical extends Transform {
   }
 }
 
-class Transpose extends Transform {
+class Transpose extends TransformBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -149,6 +135,13 @@ class Transpose extends Transform {
    */
   Args() {
     return [src, '-transpose'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Transpose';
   }
 
   /**
@@ -164,7 +157,7 @@ class Transpose extends Transform {
   }
 }
 
-class Transverse extends Transform {
+class Transverse extends TransformBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -175,6 +168,13 @@ class Transverse extends Transform {
    */
   Args() {
     return [src, '-transverse'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Transverse';
   }
 
   /**
@@ -193,7 +193,7 @@ class Transverse extends Transform {
 //-------------------------------
 //  OFFSET
 
-class Offset extends Transform {
+class Offset extends TransformBaseClass {
   constructor(src, x0, y0, x1, y1) {
     super();
     this.src_ = src;
@@ -208,6 +208,13 @@ class Offset extends Transform {
    */
   Args() {
     return [this.src_, '-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.x0_},${this.y0_} ${this.x1_},${this.y1_}`];
+  }
+
+   /**
+   * @override
+   */
+  Name() {
+    return 'Offset';
   }
 
   /**
@@ -230,7 +237,7 @@ class Offset extends Transform {
 //-----------------------------
 // ROTATE
 
-class RotateAroundCenter extends Transform {
+class RotateAroundCenter extends TransformBaseClass {
   constructor(src, degrees) {
     super();
     this.src_ = src;
@@ -242,6 +249,13 @@ class RotateAroundCenter extends Transform {
    */
   Args() {
     return ['-distort', 'SRT', this.degrees_, this.src_];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'RotateAroundCenter';
   }
 
   /**
@@ -258,7 +272,7 @@ class RotateAroundCenter extends Transform {
   }
 }
 
-class RotateAroundPoint extends Transform {
+class RotateAroundPoint extends TransformBaseClass {
   constructor(src, x, y, degrees) {
     super();
     this.src_ = src;
@@ -272,6 +286,13 @@ class RotateAroundPoint extends Transform {
    */
   Args() {
     return ['-distort', 'SRT', `${this.x_},${this.y_} ${this.degrees_}`, this.src_];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'RotateAroundPoint';
   }
 
   /**
@@ -293,7 +314,7 @@ class RotateAroundPoint extends Transform {
 //--------------------------------------
 // RESIZE 
 
-class Resize extends Transform {
+class Resize extends TransformBaseClass {
   constructor(src, width, height) {
     this.src_ = src;
     this.width_ = width;
@@ -315,6 +336,13 @@ class ResizeIgnoreAspectRatio extends Resize {
    */
   Args() {
     return this.Args_('!');
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ResizeIgnoreAspectRatio';
   }
 
   /**
@@ -345,6 +373,13 @@ class ResizeOnlyShrinkLarger extends Resize {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'ResizeOnlyShrinkLarger';
+  }
+
+  /**
    * Create a ResizeOnlyShrinkLarger object.Resize image and only shrink images that are smaller than the given size.
    * @param {string} src
    * @param {number} width
@@ -369,6 +404,13 @@ class ResizeOnlyEnlargeSmaller extends Resize {
    */
   Args() {
     return this.Args_('<');
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ResizeOnlyEnlargeSmaller';
   }
 
   /**
@@ -399,6 +441,13 @@ class ResizeFillGivenArea extends Resize {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'ResizeFillGivenArea';
+  }
+
+  /**
    * Create a ResizeFillGivenArea object. Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.
    * @param {string} src
    * @param {number} width
@@ -413,7 +462,7 @@ class ResizeFillGivenArea extends Resize {
   }
 }
 
-class ResizePercentage extends Transform {
+class ResizePercentage extends TransformBaseClass {
   constructor(src, percent) {
     this.src_ = src;
     this.percent_ = percent;
@@ -424,6 +473,13 @@ class ResizePercentage extends Transform {
    */
   Args() {
     return [this.src_, '-resize', `${this.percent_}%`];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ResizePercentage';
   }
 
   /**
@@ -440,7 +496,7 @@ class ResizePercentage extends Transform {
   }
 }
 
-class ResizePixelCountLimit extends Transform {
+class ResizePixelCountLimit extends TransformBaseClass {
   constructor(src, pixels) {
     this.src_ = src;
     this.pixels_ = pixels;
@@ -451,6 +507,13 @@ class ResizePixelCountLimit extends Transform {
    */
   Args() {
     return [this.src_, '-resize', `${this.pixels_}@`];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ResizePixelCountLimit';
   }
 
   /**
@@ -470,7 +533,7 @@ class ResizePixelCountLimit extends Transform {
 //--------------------------------
 // CROP
 
-class Crop extends Transform {
+class Crop extends TransformBaseClass {
   constructor(src, width, height, x, y, removeVirtualCanvas) {
     this.src_ = src;
     this.width_ = width;
@@ -503,6 +566,13 @@ class Crop extends Transform {
       args.push('+repage');
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Crop';
   }
 
   /**
