@@ -1,48 +1,10 @@
-let VALIDATE = require('./validate.js');
-let CONSTANTS = require('./constants.js');
 let COORDINATES = require('./coordinates.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
-let Layer = require('./layerbase.js').Layer;
-
-//---------------------------------
-// PRIMITIVE (Base class)
-
-class Primitive extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @param {number} xOffset
-   * @param {number} yOffset
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
-   */
-  Args(xOffset, yOffset) {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'primitive';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the primitive.
-   */
-  Command() {
-    return null;
-  }
-}
+let PrimitiveBaseClass = require('./primitivebaseclass.js').PrimitiveBaseClass;
 
 //--------------------------------
 // BEZIER
 
-class Bezier extends Primitive {
+class Bezier extends PrimitiveBaseClass {
   /**
    * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through. (Required)
    * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
@@ -110,7 +72,7 @@ class Bezier extends Primitive {
 //--------------------------------
 // CIRCLE
 
-class Circle extends Primitive {
+class Circle extends PrimitiveBaseClass {
   /**
    * @param {Coordinates} center Coordinates for center of circle. (Required)
    * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.) (Required)
@@ -174,7 +136,7 @@ class Circle extends Primitive {
 //--------------------------------
 // ELLIPSE
 
-class Ellipse extends Primitive {
+class Ellipse extends PrimitiveBaseClass {
   /**
    * @param {Coordinates} center Coordinates for the center of the ellipse. (Required)
    * @param {number} width Width of of ellipse (in pixels). (Required)
@@ -249,7 +211,7 @@ class Ellipse extends Primitive {
 //--------------------------------
 // LINE
 
-class Line extends Primitive {
+class Line extends PrimitiveBaseClass {
   /**
    * @param {Coordinates} start Start coordinates (Required)
    * @param {Coordinates} end End coordinates (Required)
@@ -305,7 +267,7 @@ class Line extends Primitive {
 //--------------------------------
 // PATH
 
-class Path extends Primitive {
+class Path extends PrimitiveBaseClass {
   /** 
   * @param {Array<Coordinates>} points A list of coordinates to be connected by a line in the order provided. (Required)
   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
@@ -386,7 +348,7 @@ class Path extends Primitive {
 //--------------------------------
 // POINT
 
-class Point extends Primitive {
+class Point extends PrimitiveBaseClass {
   /**
    * @param {number} x X-coordinate (Required)
    * @param {number} y Y-coordinate (Required)
@@ -433,7 +395,7 @@ class Point extends Primitive {
 //--------------------------------
 // TEXT
 
-class Text extends Primitive {
+class Text extends PrimitiveBaseClass {
   /**
    * @param {string} string String containing text. (Required)
    * @param {string} font Font name (Optional)
