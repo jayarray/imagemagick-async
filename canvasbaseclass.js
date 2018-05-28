@@ -51,14 +51,37 @@ class CanvasBaseClass extends LayerBaseClass {
   }
 
   /**
-   * @returns {Array<string>} Returns an array of fx and mod names that can be directly applied to a canvas' Arg list.  // TO DO: Verify each!
+   * @returns {Array<string>} Returns an array of fx and mod names that can be included in a canvas' args.
    */
   InLineEffects() {
-    return ['Negate', 'Colorize', 'GrayscaleFormat', 'RgbFormat', 'Replace', 'Transparency', 'ChannelAdjust', 'AutoLevel', 'Compare', 'Difference', 'Composite',
-      'MultiplyWhiteTransparency', 'MultiplyBlackTransparency', 'Add', 'Subtract', 'Union', 'Intersection', 'Difference', 'Exclusion', 'ChangedPixels',
-      'UnchangedPixels', 'CutOut', 'CutIn', 'Swirl', 'Implode', 'Wave', 'Blur', 'OilPainting', 'CharcoalSketch', 'ColoringBookSketch', 'PencilSketch', 'Roll',
-      'MirrorHorizontal', 'MirrorVertical', 'Transpose', 'Transverse', 'Offset', 'RotateAroundCenter', 'RotateAroundPoint', 'ResizeIgnoreAspectRatio',
-      'ResizeOnlyShrinkLarger', 'ResizeOnlyEnlargeSmaller', 'ResizeFillGivenArea', 'ResizePercentage', 'ResizePixelCountLimit', 'Crop'];
+    return [
+      'Negate',
+      'Colorize',
+      'GrayscaleFormat',
+      'RgbFormat',
+      'Replace',
+      'AutoLevel',
+      'Swirl',
+      'Implode',
+      'Wave',
+      'Blur',
+      'OilPainting',
+      'CharcoalSketch',
+      'Roll',
+      'MirrorHorizontal',
+      'MirrorVertical',
+      'Transpose',
+      'Transverse',
+      'Offset',
+      'RotateAroundCenter',
+      'RotateAroundPoint',
+      'ResizeIgnoreAspectRatio',
+      'ResizeOnlyShrinkLarger',
+      'ResizeOnlyEnlargeSmaller',
+      'ResizeFillGivenArea',
+      'ResizePercentage',
+      'ResizePixelCountLimit'
+    ];
   }
 }
 
