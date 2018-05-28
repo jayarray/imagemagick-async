@@ -1,6 +1,6 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-let Layer = require('./layerbase.js').Layer;
+let ColorBaseClass = require('./colorbaseclass.js').ColorBaseClass;
 
 //-------------------------------------
 // CONSTANTS
@@ -422,42 +422,10 @@ class Color {
   }
 }
 
-//--------------------------------
-// COLOR LAYER (base class)
-
-class ColorLayer extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'mod';
-  }
-}
-
 //-------------------------------
 // NEGATE
 
-class Negate extends ColorLayer {
+class Negate extends ColorBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -468,6 +436,13 @@ class Negate extends ColorLayer {
    */
   Args() {
     return [this.src_, '-negate'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Negate';
   }
 
   /**
@@ -486,7 +461,7 @@ class Negate extends ColorLayer {
 //-------------------------------
 // COLORIZE
 
-class Colorize extends ColorLayer {
+class Colorize extends ColorBaseClass {
   constructor(src, fillColor, percent) {
     super();
     this.src_ = src;
@@ -499,6 +474,13 @@ class Colorize extends ColorLayer {
    */
   Args() {
     return [this.src_, '-fill', this.fillColor_, '-colorize', `${this.percent_}%`];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Colorize';
   }
 
   /**
@@ -517,7 +499,7 @@ class Colorize extends ColorLayer {
 //-------------------------------
 // GRAYSCALE
 
-class GrayscaleFormat extends ColorLayer {
+class GrayscaleFormat extends ColorBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -528,6 +510,13 @@ class GrayscaleFormat extends ColorLayer {
    */
   Args() {
     return [this.src_, '-colorspace', 'Gray'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'GrayscaleFormat';
   }
 
   /**
@@ -552,7 +541,7 @@ class GrayscaleFormat extends ColorLayer {
  * @param {string} outputPath The path where the image will be rendered to.
  * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
  */
-class RgbFormat extends ColorLayer {
+class RgbFormat extends ColorBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -563,6 +552,13 @@ class RgbFormat extends ColorLayer {
    */
   Args() {
     return [this.src_, '-colorspace', 'RGB'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'RgbFormat';
   }
 
   /**
@@ -581,7 +577,7 @@ class RgbFormat extends ColorLayer {
 //--------------------------------------
 // REPLACE
 
-class Replace extends ColorLayer {
+class Replace extends ColorBaseClass {
   constructor(src, targetColor, desiredColor, fuzz) {
     super();
     this.src_ = src;
@@ -604,6 +600,13 @@ class Replace extends ColorLayer {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Replace';
+  }
+
+  /**
    * Create a Replace object. Replaces one color with another.
    * @param {string} src
    * @param {string} targetColor The color you want to change. (Valid color format string used in Image Magick)
@@ -622,7 +625,7 @@ class Replace extends ColorLayer {
 //---------------------------------------
 // TRANSPARENCY
 
-class Transparency extends ColorLayer {
+class Transparency extends ColorBaseClass {
   constructor(src, percent) {
     super();
     this.src_ = src;
@@ -634,6 +637,13 @@ class Transparency extends ColorLayer {
    */
   Args() {
     return [this.src_, '-alpha', 'on', '-channel', 'a', '-evaluate', 'set', `${this.percent_}%`];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Transparency';
   }
 
   /**
@@ -653,7 +663,7 @@ class Transparency extends ColorLayer {
 //-------------------------------
 // CHANNEL ADJUST
 
-class ChannelAdjust extends ColorLayer {
+class ChannelAdjust extends ColorBaseClass {
   constructor(src, channel, value) {
     super();
     this.src_ = src;
@@ -666,6 +676,13 @@ class ChannelAdjust extends ColorLayer {
    */
   Args() {
     return [this.src_, '-alpha', 'set', '-channel', this.channel_, '-evaluate', 'set', this.value_];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ChannelAdjust';
   }
 
   /**
@@ -686,7 +703,7 @@ class ChannelAdjust extends ColorLayer {
 //------------------------------------
 // AUTO LEVEL
 
-class AutoLevel extends ColorLayer {
+class AutoLevel extends ColorBaseClass {
   constructor(src) {
     super();
     this.src_ = src;
@@ -697,6 +714,13 @@ class AutoLevel extends ColorLayer {
    */
   Args() {
     return [this.src_, '-auto-level'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'AutoLevel';
   }
 
   /**
