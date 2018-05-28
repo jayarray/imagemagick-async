@@ -1,42 +1,3 @@
-
-
-let VALIDATE = require('./validate.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
-let Layer = require('./layerbase.js').Layer;
-
-//------------------------------------
-// CUT (base class)
-
-class Cut extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'mod';
-  }
-}
-
 //--------------------------------------
 // OUT
 
@@ -52,6 +13,13 @@ class CutOut extends Cut {
    */
   Args() {
     return [baseImagePath, cutoutImagePath, '-compose', 'Dst_Out', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'CutOut';
   }
 
   /**
@@ -83,6 +51,13 @@ class CutIn extends Cut {
    */
   Args() {
     return [baseImagePath, cutoutImagePath, '-compose', 'Dst_In', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'CutIn';
   }
 
   /**
