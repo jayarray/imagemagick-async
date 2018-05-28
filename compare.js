@@ -1,34 +1,10 @@
 let VALIDATE = require('./validate.js');
-let Layer = require('./layerbase.js').Layer;
-
-//------------------------------------
-// COMPARISON (base class)
-
-class Comparison extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'mod';
-  }
-}
+let CompareBaseClass = require('./comparebaseclass.js').CompareBaseClass;
 
 //-------------------------------------
 // COMPARE
 
-class Compare extends Comparison {
+class Compare extends CompareBaseClass {
   constructor(src1, src2, highlightColor, lowlightColor) {
     super();
     this.src1_ = src1;
@@ -48,6 +24,13 @@ class Compare extends Comparison {
       args.push('-lowlight-color', this.lowlightColor_);
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Compare';
   }
 
   /**
@@ -84,7 +67,7 @@ class Compare extends Comparison {
  * @param {string} outputPath The path where the resulting image will be rendered.
  * @returns {Promise} Returns a promise that resolves if successful. Otherwise, it returns an error.
  */
-class Difference extends Comparison {
+class Difference extends CompareBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -97,6 +80,13 @@ class Difference extends Comparison {
   */
   Args() {
     let args = [src1, src2, '-compose', 'difference'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Difference';
   }
 
   /**
