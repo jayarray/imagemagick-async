@@ -1,6 +1,6 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-let Layer = require('./layerbase.js').Layer;
+let ComposeBaseClass = require('./composebaseclass.js').ComposeBaseClass;
 
 //------------------------------------------
 // CONSTANTS
@@ -8,41 +8,9 @@ let Layer = require('./layerbase.js').Layer;
 const MIN_FILEPATHS = 2;
 
 //-------------------------------------------
-// COMPOSE (base class)
-
-class Compose extends Layer {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'mod';
-  }
-}
-
-//-------------------------------------------
 // COMPOSITE
 
-class Composite extends Compose {
+class Composite extends ComposeBaseClass {
   constructor(filepaths, gravity) {
     super();
     this.filepaths_ = filepaths;
@@ -72,6 +40,13 @@ class Composite extends Compose {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Composite';
+  }
+
+  /**
    * Create a Composite object. Creates a single image from a list of provided images. The first image is the bottom-most layer and the last image is the top-most layer.
    * @param {Array<string>} filepaths
    * @returns {Composite} Returns a Composite object. If inputs are invalid, it returns null.
@@ -87,7 +62,7 @@ class Composite extends Compose {
 //--------------------------------------
 // MULTIPLY (white transparency)
 
-class MultiplyWhiteTransparency extends Compose {
+class MultiplyWhiteTransparency extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -99,6 +74,13 @@ class MultiplyWhiteTransparency extends Compose {
    */
   Args() {
     return ['-compose', 'Multiply', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'MultiplyWhiteTransparency';
   }
 
   /**
@@ -118,7 +100,7 @@ class MultiplyWhiteTransparency extends Compose {
 //--------------------------------------
 // MULTIPLY (black transparency)
 
-class MultiplyBlackTransparency extends Compose {
+class MultiplyBlackTransparency extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -130,6 +112,13 @@ class MultiplyBlackTransparency extends Compose {
    */
   Args() {
     return ['-compose', 'Screen', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'MultiplyBlackTransparency';
   }
 
   /**
@@ -149,7 +138,7 @@ class MultiplyBlackTransparency extends Compose {
 //--------------------------------------
 // ADD
 
-class Add extends Compose {
+class Add extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -161,6 +150,13 @@ class Add extends Compose {
    */
   Args() {
     return ['-compose', 'plus', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Add';
   }
 
   /**
@@ -180,7 +176,7 @@ class Add extends Compose {
 //--------------------------------------
 // SUBTRACT
 
-class Subtract extends Compose {
+class Subtract extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -192,6 +188,13 @@ class Subtract extends Compose {
    */
   Args() {
     return ['-compose', 'minus', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Subtract';
   }
 
   /**
@@ -211,7 +214,7 @@ class Subtract extends Compose {
 //--------------------------------------
 // SET THEORY
 
-class Union extends Compose {
+class Union extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -223,6 +226,13 @@ class Union extends Compose {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Lighten', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Union';
   }
 
   /**
@@ -239,7 +249,7 @@ class Union extends Compose {
   }
 }
 
-class Intersection extends Compose {
+class Intersection extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -251,6 +261,13 @@ class Intersection extends Compose {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Darken', '-composite'];
+  }
+
+  /**
+  * @override
+  */
+  Name() {
+    return 'Intersection';
   }
 
   /**
@@ -267,7 +284,7 @@ class Intersection extends Compose {
   }
 }
 
-class Difference extends Compose {
+class Difference extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -279,6 +296,13 @@ class Difference extends Compose {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Difference', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Difference';
   }
 
   /**
@@ -295,7 +319,7 @@ class Difference extends Compose {
   }
 }
 
-class Exclusion extends Compose {
+class Exclusion extends ComposeBaseClass {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
@@ -307,6 +331,13 @@ class Exclusion extends Compose {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Minus_Src', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Exclusion';
   }
 
   /**
@@ -326,7 +357,7 @@ class Exclusion extends Compose {
 //--------------------------------------
 // MASKS
 
-class ChangedPixels extends Compose {
+class ChangedPixels extends ComposeBaseClass {
   constructor(src1, src2, fuzz) {
     super();
     this.src1_ = src1;
@@ -348,6 +379,13 @@ class ChangedPixels extends Compose {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'ChangedPixels';
+  }
+
+  /**
    * Create an ChangedPixels object. Make specific pixels fully transparent. That is, the pixels in src2 that match those in src1 will become transparent.
    * @param {string} src1
    * @param {string} src2
@@ -362,7 +400,7 @@ class ChangedPixels extends Compose {
   }
 }
 
-class UnchangedPixels extends Compose {
+class UnchangedPixels extends ComposeBaseClass {
   constructor(src1, src2, fuzz) {
     super();
     this.src1_ = src1;
@@ -381,6 +419,13 @@ class UnchangedPixels extends Compose {
     args.push('-compose', 'ChangeMask', '-composite', '-channel', 'A', '-negate');
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'UnchangedPixels';
   }
 
   /**
