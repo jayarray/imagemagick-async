@@ -175,6 +175,129 @@ function RenderComposite(filepaths, gravity, outputPath) {
   });
 }
 
+//---------------------------------------
+// RENDER METHODS (Experimenting)
+
+const PromiseSerial = funcs =>
+  funcs.reduce((promise, func) =>
+    promise.then(result => func().then(Array.prototype.concat.bind(result))),
+    Promise.resolve([]));
+
+
+/**
+ * Get an ordered flat list of layers.
+ * @param {Layer} layer 
+ * @returns {Array<Layer>} Returns an aray of Layer objects.
+ */
+function GetOrderedFlatListOfLayers(layer) {
+  let childrenFlatList = OPTIMIZER.Analyze(layer).hierarchy.flatlist.map(node => node.Layer()); // Convert Node -> Layer
+  return layer.concat(childrenFlatList);
+}
+
+function SetSource(layer, source) {
+  if (layer.src_)
+    layer.src_ = s;
+  else if (layer.src1_)
+    layer.src1_ = s;
+}
+
+/**
+ * Apply effects in sequence. (A <- B, AB <- C, ABC <- D)
+ * @param {Layer} layer 
+ * @param {string} outputDir 
+ */
+function ApplyEffectsInSequence(layer, outputDir) {
+  return new Promise((resolve, reject) => {
+    let filepaths = [];
+    let actions = [];
+
+    // Add this layer to render list
+    let thisFilepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
+    filepaths.push(thisFilepath);
+
+    let thisArgs = GetArgs(layer).concat(thisFilepath);
+    actions.push(LOCAL_COMMAND.Execute(layer.Command(), thisArgs));
+
+    // Create flat list of layers
+    let flatList = GetOrderedFlatListOfLayers(layer);
+
+    // Add all other layers to render list
+    for (let i = 0; i < flatList.length; ++i) {
+      let currLayer = flatList[i];
+      let outputPath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
+      filepaths.push(outputPath);
+
+      let args = GetArgs(currLayer).concat(outputPath);
+      let cmd = currLayer.Command();
+      actions.push(LOCAL_COMMAND.Execute(cmd, args));
+    }
+
+    // Render
+    PromiseSerial(actions).then(results => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * Apply effects in sequence. (A <- B, AB <- C, ABC <- D)
+ * @param {Layer} layer 
+ * @param {string} outputDir 
+ */
+function RenderLayersAsOrderedFlatList(layer, outputDir) {
+  return new Promise((resolve, reject) => {
+    let filepaths = [];
+    let actions = [];
+
+    // Add this layer to render list
+    let thisFilepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
+    filepaths.push(thisFilepath);
+
+    let thisArgs = GetArgs(layer).concat(thisFilepath);
+    actions.push(LOCAL_COMMAND.Execute(layer.Command(), thisArgs));
+
+    // Create flat list of layers
+    let flatList = GetOrderedFlatListOfLayers(layer);
+
+    // Add all other layers to render list
+    for (let i = 0; i < flatList.length; ++i) {
+      let currLayer = flatList[i];
+      let filepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
+      filepaths.push(filepath);
+
+      let args = GetArgs(currLayer).concat(filepath);
+      let cmd = currLayer.Command();
+      actions.push(LOCAL_COMMAND.Execute(cmd, args));
+    }
+
+    // Render all layers
+    Promise.all(actions).then(results => {
+      resolve(filepaths);
+    }).catch(error => reject(error));
+  });
+}
+
+
+// Render layers in sequence (no special rules)
+function RenderMethod1(layer, outputPath) {
+
+}
+
+
+// All layers rendered individually and then composited.
+function RenderMethod2(layer, outputPath) {
+
+}
+
+
+// Method #2 + apply effects directly to layer.
+function RenderMethod3(layer, outputPath) {
+
+}
+
+
+
 //--------------------------------------
 // EXPORTS
 
