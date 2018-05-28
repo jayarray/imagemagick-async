@@ -1,57 +1,10 @@
 let VALIDATE = require('./validate.js');
-let CONSTANTS = require('./constants.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-let LINUX_COMMANDS = require('linux-commands-async');
-
-let Layer = require('./layerbase.js').Layer;
-
-//-----------------------------------
-// CANVAS (Interface)
-
-class Canvas extends Layer {
-  constructor() {
-    super();
-    this.primitiveTuples_ = [];
-  }
-
-  AddPrimitiveTuple(p, xOffset, yOffset) {
-    this.primitiveTuples_.push({ primitive: p, xOffset: xOffset, yOffset: yOffset });
-  }
-
-  PrimitiveTuples() {
-    return this.primitiveTuples_;
-  }
-
-  /**
-   * Get list of arguments required to draw the canvas.
-   * @param {Array<Primitive>} primitives
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  GetArgs_() {
-    return []; // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'canvas';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the canvas.
-   */
-  Command() {
-    return 'convert';
-  }
-}
+let CanvasBaseClass = require('./canvasbaseclass.js').CanvasBaseClass;
 
 //----------------------------------------
 // COLOR CANVAS
 
-class ColorCanvas extends Canvas {
+class ColorCanvas extends CanvasBaseClass {
   /**
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
@@ -78,6 +31,13 @@ class ColorCanvas extends Canvas {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'ColorCanvas';
+  }
+
+  /**
    * Create a Colorcanvas object with the specified properties.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
@@ -95,7 +55,7 @@ class ColorCanvas extends Canvas {
 //----------------------------------------
 // GRADIENT CANVAS
 
-class GradientCanvas extends Canvas {
+class GradientCanvas extends CanvasBaseClass {
   /**
    * @param {number} width in pixels
    * @param {number} height in pixels
@@ -122,6 +82,13 @@ class GradientCanvas extends Canvas {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'GradientCanvas';
+  }
+
+  /**
    * Create a GradientCanvas object with the specified gradient.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
@@ -139,7 +106,7 @@ class GradientCanvas extends Canvas {
 //------------------------------------
 // IMAGE CANVAS
 
-class ImageCanvas extends Canvas {
+class ImageCanvas extends CanvasBaseClass {
   /**
    * @param {string} src Source
    */
@@ -159,6 +126,13 @@ class ImageCanvas extends Canvas {
       this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'ImageCanvas';
   }
 
   /**
@@ -184,7 +158,7 @@ class ImageCanvas extends Canvas {
 //----------------------------------
 // LABEL
 
-class Label extends Canvas {
+class Label extends CanvasBaseClass {
   /**
    * @param {string} text Text string
    * @param {number} width Width in pixels. (Optional) 
@@ -250,6 +224,13 @@ class Label extends Canvas {
   }
 
   /**
+   * @override
+   */
+  Name() {
+    return 'Label';
+  }
+
+  /**
    * Create a Label object with the specified properties.
    * @param {number} width Width in pixels. (Optional) 
    * @param {number} height Height in pixels. (Optional) 
@@ -264,18 +245,7 @@ class Label extends Canvas {
    * @returns {Label} Returns a Label object. If inputs are invalid, it returns null.
    */
   static Create(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
-    if (
-      (!VALIDATE.IsInstance(width) && (VALIDATE.IsInteger(width) || VALID.IsIntegerInRange(width, 1, null))) ||
-      (!VALIDATE.IsInstance(height) && (VALIDATE.IsInteger(height) || VALID.IsIntegerInRange(height, 1, null))) ||
-      VALIDATE.IsStringInput(text) ||
-      (!VALID.IsInstance(font) && VALIDATE.IsStringInput(font)) ||
-      (!VALIDATE.IsInstance(strokeWidth) && (VALIDATE.IsInteger(strokeWidth) || VALID.IsIntegerInRange(strokeWidth, 1, null))) ||
-      (!VALID.IsInstance(strokeColor) && VALIDATE.IsStringInput(strokeColor)) ||
-      (!VALID.IsInstance(fillColor) && VALIDATE.IsStringInput(fillColor)) ||
-      (!VALID.IsInstance(underColor) && VALIDATE.IsStringInput(underColor)) ||
-      (!VALID.IsInstance(backgroundColor) && VALIDATE.IsStringInput(backgroundColor)) ||
-      (!VALID.IsInstance(gravity) && VALIDATE.IsStringInput(gravity))
-    )
+    if (!text)
       return null;
 
     return new Label(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
