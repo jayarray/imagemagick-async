@@ -31,7 +31,7 @@ class Comparison extends Layer {
 class Compare extends Comparison {
   constructor(src1, src2, highlightColor, lowlightColor) {
     super();
-    this.src1_ = src;
+    this.src1_ = src1;
     this.src2_ = src2;
     this.highlightColor_ = highlightColor;
     this.lowlightColor_ = lowlightColor;
