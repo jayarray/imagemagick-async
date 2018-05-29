@@ -14,10 +14,17 @@ class Swirl extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-swirl', this.degrees_];
+    return ['-swirl', this.degrees_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -52,10 +59,17 @@ class Implode extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-implode', this.factor_];
+    return ['-implode', this.factor_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -91,10 +105,17 @@ class Wave extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-background', 'transparent', '-wave', `${this.amplitude_}x${this.frequency_}`];
+    return ['-background', 'transparent', '-wave', `${this.amplitude_}x${this.frequency_}`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -141,16 +162,23 @@ class Blur extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_];
+    let args = [];
 
     if (this.hasTransparency_)
       args.push('-channel', 'RGBA');
     args.push('-blur', `${this.radius_}x${this.sigma_}`);
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -187,10 +215,17 @@ class OilPainting extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-paint', this.paintValue_];
+    return ['-paint', this.paintValue_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -225,10 +260,17 @@ class CharcoalSketch extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-charcoal', this.charcoalValue_];
+    return ['-charcoal', this.charcoalValue_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -263,16 +305,23 @@ class ColoringBookSketch extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_];
+    let args = [];
 
     if (this.isHeavilyShaded_)
       args.push('-segment', '1x1', '+dither', '-colors', 2);
     args.push('-edge', 1, '-negate', '-normalize', '-colorspace', 'Gray', '-blur', '0x.5', '-contrast-stretch', '0x50%');
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -309,17 +358,17 @@ class PencilSketch extends Fx {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_, '-colorspace', 'Gray', '-sketch', `${this.radius_}x${this.sigma_}+${this.angle_}`];
+    return ['-colorspace', 'Gray', '-sketch', `${this.radius_}x${this.sigma_}+${this.angle_}`];
+  }
 
-    /*
-    if (hasTransparency)
-      args.push('-channel', 'RGBA'); */
-    args.push('-blur', `${this.radius_}x${this.sigma_}`);
-
-    return args;
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**

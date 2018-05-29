@@ -9,10 +9,17 @@ class CutOut extends Cut {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [baseImagePath, cutoutImagePath, '-compose', 'Dst_Out', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -47,10 +54,17 @@ class CutIn extends Cut {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [baseImagePath, cutoutImagePath, '-compose', 'Dst_In', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**

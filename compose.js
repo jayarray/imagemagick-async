@@ -18,7 +18,7 @@ class Composite extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     let args = [];
@@ -37,6 +37,13 @@ class Composite extends ComposeBaseClass {
     args.push('-composite');
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -70,10 +77,17 @@ class MultiplyWhiteTransparency extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return ['-compose', 'Multiply', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -108,10 +122,17 @@ class MultiplyBlackTransparency extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return ['-compose', 'Screen', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -146,10 +167,17 @@ class Add extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return ['-compose', 'plus', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -184,10 +212,17 @@ class Subtract extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return ['-compose', 'minus', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -222,10 +257,17 @@ class Union extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Lighten', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -257,10 +299,17 @@ class Intersection extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Darken', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -292,10 +341,17 @@ class Difference extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Difference', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -327,10 +383,17 @@ class Exclusion extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Minus_Src', '-composite'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -366,7 +429,7 @@ class ChangedPixels extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     let args = [this.src1_, this.src2_];
@@ -376,6 +439,13 @@ class ChangedPixels extends ComposeBaseClass {
     args.push('-compose', 'ChangeMask', '-composite');
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -409,7 +479,7 @@ class UnchangedPixels extends ComposeBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     let args = [this.src1_, this.src2_];
@@ -419,6 +489,13 @@ class UnchangedPixels extends ComposeBaseClass {
     args.push('-compose', 'ChangeMask', '-composite', '-channel', 'A', '-negate');
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**

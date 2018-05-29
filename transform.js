@@ -11,10 +11,10 @@ class Roll extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_, '-roll'];
+    let args = ['-roll'];
 
     let rollStr = '';
 
@@ -31,6 +31,13 @@ class Roll extends TransformBaseClass {
     args.push(rollStr);
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return this.Args();
   }
 
   /**
@@ -65,10 +72,17 @@ class MirrorHorizontal extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [src, '-flop'];
+    return ['-flop'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -98,10 +112,17 @@ class MirrorVertical extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [src, '-flip'];
+    return ['-flip'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -131,10 +152,17 @@ class Transpose extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [src, '-transpose'];
+    return ['-transpose'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -164,10 +192,17 @@ class Transverse extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [src, '-transverse'];
+    return ['-transverse'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -204,15 +239,22 @@ class Offset extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.x0_},${this.y0_} ${this.x1_},${this.y1_}`];
+    return ['-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.x0_},${this.y0_} ${this.x1_},${this.y1_}`];
   }
 
-   /**
-   * @override
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
+  }
+
+  /**
+  * @override
+  */
   Name() {
     return 'Offset';
   }
@@ -245,10 +287,17 @@ class RotateAroundCenter extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-distort', 'SRT', this.degrees_, this.src_];
+    return ['-distort', 'SRT', this.degrees_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -282,10 +331,17 @@ class RotateAroundPoint extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-distort', 'SRT', `${this.x_},${this.y_} ${this.degrees_}`, this.src_];
+    return ['-distort', 'SRT', `${this.x_},${this.y_} ${this.degrees_}`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -322,7 +378,7 @@ class Resize extends TransformBaseClass {
   }
 
   Args_(resizeOp) {
-    return [this.src_, '-resize', `${this.width_}x${this.height_}${resizeOp}`];
+    return ['-resize', `${this.width_}x${this.height_}${resizeOp}`];
   }
 }
 
@@ -332,10 +388,17 @@ class ResizeIgnoreAspectRatio extends Resize {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return this.Args_('!');
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -366,10 +429,17 @@ class ResizeOnlyShrinkLarger extends Resize {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return this.Args_('>');
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -400,10 +470,17 @@ class ResizeOnlyEnlargeSmaller extends Resize {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return this.Args_('<');
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -434,10 +511,17 @@ class ResizeFillGivenArea extends Resize {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
     return this.Args_('^');
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -469,10 +553,17 @@ class ResizePercentage extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-resize', `${this.percent_}%`];
+    return ['-resize', `${this.percent_}%`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -503,10 +594,17 @@ class ResizePixelCountLimit extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-resize', `${this.pixels_}@`];
+    return ['-resize', `${this.pixels_}@`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -544,10 +642,10 @@ class Crop extends TransformBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_, '-crop'];
+    let args = ['-crop'];
 
     let cropStr = `${this.width_}x${this.height_}`;
 
@@ -566,6 +664,13 @@ class Crop extends TransformBaseClass {
       args.push('+repage');
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**

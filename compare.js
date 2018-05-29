@@ -13,17 +13,23 @@ class Compare extends CompareBaseClass {
     this.lowlightColor_ = lowlightColor;
   }
 
-  /** 
-   * @override
-   * @returns {Array<string|number>} Returns an array of arguments.
-  */
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
   Args() {
-    let args = [this.src1_, this.src2_, '-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.highlightColor_];
+    let args = ['-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.highlightColor_];
 
     if (this.lowlightColor_)
       args.push('-lowlight-color', this.lowlightColor_);
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src1_, this.src2_].concat(this.Args());
   }
 
   /**
@@ -74,12 +80,18 @@ class Difference extends CompareBaseClass {
     this.src2_ = src2;
   }
 
-  /** 
-   * @override
-   * @returns {Array<string|number>} Returns an array of arguments.
-  */
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
   Args() {
-    let args = [src1, src2, '-compose', 'difference'];
+    return ['-compose', 'difference'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src1_, this.src2_].concat(this.Args());
   }
 
   /**

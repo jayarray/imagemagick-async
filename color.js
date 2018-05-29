@@ -432,10 +432,17 @@ class Negate extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-negate'];
+    return ['-negate'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -470,10 +477,17 @@ class Colorize extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-fill', this.fillColor_, '-colorize', `${this.percent_}%`];
+    return ['-fill', this.fillColor_, '-colorize', `${this.percent_}%`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -506,10 +520,17 @@ class GrayscaleFormat extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-colorspace', 'Gray'];
+    return ['-colorspace', 'Gray'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -548,10 +569,17 @@ class RgbFormat extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-colorspace', 'RGB'];
+    return ['-colorspace', 'RGB'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -587,16 +615,23 @@ class Replace extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = [this.src_, '-alpha', 'on', '-channel', 'rgba'];
+    let args = ['-alpha', 'on', '-channel', 'rgba'];
 
     if (this.fuzz_ && this.fuzz_ > 0)
       args.push('-fuzz', `${this.fuzz_}%`);
     args.push('-fill', this.desiredColor_, '-opaque', this.targetColor_);
 
     return args;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -633,10 +668,17 @@ class Transparency extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-alpha', 'on', '-channel', 'a', '-evaluate', 'set', `${this.percent_}%`];
+    return ['-alpha', 'on', '-channel', 'a', '-evaluate', 'set', `${this.percent_}%`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -672,10 +714,17 @@ class ChannelAdjust extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-alpha', 'set', '-channel', this.channel_, '-evaluate', 'set', this.value_];
+    return ['-alpha', 'set', '-channel', this.channel_, '-evaluate', 'set', this.value_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -710,10 +759,17 @@ class AutoLevel extends ColorBaseClass {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments.
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src_, '-auto-level'];
+    return ['-auto-level'];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
   }
 
   /**
