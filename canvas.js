@@ -21,7 +21,7 @@ class ColorCanvas extends CanvasBaseClass {
    * @override
    * @returns {Array<string|number>} Returns an array of arguments.
    */
-  GetArgs_() {
+  Args() {
     let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
 
     if (this.PrimitiveTuples().length > 0)
@@ -72,7 +72,7 @@ class GradientCanvas extends CanvasBaseClass {
    * @override
    * @returns {Array<string|number>} Returns an array of arguments.
    */
-  GetArgs_() {
+  Args() {
     let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
     if (this.PrimitiveTuples().length > 0)
@@ -119,7 +119,7 @@ class ImageCanvas extends CanvasBaseClass {
    * @override 
    * @returns {Array<string|number>} Returns an array of arguments.
    * */
-  GetArgs_() {
+  Args() {
     let args = [this.src_];
 
     if (this.PrimitiveTuples().length > 0)
@@ -180,7 +180,7 @@ class Label extends CanvasBaseClass {
    * @override
    * @returns {Array<string|number>} Returns an array of arguments.
    */
-  GetArgs_() {
+  Args() {
     let args = [];
 
     if (this.width_ && this.height_)

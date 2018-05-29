@@ -27,10 +27,9 @@ class CanvasBaseClass extends LayerBaseClass {
 
   /**
    * Get list of arguments required to draw the canvas.
-   * @param {Array<Primitive>} primitives
    * @returns {Array<string|number>} Returns an array of arguments.
    */
-  GetArgs_() {
+  Args() {
     return []; // Override
   }
 
