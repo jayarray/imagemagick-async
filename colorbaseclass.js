@@ -38,6 +38,13 @@ class ColorBaseClass extends LayerBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSource(newSrc) {
+    this.src_ = newSrc;
+  }
+
+  /**
    * @returns {string} Returns the name of the layer.
    */
   Name() {

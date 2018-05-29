@@ -31,6 +31,19 @@ class CutBaseClass extends LayerBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */

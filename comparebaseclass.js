@@ -23,6 +23,16 @@ class CompareBaseClass extends LayerBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let variableName = `src${i + 1}_`;
+      this[variableName] = newSources[i];
+    }
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */

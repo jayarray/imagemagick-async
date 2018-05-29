@@ -105,6 +105,19 @@ class MultiplyWhiteTransparency extends ComposeBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    */
   Name() {
@@ -154,6 +167,19 @@ class MultiplyBlackTransparency extends ComposeBaseClass {
    */
   RenderArgs() {
     return this.Args();
+  }
+
+  /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
   }
 
   /**
@@ -209,6 +235,19 @@ class Add extends ComposeBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    */
   Name() {
@@ -258,6 +297,19 @@ class Subtract extends ComposeBaseClass {
    */
   RenderArgs() {
     return this.Args();
+  }
+
+  /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
   }
 
   /**
@@ -313,6 +365,19 @@ class Union extends ComposeBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    */
   Name() {
@@ -359,6 +424,19 @@ class Intersection extends ComposeBaseClass {
    */
   RenderArgs() {
     return this.Args();
+  }
+
+  /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
   }
 
   /**
@@ -411,6 +489,19 @@ class Difference extends ComposeBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    */
   Name() {
@@ -457,6 +548,19 @@ class Exclusion extends ComposeBaseClass {
    */
   RenderArgs() {
     return this.Args();
+  }
+
+  /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
   }
 
   /**
@@ -519,6 +623,19 @@ class ChangedPixels extends ComposeBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
+  }
+
+  /**
    * @override
    */
   Name() {
@@ -573,6 +690,19 @@ class UnchangedPixels extends ComposeBaseClass {
    */
   RenderArgs() {
     return this.Args();
+  }
+
+  /**
+   * Replace current source with new source.
+   */
+  UpdateSources(newSources) {
+    for (let i = 0; i < this.NumberOfSources(); ++i) {
+      let currNewSrc = newSources[i];
+      if (currNewSrc) {
+        let variableName = `src${i + 1}_`;
+        this[variableName] = currNewSrc;
+      }
+    }
   }
 
   /**
