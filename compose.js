@@ -49,6 +49,13 @@ class Composite extends ComposeBaseClass {
   /**
    * @override
    */
+  NumberOfSources() {
+    return 0;
+  }
+
+  /**
+   * @override
+   */
   Name() {
     return 'Composite';
   }
@@ -81,6 +88,13 @@ class MultiplyWhiteTransparency extends ComposeBaseClass {
    */
   Args() {
     return ['-compose', 'Multiply', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
@@ -119,6 +133,13 @@ class MultiplyBlackTransparency extends ComposeBaseClass {
     super();
     this.src1_ = src1;
     this.src2_ = src2;
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
@@ -174,6 +195,13 @@ class Add extends ComposeBaseClass {
   }
 
   /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
+  }
+
+  /**
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
@@ -216,6 +244,13 @@ class Subtract extends ComposeBaseClass {
    */
   Args() {
     return ['-compose', 'minus', this.src1_, this.src2_, '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
@@ -264,6 +299,13 @@ class Union extends ComposeBaseClass {
   }
 
   /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
+  }
+
+  /**
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
@@ -303,6 +345,13 @@ class Intersection extends ComposeBaseClass {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Darken', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
@@ -348,6 +397,13 @@ class Difference extends ComposeBaseClass {
   }
 
   /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
+  }
+
+  /**
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
@@ -387,6 +443,13 @@ class Exclusion extends ComposeBaseClass {
    */
   Args() {
     return [this.src1_, this.src2_, '-compose', 'Minus_Src', '-composite'];
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
@@ -442,6 +505,13 @@ class ChangedPixels extends ComposeBaseClass {
   }
 
   /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
+  }
+
+  /**
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
@@ -489,6 +559,13 @@ class UnchangedPixels extends ComposeBaseClass {
     args.push('-compose', 'ChangeMask', '-composite', '-channel', 'A', '-negate');
 
     return args;
+  }
+
+  /**
+   * @override
+   */
+  NumberOfSources() {
+    return 2;
   }
 
   /**
