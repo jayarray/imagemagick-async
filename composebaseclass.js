@@ -23,6 +23,13 @@ class ComposeBaseClass extends LayerBaseClass {
   }
 
   /**
+   * @returns {number} Returns the number of source inputs.
+   */
+  NumberOfSources() {
+    // Override
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */
