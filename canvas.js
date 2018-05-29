@@ -136,14 +136,6 @@ class ImageCanvas extends CanvasBaseClass {
   }
 
   /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'file';
-  }
-
-  /**
    * Create an ImageCanvas object. If inputs are invalid it returns null.
    * @param {string} src Source
    */
