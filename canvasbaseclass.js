@@ -53,7 +53,7 @@ class CanvasBaseClass extends LayerBaseClass {
   /**
    * @returns {Array<string>} Returns an array of fx and mod names that can be included in a canvas' args.
    */
-  InlineEffects() {
+  static InlineEffects() {
     return [
       'Negate',
       'Colorize',
