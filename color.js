@@ -726,7 +726,7 @@ class ChannelAdjust extends ColorBaseClass {
   RenderArgs() {
     return [this.src_].concat(this.Args());
   }
-
+  
   /**
    * @override
    */
