@@ -4,8 +4,9 @@ let TransformBaseClass = require('./transformbaseclass.js').TransformBaseClass;
 // ROLL
 
 class Roll extends TransformBaseClass {
-  constructor(horizontal, vertical) {
+  constructor(src, horizontal, vertical) {
     super();
+    this.src_ = src;
     this.horizontal_ = horizontal;
     this.vertical_ = vertical;
   }
@@ -37,7 +38,7 @@ class Roll extends TransformBaseClass {
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
-    return this.Args();
+    return [this.src_].concat(this.Args());
   }
 
   /**
@@ -54,11 +55,11 @@ class Roll extends TransformBaseClass {
    * @param {number} vertical Number of pixels to roll in this direction.
    * @returns {Roll} Returns a Roll object. If inputs are invalid, it returns null.
    */
-  static Create(horizontal, vertical) {
-    if (!horizontal || !vertical)
+  static Create(src, horizontal, vertical) {
+    if (!src || !horizontal || !vertical)
       return null;
 
-    return new Roll(horizontal, vertical);
+    return new Roll(src, horizontal, vertical);
   }
 }
 
@@ -638,7 +639,7 @@ class Crop extends TransformBaseClass {
     this.height_ = height;
     this.x_ = x;
     this.y_ = y;
-    this.removeVirtualCanvas = removeVirtualCanvas;
+    this.removeVirtualCanvas_ = removeVirtualCanvas;
   }
 
   /**
@@ -682,6 +683,7 @@ class Crop extends TransformBaseClass {
 
   /**
    * Create a Crop object. Crop an image starting from (x,y) with specified width and height.
+   * @param {string} src
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
    * @param {number} x X-coordinate of the top-left corner of the crop area.
@@ -689,7 +691,7 @@ class Crop extends TransformBaseClass {
    * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
    * @returns {Crop} Returns a Crop object. 
    */
-  static Create(src, pixels) {
+  static Create(src, width, height, x, y, removeVirtualCanvas) {
     if (!src || !width || !height || !x || !y || !removeVirtualCanvas)
       return null;
 
