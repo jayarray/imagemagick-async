@@ -31,6 +31,13 @@ class ColorBaseClass extends LayerBaseClass {
   }
 
   /**
+   * @returns {number} Returns the number of source inputs.
+   */
+  NumberOfSources() {
+    return 1;
+  }
+
+  /**
    * @returns {string} Returns the name of the layer.
    */
   Name() {
