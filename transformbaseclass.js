@@ -30,6 +30,13 @@ class TransformBaseClass extends LayerBaseClass {
   }
 
   /**
+   * Replace current source with new source.
+   */
+  UpdateSource(newSrc) {
+    this.src_ = newSrc;
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */
