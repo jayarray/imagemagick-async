@@ -4,15 +4,15 @@
 class CutOut extends Cut {
   constructor(baseImagePath, cutoutImagePath) {
     super();
-    this.baseImagePath_ = baseImagePath;
-    this.cutoutImagePath_ = cutoutImagePath;
+    this.src1_ = baseImagePath;
+    this.src2_ = cutoutImagePath;
   }
 
   /**
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [baseImagePath, cutoutImagePath, '-compose', 'Dst_Out', '-composite'];
+    return [this.src1_, this.src2_, '-compose', 'Dst_Out', '-composite'];
   }
 
   /**
@@ -49,15 +49,15 @@ class CutOut extends Cut {
 class CutIn extends Cut {
   constructor(baseImagePath, cutoutImagePath) {
     super();
-    this.baseImagePath_ = baseImagePath;
-    this.cutoutImagePath_ = cutoutImagePath;
+    this.src1_ = baseImagePath;
+    this.src2_ = cutoutImagePath;
   }
 
   /**
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [baseImagePath, cutoutImagePath, '-compose', 'Dst_In', '-composite'];
+    return [this.src1_, this.src2_, '-compose', 'Dst_In', '-composite'];
   }
 
   /**
