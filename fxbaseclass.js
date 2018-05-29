@@ -23,6 +23,13 @@ class Fx extends Layer {
   }
 
   /**
+   * @returns {number} Returns the number of source inputs.
+   */
+  NumberOfSources() {
+    return 1;
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */
