@@ -24,6 +24,13 @@ class CutBaseClass extends LayerBaseClass {
   }
 
   /**
+   * @returns {number} Returns the number of source inputs.
+   */
+  NumberOfSources() {
+    return 2;
+  }
+
+  /**
    * @override
    * @returns {string} Returns a string of the type name.
    */
