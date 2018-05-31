@@ -8,7 +8,8 @@ const DISPOSE_VALUES = [
   'Background'
 ];
 
-const GRAVITY_VALUES = ['Northwest',
+const GRAVITY_VALUES = [
+  'Northwest',
   'Northeast',
   'North',
   'Southwest',
@@ -17,6 +18,36 @@ const GRAVITY_VALUES = ['Northwest',
   'West',
   'East'
 ];
+
+const CONSOLIDATED_EFFECTS =
+  [
+    'Negate',
+    'Colorize',
+    'GrayscaleFormat',
+    'RgbFormat',
+    'Replace',
+    'AutoLevel',
+    'Swirl',
+    'Implode',
+    'Wave',
+    'Blur',
+    'OilPainting',
+    'CharcoalSketch',
+    'Roll',
+    'MirrorHorizontal',
+    'MirrorVertical',
+    'Transpose',
+    'Transverse',
+    'Offset',
+    'RotateAroundCenter',
+    'RotateAroundPoint',
+    'ResizeIgnoreAspectRatio',
+    'ResizeOnlyShrinkLarger',
+    'ResizeOnlyEnlargeSmaller',
+    'ResizeFillGivenArea',
+    'ResizePercentage',
+    'ResizePixelCountLimit'
+  ];
 
 //------------------------------
 // EXPORTS
