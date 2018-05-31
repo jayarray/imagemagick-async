@@ -1,5 +1,5 @@
 let COORDINATES = require('./coordinates.js');
-let PrimitiveBaseClass = require('./primitivebaseclass.js').PrimitiveBaseClass;
+let PrimitiveBaseClass = require('./primitivesbaseclass.js').PrimitiveBaseClass;
 
 //--------------------------------
 // BEZIER
