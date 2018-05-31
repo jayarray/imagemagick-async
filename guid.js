@@ -26,7 +26,7 @@ function Create(length) {
  * @returns {string} Returns a string that looks like this: "GUID.FORMAT"
  */
 function Filename(length, format) {
-  return `${GUID(length)}.${extension}`;
+  return `${Create(length)}.${format}`;
 }
 
 //-----------------------------------
