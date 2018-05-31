@@ -118,6 +118,8 @@ function GroupIntoOptimizedLayers(flatList) {
 }
 
 
+
+
 //----------------------------
 
 function HierarchyToString(nodes, indent) {
@@ -147,7 +149,34 @@ function Analyze(layer) {
   return { hierarchy: hierarchy, string: hStr };
 }
 
+/**
+ * Get an ordered flat list of layers.
+ * @param {Layer} layer 
+ * @returns {Array<Layer>} Returns an aray of Layer objects.
+ */
+function GetOrderedFlatListOfLayers(layer) {
+  let childrenFlatList = GetLayerHierarchy(layer).flatlist.map(node => node.Layer());
+  return [layer].concat(childrenFlatList);
+}
+
+/**
+ * Group layers into canvases.
+ * @param {Canvas} canvas 
+ */
+function GroupIntoSeparateCanvases(canvas) {
+  let canvasList = [];
+  let flatlist = GetOrderedFlatListOfLayers(canvas);
+
+  for (let i = 0; i < flatlist.length; ++i) {
+    let currLayer = flatlist[i];
+    if (currLayer.Type() != 'primitive')
+      canvasList.push(currLayer);
+  }
+  return canvasList;
+}
+
 //--------------------------
 // EXPORTS
 
 exports.Analyze = Analyze;
+exports.GroupIntoSeparateCanvases = GroupIntoSeparateCanvases;
