@@ -2,7 +2,7 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 let PATH = require('path');
 let OPTIMIZER = require('./optimizer.js');
 let LINUX_COMMANDS = require('linux-commands-async');
-let GUID = require('guid.js');
+let GUID = require('./guid.js');
 
 //--------------------------------
 // CONSTANTS
@@ -14,9 +14,9 @@ const MIN_FILEPATHS = 2;
 
 function GetArgs(layer) {
   if (layer) {
-    if (layer.Type() == 'canvas' || layer.Type() == 'file')
-      return layer.GetArgs_();
-    return layer.Args();
+    if (layer.Type() == 'canvas')
+      return layer.Args();
+    return layer.RenderArgs();
   }
   return null;
 }
@@ -47,90 +47,6 @@ class LayerBaseClass {
   }
 
   /**
-   * Write layer to disk.
-   * @param {string} outputPath 
-   */
-  Render(outputPath) {
-    return new Promise((resolve, reject) => {
-      let parentDir = LINUX_COMMANDS.Path.ParentDir(outputPath);
-
-      this.RenderLayers_(parentDir).then(filepaths => {
-        // Finish if no compositing is needed.
-        if (filepaths.length < MIN_FILEPATHS) {
-          LINUX_COMMANDS.Move.Move(filepaths[0], outputPath, LOCAL_COMMAND).then(success => {
-            resolve();
-          }).catch(error => reject(error));
-        }
-        else {
-          // Create composite
-          RenderComposite(filepaths, null, outputPath).then(success => {
-            // Clean up temp files
-            LINUX_COMMANDS.Remove.Files(filepaths, LOCAL_COMMAND).then(success => {
-              resolve();
-            }).catch(error => reject(error));
-          }).catch(error => reject(error));
-        }
-      }).catch(error => reject(error));
-    });
-  }
-
-  /**
-   * Render all layers into one. (BRUTE FORCE: Needs optimizing) <= TO DO!!!
-   */
-  RenderLayers_(outputDir) {
-    return new Promise((resolve, reject) => {
-      let filepaths = [];
-      let actions = [];
-
-      // Add this layer to render list
-      let thisFilepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-      filepaths.push(thisFilepath);
-
-      let thisArgs = GetArgs(this).concat(thisFilepath);
-      actions.push(LOCAL_COMMAND.Execute(this.Command(), thisArgs));
-
-      // Create flat list of layers
-      let flatList = OPTIMIZER.Analyze(this).hierarchy.flatlist;
-
-      // Add all other layers to render list
-      for (let i = 0; i < flatList.length; ++i) {
-        let currNode = flatList[i];
-        let filepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-        filepaths.push(filepath);
-
-        let args = GetArgs(currNode.layer_.layer).concat(filepath);
-        actions.push(LOCAL_COMMAND.Execute(this.Command(), args));
-      }
-
-      // Render all layers
-      Promise.all(actions).then(results => {
-        resolve(filepaths);
-      }).catch(error => reject(error));
-    });
-  }
-
-  /**
-   * Use this function to render an image without applying any effects or layers to it.
-   * @param {string} outputPath 
-   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
-   */
-  RenderTempFile_(outputDir, format) {
-    return new Promise((resolve, reject) => {
-      let filepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, format));
-      let cmd = this.Command();
-      let args = GetArgs(this).concat(filepath);
-
-      LOCAL_COMMAND.Execute(cmd, args).then(output => {
-        if (output.stderr) {
-          reject(output.stderr);
-          return;
-        }
-        resolve(filepath);
-      }).catch(error => reject(error));
-    });
-  }
-
-  /**
    * @returns {string} Returns the type of layer.
    */
   Type() {
@@ -143,176 +59,145 @@ class LayerBaseClass {
   Name() {
     // Override
   }
+
+  /**
+   * Use this function to render an image without applying any effects or layers to it.
+   * @param {string} outputDir
+   * @param {string} format 
+   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
+   */
+  RenderTempFile_(outputDir, format) {
+    return new Promise((resolve, reject) => {
+      let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
+      let cmd = this.Command();
+      let args = GetArgs(this).concat(outputPath);
+
+      LOCAL_COMMAND.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        resolve(outputPath);
+      }).catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Write to disk.
+   * @param {string} outputPath 
+   */
+  Render(outputPath) {
+    return new Promise((resolve, reject) => {
+      let parentDir = LINUX_COMMANDS.Path.ParentDir(outputPath);
+      let format = LINUX_COMMANDS.Path.Extension(outputPath).replace('.', '');
+      let tempDirPath = PATH.join(parentDir, GUID.Create());
+
+      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDirPath, LOCAL_COMMAND).then(success => {
+        // Render all canvases
+        let canvasList = OPTIMIZER.GroupIntoSeparateCanvases(this);
+        let actions = canvasList.map(canvas => canvas.RenderTempFile_(tempDirPath, format));
+
+        Promise.all(actions).then(filepaths => {
+          let gravity = 'Northwest';
+          CreateComposite(filepaths, gravity, outputPath).then(success => {
+            resolve();
+
+            // Cleanup temp files
+            LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
+              resolve();
+            }).catch(error => reject(error));
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    });
+  }
 }
 
 //-------------------------------------
 // COMPOSITE
 
-function RenderComposite(filepaths, gravity, outputPath) {
+function CreateComposite(filepaths, gravity, outputPath) {
   if (filepaths.length < MIN_FILEPATHS)
     return Promise.reject(`Failed to create composite: ${MIN_FILEPATHS} or more filepaths required.`);
 
   return new Promise((resolve, reject) => {
     let args = [];
 
-    if (this.gravity_)
-      args.push('-gravity', this.gravity_);
+    if (gravity)
+      args.push('-gravity', gravity);
 
     // Add first 2 paths
-    args.push(this.filepaths_[0], this.filepaths_[1]);
+    args.push(filepaths[0], filepaths[1]);
 
     // Add other parts accordingly
-    for (let i = 2; i < this.filepaths_.length; ++i) {
-      args.push('-composite', this.filepaths_[i]);
+    for (let i = 2; i < filepaths.length; ++i) {
+      args.push('-composite', filepaths[i]);
     }
     args.push('-composite', outputPath);
 
     LOCAL_COMMAND.Execute('convert', args).then(output => {
       if (output.stderr) {
-        reject(`Failed to creaqte GIF: ${output.stderr}`);
+        reject(`Failed to render composite: ${output.stderr}`);
         return;
       }
       resolve();
-    }).catch(error => `Failed to create GIF: ${error}`);
+    }).catch(error => `Failed to render composite: ${error}`);
   });
 }
 
 //---------------------------------------
 // RENDER METHODS (Experimenting)
 
-const PromiseSerial = funcs =>
-  funcs.reduce((promise, func) =>
-    promise.then(result => func().then(Array.prototype.concat.bind(result))),
-    Promise.resolve([]));
-
-
 function ApplyEffectsInSequence(layers, outputDir, format) {
   return new Promise((resolve, reject) => {
-    let apply = (currLayer, layers) => {
+    let filepaths = [];
+    let actions = [];
+
+    // Set order of renders
+    for (let i = 0; i < layer.length; ++i) {
+      let currLayer = layers[i];
+      let path = PATH.join(outputDir, GUID.Filename(GUID_LENGTH, format));
+      filepaths.push(path);
+
+      if (i == 0) { // Render first layer as is.
+        let action = currLayer.RenderTempFile_(outputDir, format);
+        actions.push(action);
+      }
+      else { // Apply effects to previous result.
+        if (i < layer.length - 1 && currLayer.NumberOfSources() == 1) {
+          let nextLayer = layers[i + 1];
+
+          if (nextLayer.NumberOfSources() == 1) {
+            let newSrc = filepaths[i - 1];
+            nextLayer.UpdateSource(newSrc);
+          }
+          else if (nextLayer.NumberOfSources() > 1) {
+            let newSources = [filepaths[i - 1], null];
+            nextLayer.UpdateSources(newSources);
+          }
+        }
+      }
+    }
+
+    // Render images
+    let filepaths = [];
+
+    let apply = (currLayer, nextLayers) => {
       if (!currLayer)
         return;
 
       currLayer.RenderTempFile_(outputDir, format).then(filepath => {
+        filepaths.push(filepath);
         resolve();
       }).catch(error => reject(error));
     }
 
-    apply(layers[0], layers.slice(1));
-
-    funcs.reduce((promise, func) =>
-      promise.then(result => func().then(Array.prototype.concat.bind(result))),
-      Promise.resolve([]));
-  });
-}
-
-
-/**
- * Get an ordered flat list of layers.
- * @param {Layer} layer 
- * @returns {Array<Layer>} Returns an aray of Layer objects.
- */
-function GetOrderedFlatListOfLayers(layer) {
-  let childrenFlatList = OPTIMIZER.Analyze(layer).hierarchy.flatlist.map(node => node.Layer()); // Convert Node -> Layer
-  return layer.concat(childrenFlatList);
-}
-
-
-/**
- * Apply effects in sequence. (A <- B, AB <- C, ABC <- D)
- * @param {Layer} layer 
- * @param {string} outputDir 
- */
-function ApplyEffectsInSequence(layer, outputDir) {
-  return new Promise((resolve, reject) => {
-    let filepaths = [];
-    let actions = [];
-
-    // Add this layer to render list
-    let thisFilepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-    filepaths.push(thisFilepath);
-
-    let thisArgs = GetArgs(layer).concat(thisFilepath);
-    actions.push(LOCAL_COMMAND.Execute(layer.Command(), thisArgs));
-
-    // Create flat list of layers
-    let flatList = GetOrderedFlatListOfLayers(layer);
-
-    // Add all other layers to render list
-    for (let i = 0; i < flatList.length; ++i) {
-      let currLayer = flatList[i];
-      let outputPath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-      filepaths.push(outputPath);
-
-      let args = GetArgs(currLayer).concat(outputPath);
-      let cmd = currLayer.Command();
-      actions.push(LOCAL_COMMAND.Execute(cmd, args));
-    }
-
-    // Render
-    PromiseSerial(actions).then(results => {
-      resolve();
+    apply(nextLayers[0], nextLayers.slice(1)).then(success => {
+      resolve(filepaths[-1]);
     }).catch(error => reject(error));
   });
 }
-
-
-/**
- * Apply effects in sequence. (A <- B, AB <- C, ABC <- D)
- * @param {Layer} layer 
- * @param {string} outputDir 
- */
-function RenderLayersAsOrderedFlatList(layer, outputDir) {
-  return new Promise((resolve, reject) => {
-    let filepaths = [];
-    let actions = [];
-
-    // Add this layer to render list
-    let thisFilepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-    filepaths.push(thisFilepath);
-
-    let thisArgs = GetArgs(layer).concat(thisFilepath);
-    actions.push(LOCAL_COMMAND.Execute(layer.Command(), thisArgs));
-
-    // Create flat list of layers
-    let flatList = GetOrderedFlatListOfLayers(layer);
-
-    // Add all other layers to render list
-    for (let i = 0; i < flatList.length; ++i) {
-      let currLayer = flatList[i];
-      let filepath = PATH.join(outputDir, GuidFilenameGenerator(GUID_LENGTH, 'png'));
-      filepaths.push(filepath);
-
-      let args = GetArgs(currLayer).concat(filepath);
-      let cmd = currLayer.Command();
-      actions.push(LOCAL_COMMAND.Execute(cmd, args));
-    }
-
-    // Render all layers
-    Promise.all(actions).then(results => {
-      resolve(filepaths);
-    }).catch(error => reject(error));
-  });
-}
-
-
-// Render layers in sequence (no special rules)
-function RenderMethod1(layer, outputPath) {
-
-}
-
-
-// All layers rendered individually and then composited.
-function RenderMethod2(layer, outputPath) {
-
-}
-
-
-// Method #2 + apply effects directly to layer.
-function RenderMethod3(layer, outputPath) {
-
-}
-
-
 
 //--------------------------------------
 // EXPORTS
