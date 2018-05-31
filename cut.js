@@ -1,7 +1,9 @@
+let CutBaseClass = require('./cutbaseclass.js').CutBaseClass;
+
 //--------------------------------------
 // OUT
 
-class CutOut extends Cut {
+class CutOut extends CutBaseClass {
   constructor(baseImagePath, cutoutImagePath) {
     super();
     this.src1_ = baseImagePath;
@@ -46,7 +48,7 @@ class CutOut extends Cut {
 //--------------------------------------
 // IN
 
-class CutIn extends Cut {
+class CutIn extends CutBaseClass {
   constructor(baseImagePath, cutoutImagePath) {
     super();
     this.src1_ = baseImagePath;
