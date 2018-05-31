@@ -1,8 +1,8 @@
-let Layer = require('./layerbase.js').Layer;
+let LayerBaseClass = require('./layerbaseclass.js').LayerBaseClass;
 
 //-----------------------------
 
-class Fx extends Layer {
+class FxBaseClass extends LayerBaseClass {
   constructor() {
     super();
   }
@@ -48,4 +48,4 @@ class Fx extends Layer {
 //--------------------------------
 // EXPORTS
 
-exports.Fx = Fx;
+exports.FxBaseClass = FxBaseClass;

@@ -1,12 +1,12 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
-let Fx = require('./fxbaseclass.js').Fx;
+let FxBaseClass = require('./fxbaseclass.js').FxBaseClass;
 
 //---------------------------------
 // SWIRL
 
-class Swirl extends Fx {
+class Swirl extends FxBaseClass {
   constructor(src, degrees) {
     super();
     this.src_ = src;
@@ -51,7 +51,7 @@ class Swirl extends Fx {
 //---------------------------------
 // IMPLODE
 
-class Implode extends Fx {
+class Implode extends FxBaseClass {
   constructor(src, factor) {
     super();
     this.src_ = src;
@@ -96,7 +96,7 @@ class Implode extends Fx {
 //---------------------------------
 // WAVE
 
-class Wave extends Fx {
+class Wave extends FxBaseClass {
   constructor(src, amplitude, frequency) {
     super();
     this.src_ = src;
@@ -152,7 +152,7 @@ class Wave extends Fx {
  * @param {string} outputPath The path where the resulting image will be rendered to.
  * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
  */
-class Blur extends Fx {
+class Blur extends FxBaseClass {
   constructor(src, radius, sigma, hasTransparency) {
     super();
     this.src_ = src;
@@ -207,7 +207,7 @@ class Blur extends Fx {
 //----------------------------------------------
 // PAINT
 
-class OilPainting extends Fx {
+class OilPainting extends FxBaseClass {
   constructor(src, paintValue) {
     super();
     this.src_ = src;
@@ -252,7 +252,7 @@ class OilPainting extends Fx {
 //-------------------------------------
 // CHARCOAL SKETCH
 
-class CharcoalSketch extends Fx {
+class CharcoalSketch extends FxBaseClass {
   constructor(src, charcoalValue) {
     super();
     this.src_ = src;
@@ -297,7 +297,7 @@ class CharcoalSketch extends Fx {
 //-------------------------------------
 // COLORING BOOK SKETCH
 
-class ColoringBookSketch extends Fx {
+class ColoringBookSketch extends FxBaseClass {
   constructor(src, isHeavilyShaded) {
     super();
     this.src_ = src;
@@ -348,7 +348,7 @@ class ColoringBookSketch extends Fx {
 //-----------------------------------------
 // PENCIL SKETCH
 
-class PencilSketch extends Fx {
+class PencilSketch extends FxBaseClass {
   constructor(src, radius, sigma, angle) {
     super();
     this.src_ = src;
