@@ -1,4 +1,5 @@
 let VALIDATE = require('./validate.js');
+let CONSTANTS = require('./constants.js');
 let CanvasBaseClass = require('./canvasbaseclass.js').CanvasBaseClass;
 
 //----------------------------------------
@@ -11,9 +12,7 @@ class ColorCanvas extends CanvasBaseClass {
    * @param {string} color The color of the canvas. (Valid color format string used in Image Magick)
    */
   constructor(width, height, color) {
-    super();
-    this.width_ = width;
-    this.height_ = height;
+    super(width, height);
     this.color_ = color;
   }
 
@@ -24,8 +23,8 @@ class ColorCanvas extends CanvasBaseClass {
   Args() {
     let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
 
-    if (this.PrimitiveTuples().length > 0)
-      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    if (this.Primitives().length > 0)
+      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
 
     return args;
   }
@@ -62,9 +61,7 @@ class GradientCanvas extends CanvasBaseClass {
    * @param {LinearGradient|RadialGradient} gradient
    */
   constructor(width, height, gradient) {
-    super();
-    this.width_ = width;
-    this.height_ = height;
+    super(width, height);
     this.gradient_ = gradient;
   }
 
@@ -75,8 +72,8 @@ class GradientCanvas extends CanvasBaseClass {
   Args() {
     let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
-    if (this.PrimitiveTuples().length > 0)
-      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    if (this.Primitives().length > 0)
+      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
 
     return args;
   }
@@ -108,10 +105,12 @@ class GradientCanvas extends CanvasBaseClass {
 
 class ImageCanvas extends CanvasBaseClass {
   /**
+   * @param {number} width Width (in pixels)
+   * @param {number} height Height (in pixels)
    * @param {string} src Source
    */
-  constructor(src) {
-    super();
+  constructor(width, height, src) {
+    super(width, height);
     this.src_ = src;
   }
 
@@ -122,8 +121,8 @@ class ImageCanvas extends CanvasBaseClass {
   Args() {
     let args = [this.src_];
 
-    if (this.PrimitiveTuples().length > 0)
-      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    if (this.Primitives().length > 0)
+      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
 
     return args;
   }
@@ -139,11 +138,11 @@ class ImageCanvas extends CanvasBaseClass {
    * Create an ImageCanvas object. If inputs are invalid it returns null.
    * @param {string} src Source
    */
-  static Create(src) {
+  static Create(width, height, src) {
     if (VALIDATE.IsStringInput(src))
       return null;
 
-    return new ImageCanvas(src);
+    return new ImageCanvas(width, height, src);
   }
 }
 
@@ -152,9 +151,9 @@ class ImageCanvas extends CanvasBaseClass {
 
 class Label extends CanvasBaseClass {
   /**
-   * @param {string} text Text string
    * @param {number} width Width in pixels. (Optional) 
-   * @param {number} height Height in pixels. (Optional) 
+   * @param {number} height Height in pixels. (Optional)
+   * @param {string} text Text string
    * @param {string} font Font name (Optional) 
    * @param {number} strokeWidth Thickness of the text outline. (Optional) 
    * @param {string} strokeColor The color of the text outline. (Optional) 
@@ -163,10 +162,9 @@ class Label extends CanvasBaseClass {
    * @param {string} backgroundColor The background color for the entire label. (Optional) 
    * @param {string} gravity Gravity of the text. (Optional) 
    */
-  constructor(text, width, height, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  constructor(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+    super(width, height);
     this.text_ = text;
-    this.width_ = width;
-    this.height_ = height;
     this.font_ = font;
     this.strokeWidth_ = strokeWidth;
     this.strokeColor_ = strokeColor;
@@ -209,8 +207,8 @@ class Label extends CanvasBaseClass {
 
     args.push(`label:${this.text_}`);
 
-    if (this.PrimitiveTuples().length > 0)
-      this.PrimitiveTuples().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+    if (this.Primitives().length > 0)
+      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
 
     return args;
   }

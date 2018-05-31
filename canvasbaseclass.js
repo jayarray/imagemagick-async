@@ -3,8 +3,10 @@ let LayerBaseClass = require('./layerbaseclass.js').LayerBaseClass;
 //---------------------------------
 
 class CanvasBaseClass extends LayerBaseClass {
-  constructor() {
+  constructor(width, height) {
     super();
+    this.width_ = width;
+    this.height_ = height;
     this.primitives_ = [];
   }
 
@@ -50,37 +52,17 @@ class CanvasBaseClass extends LayerBaseClass {
   }
 
   /**
-   * @returns {Array<string>} Returns an array of fx and mod names that can be included in a canvas' args.
+   * @returns {number} Returns the width of the canvas.
    */
-  static InlineEffects() {
-    return [
-      'Negate',
-      'Colorize',
-      'GrayscaleFormat',
-      'RgbFormat',
-      'Replace',
-      'AutoLevel',
-      'Swirl',
-      'Implode',
-      'Wave',
-      'Blur',
-      'OilPainting',
-      'CharcoalSketch',
-      'Roll',
-      'MirrorHorizontal',
-      'MirrorVertical',
-      'Transpose',
-      'Transverse',
-      'Offset',
-      'RotateAroundCenter',
-      'RotateAroundPoint',
-      'ResizeIgnoreAspectRatio',
-      'ResizeOnlyShrinkLarger',
-      'ResizeOnlyEnlargeSmaller',
-      'ResizeFillGivenArea',
-      'ResizePercentage',
-      'ResizePixelCountLimit'
-    ];
+  Width() {
+    return this.width_;
+  }
+
+  /**
+   * @returns {number} Returns the height of the canvas.
+   */
+  Height() {
+    return this.height_;
   }
 }
 
