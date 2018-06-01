@@ -10,23 +10,12 @@ let GUID = require('./guid.js');
 const MIN_FILEPATHS = 2;
 
 //---------------------------------
-// ARGS
-
-function GetArgs(layer) {
-  if (layer) {
-    if (layer.Type() == 'canvas')
-      return layer.Args();
-    return layer.RenderArgs();
-  }
-  return null;
-}
-
-//---------------------------------
 // LAYER (Base class)
 
 class LayerBaseClass {
   constructor() {
     this.layers_ = [];
+    this.appliedFxAndMods_ = [];
   }
 
   /**
@@ -44,6 +33,21 @@ class LayerBaseClass {
    */
   Draw(layer, x, y) {
     this.layers_.push({ layer: layer, x: x, y: y });
+  }
+
+  /**
+   * Directly apply an effect or modification to this layer.
+   * @param {Layer} fxOrMod An Fx or Mod layer
+   */
+  ApplyFxOrMod(fxOrMod) {
+    this.appliedFxAndMods_.push(fxOrMod);
+  }
+
+  /**
+   * @return {Array<Layer>} Returns an array of Fx and Mod layers applied to this layer.
+   */
+  AppliedFxAndMods() {
+    return this.appliedFxAndMods_;
   }
 
   /**
@@ -70,7 +74,7 @@ class LayerBaseClass {
     return new Promise((resolve, reject) => {
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
       let cmd = this.Command();
-      let args = GetArgs(this).concat(outputPath);
+      let args = this.Args().concat(outputPath);
 
       LOCAL_COMMAND.Execute(cmd, args).then(output => {
         if (output.stderr) {
@@ -79,6 +83,90 @@ class LayerBaseClass {
         }
 
         resolve(outputPath);
+      }).catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Use this function to render an image using a specific command string. (For use with applied FX and Mods command)
+   * @param {string} cmd Command string
+   * @param {string} outputDir
+   * @param {string} format 
+   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
+   */
+  RenderTempFileByCmd_(cmd, outputDir, format) {
+    return new Promise((resolve, reject) => {
+      LOCAL_COMMAND.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        resolve(outputPath);
+      }).catch(error => reject(error));
+    });
+  }
+
+  /**
+   * Use this function to render an image without applying any effects or layers to it.
+   * @param {string} outputDir
+   * @param {string} format 
+   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
+   */
+  RenderTempFileWithAppliedFxAndMods_(outputDir, format) {
+    return new Promise((resolve, reject) => {
+      let effectGroups = OPTIMIZER.GroupConsolableFxAndMods(this.appliedFxAndMods_);
+      let prevOutputPath = this.src_;
+
+      // Create temp directory
+      let tempDir = PATH.join(outputDir, GUID.Create(GUID.DEFAULT_LENGTH));
+
+      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDir, LOCAL_COMMAND).then(success => {
+        this.RenderTempFile_(outputDir, format).then(ouputPath => {
+          let apply = (groups) => {
+            return new Promise((resolve, reject) => {
+              if (groups.length == 0)
+                return;
+
+              let currGroup = groups[0];
+
+              let mainEffect = currGroup[0];
+              mainEffect.UpdateSource(prevOutputPath);
+
+              let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
+              prevOutputPath = tempOutputPath;
+
+              let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
+
+              let consolidatedEffects = currGroup.slice(1);
+              consolidatedEffects.forEach(c => args = args.concat(c.Args()));
+              args.push(tempOutputPath);
+
+              let cmd = args.join(' ');
+              LOCAL_COMMAND.Execute(cmd, []).then(output => {
+                if (output.stderr) {
+                  reject(output.stderr);
+                  return;
+                }
+                resolve(apply(groups.slice(1)));
+              }).catch(error => reject(error));
+            });
+          };
+
+          // Render effects in order
+          apply(effectGroups).then(outputPath => {
+            // Move final image out of temp dir
+            let filename = LINUX_COMMANDS.Path.Filename(outputPath);
+            let newOutputPath = PATH.join(outputDir, filename);
+
+            LINUX_COMMANDS.Move.Move(outputPath, newOutputPath, LOCAL_COMMAND).then(success => {
+              // Clean up temp directory
+              LINUX_COMMANDS.Directory.Remove(tempDir, LOCAL_COMMAND).then(success => {
+                resolve(newOutputPath);
+              }).catch(error => reject(error));
+            }).catch(error => reject(error));
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
       }).catch(error => reject(error));
     });
   }
@@ -93,17 +181,27 @@ class LayerBaseClass {
       let format = LINUX_COMMANDS.Path.Extension(outputPath).replace('.', '');
       let tempDirPath = PATH.join(parentDir, GUID.Create());
 
+      // Create temp directory
       LINUX_COMMANDS.Mkdir.MakeDirectory(tempDirPath, LOCAL_COMMAND).then(success => {
-        // Render all canvases
+
+        // Render all canvases into temp directory
         let canvasList = OPTIMIZER.GroupIntoSeparateCanvases(this);
-        let actions = canvasList.map(canvas => canvas.RenderTempFile_(tempDirPath, format));
+
+        let actions = [];
+        for (let i = 0; i < canvasList.length; ++i) {
+          let currCanvas = canvasList[i];
+          if (currCanvas.AppliedFxAndMods().length > 0)
+            actions.push(currCanvas.RenderTempFileWithAppliedFxAndMods_(tempDirPath, format));
+          else
+            actions.push(currCanvas.RenderTempFile_(tempDirPath, format));
+        }
 
         Promise.all(actions).then(filepaths => {
+          // Compose all rendered images
           let gravity = 'Northwest';
           CreateComposite(filepaths, gravity, outputPath).then(success => {
-            resolve();
 
-            // Cleanup temp files
+            // Clean up temp directory
             LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
               resolve();
             }).catch(error => reject(error));
