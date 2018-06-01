@@ -125,8 +125,10 @@ class LayerBaseClass {
         this.RenderTempFile_(outputDir, format).then(ouputPath => {
           let apply = (groups) => {
             return new Promise((resolve, reject) => {
-              if (groups.length == 0)
+              if (groups.length == 0) {
+                resolve(prevOutputPath);
                 return;
+              }
 
               let currGroup = groups[0];
 
