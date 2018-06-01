@@ -1,3 +1,7 @@
+let CONSTANTS = require('./constants.js');
+
+//-------------------------------
+
 class Node {
   constructor(layer) {
     this.layer_ = layer;
@@ -100,26 +104,6 @@ function GroupByParent(flatlist) {
   return groups;
 }
 
-//---------------------------------
-
-//function GroupBy
-
-//---------------------------------
-
-function IsOptimizable(flatlist) {
-
-}
-
-
-function GroupIntoOptimizedLayers(flatList) {
-  let groups = [];
-
-  // TO DO
-}
-
-
-
-
 //----------------------------
 
 function HierarchyToString(nodes, indent) {
@@ -175,8 +159,41 @@ function GroupIntoSeparateCanvases(canvas) {
   return canvasList;
 }
 
+/**
+ * Combine certain Fx and Mods with others to
+ * @param {*} arr 
+ */
+function GroupConsolableFxAndMods(arr) {
+  let groups = [];
+  let currGroup = [];
+
+  for (let i = 0; i < arr.length; ++i) {
+    let currFxOrMod = arr[i];
+
+    if (i == 0)
+      currGroup.push(currFxOrMod);
+    else {
+      if (CONSTANTS.CONSOLIDATED_EFFECTS.includes(currFxOrMod.Name()))
+        currGroup.push(currFxOrMod);
+      else {
+        groups.push(currGroup);
+
+        // Clear curr list
+        currGroup = [];
+        currGroup.push(currFxOrMod);
+      }
+    }
+
+    if (i == arr.length - 1 && currGroup.length > 0)
+      groups.push(currGroup);
+  }
+
+  return groups;
+}
+
 //--------------------------
 // EXPORTS
 
 exports.Analyze = Analyze;
 exports.GroupIntoSeparateCanvases = GroupIntoSeparateCanvases;
+exports.GroupConsolableFxAndMods = GroupConsolableFxAndMods;
