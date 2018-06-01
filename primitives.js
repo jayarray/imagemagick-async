@@ -96,7 +96,7 @@ class Circle extends PrimitiveBaseClass {
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the circle.
   */
   Args(xOffset, yOffset) {
-    args = [];
+    let args = [];
 
     if (this.fillColor_)
       args.push('-fill', this.fillColor_);
@@ -243,7 +243,7 @@ class Line extends PrimitiveBaseClass {
 
     let start = COORDINATES.Create(this.start_.x_ + xOffset, this.start_.y_ + yOffset);
     let end = COORDINATES.Create(this.end_.x_ + xOffset, this.end_.y_ + yOffset);
-    args.push('-draw', `line ${start.String()} ${end_.String()}`);
+    args.push('-draw', `line ${start.String()} ${end.String()}`);
 
     return args;
   }
