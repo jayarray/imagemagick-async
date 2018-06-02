@@ -76,6 +76,9 @@ class LayerBaseClass {
       let cmd = this.Command();
       let args = this.Args().concat(outputPath);
 
+      console.log(`\nLAYER: ${this.Name()}`);
+      console.log(`CMD: ${cmd} ${args.join(' ')}`);
+
       LOCAL_COMMAND.Execute(cmd, args).then(output => {
         if (output.stderr) {
           reject(output.stderr);
@@ -133,7 +136,8 @@ class LayerBaseClass {
               let currGroup = groups[0];
 
               let mainEffect = currGroup[0];
-              mainEffect.UpdateSource(prevOutputPath);
+              mainEffect.UpdateSource(prevOutputPath); // prev is undefined (???)
+              // NOTE: Find a way to make an "apply" function for Render() function.
 
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
               prevOutputPath = tempOutputPath;
@@ -145,6 +149,10 @@ class LayerBaseClass {
               args.push(tempOutputPath);
 
               let cmd = args.join(' ');
+
+              console.log(`\nLAYER: ${mainEffect.Name()}`);
+              console.log(`CMD: ${cmd}`);
+
               LOCAL_COMMAND.Execute(cmd, []).then(output => {
                 if (output.stderr) {
                   reject(output.stderr);
