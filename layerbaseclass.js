@@ -76,9 +76,6 @@ class LayerBaseClass {
       let cmd = this.Command();
       let args = this.Args().concat(outputPath);
 
-      console.log(`\nLAYER: ${this.Name()}`);
-      console.log(`CMD: ${cmd} ${args.join(' ')}`);
-
       LOCAL_COMMAND.Execute(cmd, args).then(output => {
         if (output.stderr) {
           reject(output.stderr);
@@ -132,9 +129,6 @@ class LayerBaseClass {
 
               let cmd = args.join(' ');
 
-              console.log(`\nLAYER: ${mainEffect.Name()}`);
-              console.log(`CMD: ${cmd}`);
-
               LOCAL_COMMAND.Execute(cmd, []).then(output => {
                 if (output.stderr) {
                   reject(output.stderr);
@@ -173,7 +167,6 @@ class LayerBaseClass {
   Render(outputPath) {
     return new Promise((resolve, reject) => {
       let prevOutputPath = null;
-
       let parentDir = LINUX_COMMANDS.Path.ParentDir(outputPath);
       let format = LINUX_COMMANDS.Path.Extension(outputPath).replace('.', '');
       let tempDirPath = PATH.join(parentDir, GUID.Create());
