@@ -91,26 +91,6 @@ class LayerBaseClass {
   }
 
   /**
-   * Use this function to render an image using a specific command string. (For use with applied FX and Mods command)
-   * @param {string} cmd Command string
-   * @param {string} outputDir
-   * @param {string} format 
-   * @returns {Promise<string>} Returns a Promise. If successful, it returns a string representing the output path. Else, it returns an error.
-   */
-  RenderTempFileByCmd_(cmd, outputDir, format) {
-    return new Promise((resolve, reject) => {
-      LOCAL_COMMAND.Execute(cmd, args).then(output => {
-        if (output.stderr) {
-          reject(output.stderr);
-          return;
-        }
-
-        resolve(outputPath);
-      }).catch(error => reject(error));
-    });
-  }
-
-  /**
    * Use this function to render an image without applying any effects or layers to it.
    * @param {string} outputDir
    * @param {string} format 
@@ -119,19 +99,23 @@ class LayerBaseClass {
   RenderTempFileWithAppliedFxAndMods_(outputDir, format) {
     return new Promise((resolve, reject) => {
       let effectGroups = OPTIMIZER.GroupConsolableFxAndMods(this.appliedFxAndMods_);
-      let prevOutputPath = this.src_;
+
+      let prevOutputPath = null;
 
       // Create temp directory
       let tempDir = PATH.join(outputDir, GUID.Create(GUID.DEFAULT_LENGTH));
 
       LINUX_COMMANDS.Mkdir.MakeDirectory(tempDir, LOCAL_COMMAND).then(success => {
-        this.RenderTempFile_(outputDir, format).then(ouputPath => {
+        this.RenderTempFile_(outputDir, format).then(outputPath => {
+
           let apply = (groups) => {
             return new Promise((resolve, reject) => {
               if (groups.length == 0) {
                 resolve(prevOutputPath);
                 return;
               }
+
+              prevOutputPath = outputPath;
 
               let currGroup = groups[0];
 
@@ -140,8 +124,6 @@ class LayerBaseClass {
               // NOTE: Find a way to make an "apply" function for Render() function.
 
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
-              prevOutputPath = tempOutputPath;
-
               let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
 
               let consolidatedEffects = currGroup.slice(1);
@@ -158,6 +140,9 @@ class LayerBaseClass {
                   reject(output.stderr);
                   return;
                 }
+
+                prevOutputPath = tempOutputPath;
+
                 resolve(apply(groups.slice(1)));
               }).catch(error => reject(error));
             });
@@ -187,6 +172,8 @@ class LayerBaseClass {
    */
   Render(outputPath) {
     return new Promise((resolve, reject) => {
+      let prevOutputPath = null;
+
       let parentDir = LINUX_COMMANDS.Path.ParentDir(outputPath);
       let format = LINUX_COMMANDS.Path.Extension(outputPath).replace('.', '');
       let tempDirPath = PATH.join(parentDir, GUID.Create());
@@ -197,19 +184,34 @@ class LayerBaseClass {
         // Render all canvases into temp directory
         let canvasList = OPTIMIZER.GroupIntoSeparateCanvases(this);
 
-        let actions = [];
-        for (let i = 0; i < canvasList.length; ++i) {
-          let currCanvas = canvasList[i];
-          if (currCanvas.AppliedFxAndMods().length > 0)
-            actions.push(currCanvas.RenderTempFileWithAppliedFxAndMods_(tempDirPath, format));
-          else
-            actions.push(currCanvas.RenderTempFile_(tempDirPath, format));
-        }
+        let tempFilepaths = []; // delete these after composing final image
 
-        Promise.all(actions).then(filepaths => {
+        let apply = (canvases) => {
+          return new Promise((resolve, reject) => {
+            if (canvases.length == 0) {
+              resolve(prevOutputPath);
+              return;
+            }
+
+            let currCanvas = canvases[0];
+
+            let action = null;
+            if (currCanvas.AppliedFxAndMods().length > 0)
+              action = currCanvas.RenderTempFileWithAppliedFxAndMods_(tempDirPath, format);
+            else
+              action = currCanvas.RenderTempFile_(tempDirPath, format);
+
+            action.then(filepath => {
+              tempFilepaths.push(filepath);
+              resolve(apply(canvases.slice(1)));
+            }).catch(error => reject(error));
+          });
+        };
+
+        apply(canvasList).then(filepath => {
           // Compose all rendered images
           let gravity = 'Northwest';
-          CreateComposite(filepaths, gravity, outputPath).then(success => {
+          CreateComposite(tempFilepaths, gravity, outputPath).then(success => {
 
             // Clean up temp directory
             LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
@@ -251,59 +253,6 @@ function CreateComposite(filepaths, gravity, outputPath) {
       }
       resolve();
     }).catch(error => `Failed to render composite: ${error}`);
-  });
-}
-
-//---------------------------------------
-// RENDER METHODS (Experimenting)
-
-function ApplyEffectsInSequence(layers, outputDir, format) {
-  return new Promise((resolve, reject) => {
-    let filepaths = [];
-    let actions = [];
-
-    // Set order of renders
-    for (let i = 0; i < layer.length; ++i) {
-      let currLayer = layers[i];
-      let path = PATH.join(outputDir, GUID.Filename(GUID_LENGTH, format));
-      filepaths.push(path);
-
-      if (i == 0) { // Render first layer as is.
-        let action = currLayer.RenderTempFile_(outputDir, format);
-        actions.push(action);
-      }
-      else { // Apply effects to previous result.
-        if (i < layer.length - 1 && currLayer.NumberOfSources() == 1) {
-          let nextLayer = layers[i + 1];
-
-          if (nextLayer.NumberOfSources() == 1) {
-            let newSrc = filepaths[i - 1];
-            nextLayer.UpdateSource(newSrc);
-          }
-          else if (nextLayer.NumberOfSources() > 1) {
-            let newSources = [filepaths[i - 1], null];
-            nextLayer.UpdateSources(newSources);
-          }
-        }
-      }
-    }
-
-    // Render images
-    let filepaths = [];
-
-    let apply = (currLayer, nextLayers) => {
-      if (!currLayer)
-        return;
-
-      currLayer.RenderTempFile_(outputDir, format).then(filepath => {
-        filepaths.push(filepath);
-        resolve();
-      }).catch(error => reject(error));
-    }
-
-    apply(nextLayers[0], nextLayers.slice(1)).then(success => {
-      resolve(filepaths[-1]);
-    }).catch(error => reject(error));
   });
 }
 
