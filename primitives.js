@@ -25,17 +25,15 @@ class Bezier extends PrimitiveBaseClass {
    * @param {number} yOffset
    * @returns {string} Returns a space-delimited string representing all points in the bezier curve.
    */
-  PointsToString(xOffset, yOffset) {
-    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset, point.y_ + yOffset).String()).join(' ');
+  PointsToString() {
+    return this.points_.map(point => COORDINATES.Create(point.x_ + this.xOffset_, point.y_ + this.yOffset_).String()).join(' ');
   }
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the bezier curve.
   */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.fillColor_)
@@ -49,7 +47,7 @@ class Bezier extends PrimitiveBaseClass {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    args.push('-draw', `bezier ${this.PointsToString(xOffset, yOffset)}`);
+    args.push('-draw', `bezier ${this.PointsToString(this.xOffset_, this.yOffset_)}`);
     return args;
   }
 
@@ -91,11 +89,9 @@ class Circle extends PrimitiveBaseClass {
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the circle.
   */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.fillColor_)
@@ -109,8 +105,8 @@ class Circle extends PrimitiveBaseClass {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + xOffset, this.center_.y_ + yOffset);
-    let edge = COORDINATES.Create(this.edge_.x_ + xOffset, this.edge_.y_ + yOffset);
+    let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
+    let edge = COORDINATES.Create(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);
 
     return args;
@@ -161,11 +157,9 @@ class Ellipse extends PrimitiveBaseClass {
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the ellipse.
   */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.fillColor_)
@@ -179,7 +173,7 @@ class Ellipse extends PrimitiveBaseClass {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let center = COORDINATES.Create(this.center_.x_ + xOffset, this.center_.y_ + yOffset);
+    let center = COORDINATES.Create(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
 
     let angleStart = this.angleStart_ || 0;
     let angleEnd = this.angleEnd_ || 360;
@@ -228,11 +222,9 @@ class Line extends PrimitiveBaseClass {
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the line.
    */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.color_)
@@ -241,8 +233,8 @@ class Line extends PrimitiveBaseClass {
     if (this.width_)
       args.push('-strokewidth', this.width_);
 
-    let start = COORDINATES.Create(this.start_.x_ + xOffset, this.start_.y_ + yOffset);
-    let end = COORDINATES.Create(this.end_.x_ + xOffset, this.end_.y_ + yOffset);
+    let start = COORDINATES.Create(this.start_.x_ + this.xOffset_, this.start_.y_ + this.yOffset_);
+    let end = COORDINATES.Create(this.end_.x_ + this.xOffset_, this.end_.y_ + this.yOffset_);
     args.push('-draw', `line ${start.String()} ${end.String()}`);
 
     return args;
@@ -286,21 +278,17 @@ class Path extends PrimitiveBaseClass {
 
   /** 
    * Get a list of points in string form that have the X and Y offsets applied to them.
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {string} Returns a space-delimited string representing all points in the path.
    */
-  PointsToString(xOffset, yOffset) {
-    return this.points_.map(point => COORDINATES.Create(point.x_ + xOffset, point.y_ + yOffset).String()).join(' ');
+  PointsToString() {
+    return this.points_.map(point => COORDINATES.Create(point.x_ + this.xOffset_, point.y_ + this.yOffset_).String()).join(' ');
   }
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the path.
    */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.fillColor_)
@@ -314,7 +302,7 @@ class Path extends PrimitiveBaseClass {
     if (this.strokeWidth_)
       args.push('-strokewidth', this.strokeWidth_);
 
-    let pointStringArr = this.PointsToString(xOffset, yOffset).split(' ');
+    let pointStringArr = this.PointsToString(this.xOffset_, this.yOffset_).split(' ');
 
     let drawString = `path 'M ${pointStringArr[0]} L ${pointStringArr[1]}`;
     if (pointStrings.length > 2)
@@ -363,17 +351,15 @@ class Point extends PrimitiveBaseClass {
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the point.
    */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.color_)
       args.push('-fill', this.color_); // Default color is black
 
-    args.push('-draw', `point ${this.x_ + xOffset},${this.y_ + yOffset}`);
+    args.push('-draw', `point ${this.x_ + this.xOffset_},${this.y_ + this.yOffset_}`);
     return args;
   }
 
@@ -418,11 +404,9 @@ class Text extends PrimitiveBaseClass {
 
   /** 
    * @override
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the point.
    */
-  Args(xOffset, yOffset) {
+  Args() {
     let args = [];
 
     if (this.fillColor_)
@@ -443,7 +427,7 @@ class Text extends PrimitiveBaseClass {
     if (this.gravity_)
       args.push('-gravity', this.gravity_);
 
-    args.push('-draw', `text ${xOffset},${yOffset} '${this.string_}'`);
+    args.push('-draw', `text ${this.xOffset_},${this.yOffset_} '${this.string_}'`);
     return args;
   }
 

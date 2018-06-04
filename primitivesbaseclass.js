@@ -3,17 +3,16 @@ let LayerBaseClass = require('./layerbaseclass.js').LayerBaseClass;
 //---------------------------------
 // PRIMITIVE (Base class)
 
-class PrimitiveBaseClass extends LayerBaseClass {
+class PrimitiveBaseClass {
   constructor() {
-    super();
+    this.xOffset_ = 0;
+    this.yOffset_ = 0;
   }
 
   /**
-   * @param {number} xOffset
-   * @param {number} yOffset
    * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
    */
-  Args(xOffset, yOffset) {
+  Args() {
     // Override
   }
 
