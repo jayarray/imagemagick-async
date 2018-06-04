@@ -16,6 +16,8 @@ class LayerBaseClass {
   constructor() {
     this.layers_ = [];
     this.appliedFxAndMods_ = [];
+    this.xOffset_ = 0;
+    this.yOffset_ = 0;
   }
 
   /**
@@ -25,14 +27,29 @@ class LayerBaseClass {
     // Override (Different layers use different command keywords: i.e. 'convert <...>', 'compare <...>', etc)
   }
 
+  SetXoffset(x) {
+    this.xOffset_ = x;
+  }
+
+  SetYoffset(y) {
+    this.y0Offset_ = y;
+  }
+
+  SetOffsets(x, y) {
+    this.xOffset_ = x;
+    this.yOffset_ = y;
+  }
+
   /**
    * Add a layer to this layer.
    * @param {Layer} layer 
    * @param {number} xOffset 
    * @param {number} yOffset 
    */
-  Draw(layer, x, y) {
-    this.layers_.push({ layer: layer, x: x, y: y });
+  Draw(layer, xOffset, yOffset) {
+    layer.xOffset_ = xOffset;
+    layer.yOffset_ = yOffset;
+    this.layers_.push(layer);
   }
 
   /**
@@ -74,7 +91,9 @@ class LayerBaseClass {
     return new Promise((resolve, reject) => {
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
       let cmd = this.Command();
-      let args = this.Args().concat(outputPath);
+      let args = this.Args();
+
+      args = args.concat(outputPath);
 
       LOCAL_COMMAND.Execute(cmd, args).then(output => {
         if (output.stderr) {
@@ -117,8 +136,7 @@ class LayerBaseClass {
               let currGroup = groups[0];
 
               let mainEffect = currGroup[0];
-              mainEffect.UpdateSource(prevOutputPath); // prev is undefined (???)
-              // NOTE: Find a way to make an "apply" function for Render() function.
+              mainEffect.UpdateSource(prevOutputPath);
 
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
               let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
@@ -144,7 +162,6 @@ class LayerBaseClass {
 
           // Render effects in order
           apply(effectGroups).then(outputPath => {
-            // Move final image out of temp dir
             let filename = LINUX_COMMANDS.Path.Filename(outputPath);
             let newOutputPath = PATH.join(outputDir, filename);
 
@@ -202,10 +219,20 @@ class LayerBaseClass {
         };
 
         apply(canvasList).then(filepath => {
-          // Compose all rendered images
-          let gravity = 'Northwest';
-          CreateComposite(tempFilepaths, gravity, outputPath).then(success => {
+          let src = tempFilepaths[0];
+          let filepathOffsetTuples = [];
 
+          for (let i = 1; i < tempFilepaths.length; ++i) {
+            let path = tempFilepaths[i];
+
+            let currCanvas = canvasList[i];
+            filepathOffsetTuples.push({ filepath: path, xOffset: currCanvas.xOffset_, yOffset: currCanvas.yOffset_ });
+          }
+
+          let gravity = 'Northwest';
+
+          // Render a composite image
+          DrawMultipleImages(src, filepathOffsetTuples, gravity, outputPath).then(success => {
             // Clean up temp directory
             LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
               resolve();
@@ -248,6 +275,53 @@ function CreateComposite(filepaths, gravity, outputPath) {
     }).catch(error => `Failed to render composite: ${error}`);
   });
 }
+
+//------------------------------------
+// DRAW MULTIPLE IMAGES
+
+function DrawMultipleImages(src, filepathOffsetTuples, gravity, outputPath) {
+  return new Promise((resolve, reject) => {
+    let args = [src];
+
+    if (gravity)
+      args.push('-gravity', gravity);
+
+    // Add other parts accordingly
+    for (let i = 0; i < filepathOffsetTuples.length; ++i) {
+      let currTuple = filepathOffsetTuples[i];
+      args.push('-draw', `image over ${currTuple.xOffset},${currTuple.yOffset} 0,0 '${currTuple.filepath}'`);
+    }
+    args.push(outputPath);
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to render composite: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to render composite: ${error}`);
+  });
+}
+
+//-------------------------------------
+// OFFSET
+
+function Offset(src, xOffset, yOffset, outputPath) {
+  return new Promise((resolve, reject) => {
+    let args = [src, '-virtual-pixel', 'transparent', '-distort', 'Affine', `0,0 ${xOffset},${yOffset}`, outputPath];
+
+    console.log(`OFFSET:: Command: convert ${args.join(' ')}`); // DEBUG
+
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to offset image: ${output.stderr}`);
+        return;
+      }
+      resolve();
+    }).catch(error => `Failed to offset image: ${error}`);
+  });
+}
+
 
 //--------------------------------------
 // EXPORTS
