@@ -26,19 +26,19 @@ class Node {
   }
 
   Layer() {
-    return this.layer_.layer;
+    return this.layer_;
   }
 
   Xoffset() {
-    return this.layer_.x;
+    return this.layer_.xOffset_;
   }
 
   Yoffset() {
-    return this.layer_.y;
+    return this.layer_.yOffset_;
   }
 
   Type() {
-    return this.Layer().Type();
+    return this.layer_.Type();
   }
 }
 
@@ -115,7 +115,7 @@ function HierarchyToString(nodes, indent) {
   while (stack && stack.length > 0) {
     // Get next node
     let currNode = stack.pop();
-    string += `${'  '.repeat(indent)}${currNode.Layer().Type()}\n`;
+    string += `${'  '.repeat(indent)}${currNode.Type()}\n`;
 
     // Add children to parent
     let children = currNode.Layer().layers_.map(l => new Node(l));
@@ -161,7 +161,7 @@ function GroupIntoSeparateCanvases(canvas) {
 
 /**
  * Combine certain Fx and Mods with others to
- * @param {*} arr 
+ * @param {Array<Layer>} arr 
  */
 function GroupConsolableFxAndMods(arr) {
   let groups = [];
