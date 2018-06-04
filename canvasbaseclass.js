@@ -17,7 +17,9 @@ class CanvasBaseClass extends LayerBaseClass {
    * @param {number} yOffset 
    */
   AddPrimitive(p, xOffset, yOffset) {
-    this.primitives_.push({ primitive: p, xOffset: xOffset, yOffset: yOffset });
+    p.xOffset_ = xOffset;
+    p.yOffset_ = yOffset;
+    this.primitives_.push(p);
   }
 
   /**

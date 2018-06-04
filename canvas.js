@@ -24,7 +24,7 @@ class ColorCanvas extends CanvasBaseClass {
     let args = ['-size', `${this.width_}x${this.height_}`, `canvas:${this.color_}`];
 
     if (this.Primitives().length > 0)
-      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+      this.Primitives().forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -73,7 +73,7 @@ class GradientCanvas extends CanvasBaseClass {
     let args = ['-size', `${this.width_}x${this.height_}`].concat(this.gradient_.Args());
 
     if (this.Primitives().length > 0)
-      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+      this.Primitives().forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -122,7 +122,7 @@ class ImageCanvas extends CanvasBaseClass {
     let args = [this.src_];
 
     if (this.Primitives().length > 0)
-      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+      this.Primitives().forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -208,7 +208,7 @@ class Label extends CanvasBaseClass {
     args.push(`label:${this.text_}`);
 
     if (this.Primitives().length > 0)
-      this.Primitives().forEach(tuple => args = args.concat(tuple.primitive.Args(tuple.xOffset, tuple.yOffset)));
+      this.Primitives().forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
