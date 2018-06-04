@@ -315,7 +315,7 @@ class RotateAroundCenter extends TransformBaseClass {
    * @returns {RotateAroundCenter} Returns a RotateAroundCenter object. If inputs are invalid, it returns null.
    */
   static Create(src, degrees) {
-    if (!src || !degrees)
+    if (!src || Number.isNan(degrees))
       return null;
 
     return new RotateAroundCenter(src, degrees);
