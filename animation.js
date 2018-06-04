@@ -2,6 +2,11 @@ let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //--------------------------------------
+// CONSTANTS
+
+const MIN_FILEPATHS = 2;
+
+//--------------------------------------
 // GIF
 
 /**
@@ -16,10 +21,6 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
  */
 function Gif(canvas, filepaths, loop, delay, dispose, outputPath) {
   let minLoopValue = 0;
-
-  let parentClass = Object.getPrototypeOf(o.constructor).name;
-  if (parentClass != 'Canvas')
-    return Promise.reject(`Failed to create GIF: canvas is an invalid type`);
 
   let error = VALIDATE.IsArray(filepaths);
   if (error)
