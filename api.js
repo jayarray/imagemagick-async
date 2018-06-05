@@ -1,3 +1,4 @@
+let ANIMATION = require('./animation.js');
 let CANVAS = require('./canvas.js');
 let COLOR = require('./color.js');
 let COMPARE = require('./compare.js');
@@ -35,11 +36,13 @@ function GradientCanvas(width, height, gradient) {
 
 /**
  * Create an image canvas layer.
- * @param {string} path Image location
+ * @param {number} width 
+ * @param {number} height 
+ * @param {string} src
  * @returns {Layer} Returns a Layer object.
  */
-function ImageCanvas(path) {
-  return CANVAS.CreateImageCanvas(path);
+function ImageCanvas(width, height, src) {
+  return CANVAS.CreateImageCanvas(width, height, src);
 }
 
 /**
@@ -576,6 +579,33 @@ function Crop(src, width, height, x, y, removeVirtualCanvas) {
   return TRANSFORM.CreateCropMod(src, width, height, x, y, removeVirtualCanvas);
 }
 
+/**
+ * Rotate an image.
+ * @param {string} src 
+ * @param {number} degrees 
+ * @param {string} outputPath 
+ */
+function RotateImage(src, degrees, outputPath) {
+  return TRANSFORM.CreateRotateImageMod(src, degrees, outputPath);
+}
+
+//------------------------------
+// ANIMATION
+
+/**
+ * Create a GIF from the provided filepath list (in ther order provided).
+ * @param {Canvas} canvas Canvas object
+ * @param {Array<string>} filepaths List of filepaths
+ * @param {number} loop (Optional) The number of times the GIF animation is to cycle before stopping. The default value is 0 (infinite loop). Valid loop values are from 0 to infinity.
+ * @param {number} delay The delay time measured in 1/100th of a seconds at a time.
+ * @param {string} dispose (Optional) Determines what the following images should do with the previous results of the GIF animation. Default is 'Undefined'.
+ * @param {string} outputPath The path where the GIF will be rendered.
+ * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function CreateGif(canvas, filepaths, loop, delay, dispose, outputPath) {
+  return ANIMATION.CreateGif(canvas, filepaths, loop, delay, dispose, outputPath);
+}
+
 //-------------------------------
 // IDENTIFY
 
@@ -651,5 +681,8 @@ exports.ResizeFillGivenArea = ResizeFillGivenArea;
 exports.ResizePercentage = ResizePercentage;
 exports.ResizePixelCountLimit = ResizePixelCountLimit;
 exports.Crop = Crop;
+exports.RotateImage = RotateImage;
+
+exports.CreateGif = CreateGif;
 
 exports.Identify = Identify;
