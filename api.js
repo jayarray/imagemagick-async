@@ -4,6 +4,7 @@ let COMPARE = require('./compare.js');
 let COMPOSE = require('./compose.js');
 let CUT = require('./cut.js');
 let FX = require('./fx.js');
+let IDENTIFY = require('./identify.js');
 let TRANSFORM = require('./transform.js');
 let PRIMITIVES = require('./primitives.js');
 
@@ -576,6 +577,17 @@ function Crop(src, width, height, x, y, removeVirtualCanvas) {
 }
 
 //-------------------------------
+// IDENTIFY
+
+/**
+ * Get information about an image.
+ * @param {string} src 
+ */
+function Identify(src) {
+  return IDENTIFY.CreateImageInfo(src);
+}
+
+//-------------------------------
 // EXPORTS
 
 exports.ColorCanvas = ColorCanvas;
@@ -639,3 +651,5 @@ exports.ResizeFillGivenArea = ResizeFillGivenArea;
 exports.ResizePercentage = ResizePercentage;
 exports.ResizePixelCountLimit = ResizePixelCountLimit;
 exports.Crop = Crop;
+
+exports.Identify = Identify;
