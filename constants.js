@@ -2,51 +2,51 @@ const MIN_WIDTH = 1;
 const MIN_HEIGHT = 1;
 
 const DISPOSE_VALUES = [
-  'Undefined',
+  'Background',
   'None',
   'Previous',
-  'Background'
+  'Undefined'
 ];
 
 const GRAVITY_VALUES = [
-  'Northwest',
-  'Northeast',
+  'East',
   'North',
-  'Southwest',
-  'Southeast',
+  'Northeast',
+  'Northwest',
   'South',
-  'West',
-  'East'
+  'Southeast',
+  'Southwest',
+  'West'
 ];
 
 const CONSOLIDATED_EFFECTS =
   [
-    'Negate',
+    'AutoLevel',
+    'Blur',
+    'CharcoalSketch',
     'Colorize',
     'GrayscaleFormat',
-    'RgbFormat',
-    'Replace',
-    'AutoLevel',
-    'Swirl',
     'Implode',
-    'Wave',
-    'Blur',
-    'OilPainting',
-    'CharcoalSketch',
-    'Roll',
     'MirrorHorizontal',
     'MirrorVertical',
-    'Transpose',
-    'Transverse',
+    'Negate',
     'Offset',
-    'RotateAroundCenter',
-    'RotateAroundPoint',
+    'OilPainting',
+    'Replace',
+    'ResizeFillGivenArea',
     'ResizeIgnoreAspectRatio',
     'ResizeOnlyShrinkLarger',
     'ResizeOnlyEnlargeSmaller',
-    'ResizeFillGivenArea',
+    'ResizePixelCountLimit',
     'ResizePercentage',
-    'ResizePixelCountLimit'
+    'RgbFormat',
+    'Roll',
+    'RotateAroundCenter',
+    'RotateAroundPoint',
+    'Swirl',
+    'Transpose',
+    'Transverse',
+    'Wave'
   ];
 
 //------------------------------
