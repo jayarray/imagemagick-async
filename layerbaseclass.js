@@ -89,12 +89,15 @@ class LayerBaseClass {
    */
   RenderTempFile_(outputDir, format) {
     return new Promise((resolve, reject) => {
+      // Create temp file name
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
-      let cmd = this.Command();
-      let args = this.Args();
 
+      // Build command
+      let cmd = this.Command();
+      let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
       args = args.concat(outputPath);
 
+      // Execute command
       LOCAL_COMMAND.Execute(cmd, args).then(output => {
         if (output.stderr) {
           reject(output.stderr);
@@ -213,6 +216,7 @@ class LayerBaseClass {
 
             action.then(filepath => {
               tempFilepaths.push(filepath);
+              prevOutputPath = filepath;
               resolve(apply(canvases.slice(1)));
             }).catch(error => reject(error));
           });
@@ -232,7 +236,7 @@ class LayerBaseClass {
           let gravity = 'Northwest';
 
           // Render a composite image
-          DrawMultipleImages(src, filepathOffsetTuples, gravity, outputPath).then(success => {
+          Composite(src, filepathOffsetTuples, gravity, outputPath).then(success => {
             // Clean up temp directory
             LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
               resolve();
@@ -247,39 +251,7 @@ class LayerBaseClass {
 //-------------------------------------
 // COMPOSITE
 
-function CreateComposite(filepaths, gravity, outputPath) {
-  if (filepaths.length < MIN_FILEPATHS)
-    return Promise.reject(`Failed to create composite: ${MIN_FILEPATHS} or more filepaths required.`);
-
-  return new Promise((resolve, reject) => {
-    let args = [];
-
-    if (gravity)
-      args.push('-gravity', gravity);
-
-    // Add first 2 paths
-    args.push(filepaths[0], filepaths[1]);
-
-    // Add other parts accordingly
-    for (let i = 2; i < filepaths.length; ++i) {
-      args.push('-composite', filepaths[i]);
-    }
-    args.push('-composite', outputPath);
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to render composite: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to render composite: ${error}`);
-  });
-}
-
-//------------------------------------
-// DRAW MULTIPLE IMAGES
-
-function DrawMultipleImages(src, filepathOffsetTuples, gravity, outputPath) {
+function Composite(src, filepathOffsetTuples, gravity, outputPath) {
   return new Promise((resolve, reject) => {
     let args = [src];
 
@@ -300,6 +272,24 @@ function DrawMultipleImages(src, filepathOffsetTuples, gravity, outputPath) {
       }
       resolve();
     }).catch(error => `Failed to render composite: ${error}`);
+  });
+}
+
+//---------------------------------------
+// FINALIZE
+
+function Finalize(src, output) {
+  return new Promise((resolve, reject) => {
+    let executor = LINUX_COMMANDS.Command.LOCAL;
+
+    executor.Execute('convert', [src, outputPath]).then(output => {
+      if (output.stderr) {
+        reject(output.stderr);
+        return;
+      }
+
+      resolve();
+    }).catch(error => reject(error));
   });
 }
 
