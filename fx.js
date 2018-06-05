@@ -1,6 +1,3 @@
-let VALIDATE = require('./validate.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-
 let FxBaseClass = require('./fxbaseclass.js').FxBaseClass;
 
 //---------------------------------
