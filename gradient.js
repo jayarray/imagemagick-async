@@ -1,6 +1,5 @@
 let VALIDATE = require('./validate.js');
 let CONSTANTS = require('./constants.js');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //-------------------------------
 // VECTOR
