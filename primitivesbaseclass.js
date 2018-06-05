@@ -1,5 +1,3 @@
-let LayerBaseClass = require('./layerbaseclass.js').LayerBaseClass;
-
 //---------------------------------
 // PRIMITIVE (Base class)
 
