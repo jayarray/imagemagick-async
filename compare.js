@@ -1,4 +1,3 @@
-let VALIDATE = require('./validate.js');
 let CompareBaseClass = require('./comparebaseclass.js').CompareBaseClass;
 
 //-------------------------------------
