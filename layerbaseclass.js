@@ -3,6 +3,7 @@ let PATH = require('path');
 let OPTIMIZER = require('./optimizer.js');
 let LINUX_COMMANDS = require('linux-commands-async');
 let GUID = require('./guid.js');
+let COMPLEX_OPERATIONS = require('./complexoperations.js');
 
 //--------------------------------
 // CONSTANTS
@@ -92,20 +93,25 @@ class LayerBaseClass {
       // Create temp file name
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
 
-      // Build command
-      let cmd = this.Command();
-      let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
-      args = args.concat(outputPath);
+      if (this.Name() == 'RotateImage') {
+        RotateImage(this, this.src_, this.xOffset_, this.yOffset_, this.degrees_, [], outputPath).then(success => {
+          resolve(outputPath);
+        }).catch(error => reject(error));
+      }
+      else {
+        let cmd = this.Command();
+        let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
+        args = args.concat(outputPath);
 
-      // Execute command
-      LOCAL_COMMAND.Execute(cmd, args).then(output => {
-        if (output.stderr) {
-          reject(output.stderr);
-          return;
-        }
+        LOCAL_COMMAND.Execute(cmd, args).then(output => {
+          if (output.stderr) {
+            reject(output.stderr);
+            return;
+          }
 
-        resolve(outputPath);
-      }).catch(error => reject(error));
+          resolve(outputPath);
+        }).catch(error => reject(error));
+      }
     });
   }
 
@@ -134,7 +140,7 @@ class LayerBaseClass {
                 return;
               }
 
-              prevOutputPath = outputPath;
+              prevOutputPath = outputPath; // Keep track of most recent render
 
               let currGroup = groups[0];
 
@@ -142,24 +148,31 @@ class LayerBaseClass {
               mainEffect.UpdateSource(prevOutputPath);
 
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
-              let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
-
               let consolidatedEffects = currGroup.slice(1);
-              consolidatedEffects.forEach(c => args = args.concat(c.Args()));
-              args.push(tempOutputPath);
 
-              let cmd = args.join(' ');
+              if (mainEffect.Name() == 'RotateImage') {
+                RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, this.degrees_, consolidatedEffects, tempOutputPath).then(success => {
+                  prevOutputPath = tempOutputPath;
+                  resolve(apply(groups.slice(1)));
+                }).catch(error => reject(error));
+              }
+              else {
+                let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
+                consolidatedEffects.forEach(c => args = args.concat(c.Args()));
+                args.push(tempOutputPath);
 
-              LOCAL_COMMAND.Execute(cmd, []).then(output => {
-                if (output.stderr) {
-                  reject(output.stderr);
-                  return;
-                }
+                let cmd = args.join(' ');
 
-                prevOutputPath = tempOutputPath;
+                LOCAL_COMMAND.Execute(cmd, []).then(output => {
+                  if (output.stderr) {
+                    reject(output.stderr);
+                    return;
+                  }
 
-                resolve(apply(groups.slice(1)));
-              }).catch(error => reject(error));
+                  prevOutputPath = tempOutputPath;
+                  resolve(apply(groups.slice(1)));
+                }).catch(error => reject(error));
+              }
             });
           };
 
@@ -275,18 +288,16 @@ function Composite(src, filepathOffsetTuples, gravity, outputPath) {
   });
 }
 
-//---------------------------------------
-// FINALIZE
+//------------------------------------
+// ROTATE IMAGE
 
-function Finalize(src, output) {
+function RotateImage(layer, src, currXoffset, currYoffset, degrees, consolidatedEffects, outputPath) {
   return new Promise((resolve, reject) => {
-    let executor = LINUX_COMMANDS.Command.LOCAL;
-
-    executor.Execute('convert', [src, outputPath]).then(output => {
-      if (output.stderr) {
-        reject(output.stderr);
-        return;
-      }
+    COMPLEX_OPERATIONS.RotateImage(src, degrees, consolidatedEffects, outputPath).then(rotationOffsets => {
+      // Adjust offsets to offset any changes in original image used in accomodating the rotation
+      let newXoffset = currXoffset - rotationOffsets.xOffset;
+      let newYoffset = currYoffset - rotationOffsets.yOffset;
+      layer.SetOffsets(newXoffset, newYoffset);
 
       resolve();
     }).catch(error => reject(error));
