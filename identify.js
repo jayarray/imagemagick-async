@@ -1,8 +1,6 @@
 let VALIDATE = require('./validate.js');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
-let COORDINATES = require('./coordinates.js');
-
 //---------------------------------
 // CONSTANTS
 
