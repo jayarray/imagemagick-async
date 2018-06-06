@@ -1,49 +1,99 @@
-let CANVAS = require('./canvas.js');
-let PRIMITIVES = require('./primitives.js');
-let COORDINATES = require('./coordinates.js');
-let OPTIMIZER = require('./optimizer.js');
-
-let LAYER = require('./layer.js');
+let GUID = require('./guid.js');
+let API = require('./api.js');
 let PATH = require('path');
+let LINUX_COMMANDS = require('linux-commands-async');
 
 //--------------------------------
 
 let outputDir = '/home/isa/Downloads';
-let outputPath = PATH.join(outputDir, 'OUT.png');
+let format = 'png';
 
 // Create main canvas
-let forest = CANVAS.CreateImageCanvas(1920, 1080, PATH.join(outputDir, 'forest.png'));
+let forestSrc = PATH.join(outputDir, 'forest.png');
+let forest = API.ImageCanvas(1920, 1080, forestSrc);
 
+//-----------------------------------
+// Draw pikachus on canvases
+let pikaSrc = PATH.join(outputDir, 'pikachu.png');
+let pikaCount = 30;
+let degreesInterval = 10;
+let horizontalOffset = forest.Width() / pikaCount;
 
-// Create other canvases
-let pikachu = CANVAS.CreateImageCanvas(877, 910, PATH.join(outputDir, 'pikachu.png'));
-let swirl = LAYER.Swirl('?', 180);
-let negate = LAYER.Negate('?');
-pikachu.ApplyFxOrMod(swirl);
-pikachu.ApplyFxOrMod(negate);
+let pikachuList = [];
+let pikachuPaths = [];
+let pikachuActions = [];
 
-let polygon = CANVAS.CreateImageCanvas(800, 800, PATH.join(outputDir, 'polygon.png'));
+console.log('\nCreating rotated images...');
 
-// Create primitives for main canvas.
-let transparentCanvas = CANVAS.CreateColorCanvas(forest.Width(), forest.Height(), 'none');
-let circle = PRIMITIVES.CreateCircle(COORDINATES.Create(800, 500), COORDINATES.Create(500, 600), '#0000ff', 5, 'none');
-transparentCanvas.AddPrimitive(circle, 0, 0);
+for (let i = 0; i < pikaCount; ++i) {
+  // Create pikachu canvas
+  let pikachu = API.ImageCanvas(877, 910, pikaSrc);
 
-let transparentCanvas2 = CANVAS.CreateColorCanvas(forest.Width(), forest.Height(), 'none');
-let line = PRIMITIVES.CreateLine(COORDINATES.Create(0, 0), COORDINATES.Create(1920, 1080), '#ff0000', 100);
-let blur = LAYER.Blur('?', 8, 10, true);
-transparentCanvas2.AddPrimitive(line, 0, 0);
-transparentCanvas2.ApplyFxOrMod(blur);
+  // Apply rotate effect
+  let rotate = API.RotateImage('?', degreesInterval * i);
+  pikachu.ApplyFxOrMod(rotate);
+  pikachuList.push(pikachu);
 
+  // Register action
+  let pikachuPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
+  pikachuActions.push(pikachu.Render(pikachuPath));
+  pikachuPaths.push(pikachuPath);
+}
 
-// Draw layers in desired order
-//forest.Draw(polygon, 0, 0);
-//forest.Draw(pikachu, 0, 0);
-//forest.Draw(transparentCanvas, 0, 0);
-forest.Draw(transparentCanvas2, 0, 0);
+// Render all pikachus
+Promise.all(pikachuActions).then(results => {
+  console.log('Done!');
+  console.log('\nCreating composite images...');
 
-forest.Render(outputPath).then(success => {
-  console.log('Success :-)');
+  // Create composites
+  let compPaths = [];
+  let compActions = [];
+
+  for (let i = 0; i < pikachuActions.length; ++i) {
+    let width = pikachuList[0].Width();
+    let height = pikachuList[0].Height();
+    let currPikachuPath = pikachuPaths[i];
+
+    let pikachuCanvas = API.ImageCanvas(width, height, currPikachuPath);
+    let compPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
+
+    let forestCanvas = API.ImageCanvas(1920, 1080, forestSrc);
+    let horizontalOffset = 100;
+    let xOffset = 1600 - (horizontalOffset * i) - pikachuList[i].xOffset_;
+
+    forestCanvas.Draw(pikachuCanvas, xOffset, 0);
+    compActions.push(forestCanvas.Render(compPath));
+    compPaths.push(compPath);
+  }
+
+  // Render composites
+  Promise.all(compActions).then(success => {
+    console.log('Done!');
+    console.log('\nCreating GIF...');
+
+    // Create GIF
+    let blankCanvas = API.ColorCanvas(forest.Width(), forest.Height(), 'none');
+    let loop = null;
+    let delay = 10;
+    let dispose = 'None';
+    let gifPath = PATH.join(outputDir, 'pikachu.gif');
+
+    API.CreateGif(blankCanvas, compPaths, loop, delay, dispose, gifPath).then(success => {
+      console.log('Done!');
+      console.log('\nCleaning up temp directory...');
+
+      LINUX_COMMANDS.Remove.Files(pikachuPaths.concat(compPaths), LINUX_COMMANDS.Command.LOCAL).then(success => {
+        console.log('Done!');
+        console.log('\nSUCCESS :-)');
+      }).catch(error => {
+        console.log(`ERROR cleaning up temp files: ${error}`);
+      });
+    }).catch(error => {
+      console.log(`ERROR creating GIF: ${error}`);
+    });
+  }).catch(error => {
+    console.log(`ERROR rendering composites: ${error}`);
+  });
 }).catch(error => {
-  console.log(`ERROR: ${error}`);
+  console.log(`ERROR rendering pikachus: ${error}`);
 });
