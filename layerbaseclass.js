@@ -151,7 +151,7 @@ class LayerBaseClass {
               let consolidatedEffects = currGroup.slice(1);
 
               if (mainEffect.Name() == 'RotateImage') {
-                RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, this.degrees_, consolidatedEffects, tempOutputPath).then(success => {
+                RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, mainEffect.degrees_, consolidatedEffects, tempOutputPath).then(success => {
                   prevOutputPath = tempOutputPath;
                   resolve(apply(groups.slice(1)));
                 }).catch(error => reject(error));
@@ -303,26 +303,6 @@ function RotateImage(layer, src, currXoffset, currYoffset, degrees, consolidated
     }).catch(error => reject(error));
   });
 }
-
-//-------------------------------------
-// OFFSET
-
-function Offset(src, xOffset, yOffset, outputPath) {
-  return new Promise((resolve, reject) => {
-    let args = [src, '-virtual-pixel', 'transparent', '-distort', 'Affine', `0,0 ${xOffset},${yOffset}`, outputPath];
-
-    console.log(`OFFSET:: Command: convert ${args.join(' ')}`); // DEBUG
-
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
-      if (output.stderr) {
-        reject(`Failed to offset image: ${output.stderr}`);
-        return;
-      }
-      resolve();
-    }).catch(error => `Failed to offset image: ${error}`);
-  });
-}
-
 
 //--------------------------------------
 // EXPORTS
