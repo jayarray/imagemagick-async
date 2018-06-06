@@ -406,7 +406,7 @@ class RotateImage extends TransformBaseClass {
     if (!src || isNaN(degrees))
       return null;
 
-    return new RotateAroundCenter(src, degrees);
+    return new RotateImage(src, degrees);
   }
 }
 
