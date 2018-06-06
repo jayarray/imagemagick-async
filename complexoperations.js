@@ -19,9 +19,9 @@ function RotateImage(src, degrees, consolidatedEffects, outputPath) {
       let hypotenuse = Math.ceil(Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)));
 
       // Build command
-      let args = ['-size', `${hypotenuse}x${this.hypotenuse}`, 'canvas:none', '-gravity', 'Center', '-draw', `image over 0,0 0,0 '${src}'`];
-      consolidatedEffects.forEach(c => args.push(c.Args()));
-      args = args.push('-distort', 'SRT', degrees, outputPath);
+      let args = ['-size', `${hypotenuse}x${hypotenuse}`, 'canvas:none', '-gravity', 'Center', '-draw', `image over 0,0 0,0 '${src}'`];
+      consolidatedEffects.forEach(c => args = args.concat(c.Args()));
+      args = args.concat(['-distort', 'SRT', degrees, outputPath]);
 
       // Render image
       LOCAL_COMMAND.Execute('convert', args).then(output => {
