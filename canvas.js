@@ -155,6 +155,7 @@ class Label extends CanvasBaseClass {
    * @param {number} height Height in pixels. (Optional)
    * @param {string} text Text string
    * @param {string} font Font name (Optional) 
+   * @param {string} fontSize Font size
    * @param {number} strokeWidth Thickness of the text outline. (Optional) 
    * @param {string} strokeColor The color of the text outline. (Optional) 
    * @param {string} fillColor The color inside of the text outline. (Optional) 
@@ -162,10 +163,11 @@ class Label extends CanvasBaseClass {
    * @param {string} backgroundColor The background color for the entire label. (Optional) 
    * @param {string} gravity Gravity of the text. (Optional) 
    */
-  constructor(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  constructor(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
     super(width, height);
     this.text_ = text;
     this.font_ = font;
+    this.fontSize_ = fontSize;
     this.strokeWidth_ = strokeWidth;
     this.strokeColor_ = strokeColor;
     this.fillColor_ = fillColor;
@@ -205,6 +207,7 @@ class Label extends CanvasBaseClass {
     if (this.gravity_)
       args.push('-gravity', this.gravity_);
 
+    args.push('-pointsize', this.fontSize_);
     args.push(`label:${this.text_}`);
 
     if (this.Primitives().length > 0)
@@ -226,6 +229,7 @@ class Label extends CanvasBaseClass {
    * @param {number} height Height in pixels. (Optional) 
    * @param {string} text Text string
    * @param {string} font Font name (Optional) 
+   * @param {string} fontSize Font size
    * @param {number} strokeWidth Thickness of the text outline. (Optional) 
    * @param {string} strokeColor The color of the text outline. (Optional) 
    * @param {string} fillColor The color inside of the text outline. (Optional) 
@@ -234,11 +238,11 @@ class Label extends CanvasBaseClass {
    * @param {string} gravity Gravity of the text. (Optional) 
    * @returns {Label} Returns a Label object. If inputs are invalid, it returns null.
    */
-  static Create(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  static Create(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
     if (!text)
       return null;
 
-    return new Label(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
+    return new Label(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
   }
 }
 
