@@ -271,7 +271,6 @@ function Composite(src, filepathOffsetTuples, gravity, outputPath) {
     if (gravity)
       args.push('-gravity', gravity);
 
-    // Add other parts accordingly
     for (let i = 0; i < filepathOffsetTuples.length; ++i) {
       let currTuple = filepathOffsetTuples[i];
       args.push('-draw', `image over ${currTuple.xOffset},${currTuple.yOffset} 0,0 '${currTuple.filepath}'`);
