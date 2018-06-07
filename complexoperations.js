@@ -12,7 +12,7 @@ let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
  */
 function RotateImage(src, degrees, consolidatedEffects, outputPath) {
   return new Promise((resolve, reject) => {
-    IDENTIFY.CreateImageInfo(src).then(obj => {
+    IDENTIFY.ImageInfo(src).then(obj => {
       // Calculate blank canvas dimensions
       let width = obj.info_.width;
       let height = obj.info_.height;
