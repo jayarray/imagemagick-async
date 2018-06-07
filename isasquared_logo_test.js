@@ -28,24 +28,11 @@ let blur = API.Blur('?', radius, sigma, hasTransparency);
 // Create main canvas
 let canvasWidth = 1080;
 let canvasHeight = 1080;
-let canvas = API.ColorCanvas(canvasHeight, canvasWidth, 'black');
-
-// Black square
-let blackCanvas = API.ColorCanvas(canvasHeight, canvasWidth, 'none');
-let blackColor = '#000000';
-let blackWidth = 100;
-let blackOrigin = COORDINATES.Create(270, 270);
-let blackLength = 540;
-let blackCoordinates = GetSquareCoordinates(blackOrigin, blackLength);
-let blackSquare = API.Path(blackCoordinates, blackColor, blackWidth, blackColor, true);
-let blackTransparency = API.Transparency('?', 50);
-blackCanvas.AddPrimitive(blackSquare, 0, 0);
-blackCanvas.ApplyFxOrMod(blackTransparency);
-blackCanvas.ApplyFxOrMod(blur);
+let canvas = API.ColorCanvas(canvasHeight, canvasWidth, 'none');
 
 // Purple square
 let purpleCanvas = API.ColorCanvas(canvasHeight, canvasWidth, 'none');
-let purpleColor = '#b366ff';//'#8000ff'; //'#330066';
+let purpleColor = '#b366ff';
 let purpleWidth = 100;
 let purpleOrigin = COORDINATES.Create(270, 270);
 let purpleLength = 540;
@@ -55,8 +42,6 @@ let purpleTransparency = API.Transparency('?', 50);
 purpleCanvas.AddPrimitive(purpleSquare, 0, 0);
 purpleCanvas.ApplyFxOrMod(purpleTransparency);
 purpleCanvas.ApplyFxOrMod(blur);
-
-
 canvas.Draw(purpleCanvas, 0, 0);
 
 // Blue square
