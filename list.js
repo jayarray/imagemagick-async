@@ -10,7 +10,7 @@ let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
 function Fonts() {
   return new Promise((resolve, reject) => {
     let args = ['-list', 'font'];
-    LOCAL_COMMAND.Execute('identify', args).then(output => {
+    LOCAL_COMMAND.Execute('convert', args).then(output => {
       if (output.stderr) {
         reject(`Failed to get fonts: ${output.stderr}`);
         return;
