@@ -8,6 +8,7 @@ let FX = require('./fx.js');
 let IDENTIFY = require('./identify.js');
 let TRANSFORM = require('./transform.js');
 let PRIMITIVES = require('./primitives.js');
+let LIST = require('./list.js');
 
 //------------------------------------------
 // CANVAS
@@ -51,6 +52,8 @@ function ImageCanvas(width, height, src) {
  * @param {number} height 
  * @param {string} text 
  * @param {string} font 
+ * @param {number} fontSize 
+ * @param {number} kerning 
  * @param {number} strokeWidth 
  * @param {string} strokeColor 
  * @param {string} fillColor 
@@ -59,8 +62,8 @@ function ImageCanvas(width, height, src) {
  * @param {string} gravity
  * @returns {Layer} Returns a Layer object.
  */
-function LabelCanvas(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
-  return CANVAS.CreateLabelCanvas(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
+function LabelCanvas(width, height, text, font, fontSize, kerning, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  return CANVAS.CreateLabelCanvas(width, height, text, font, fontSize, kerning, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
 }
 
 //--------------------------------------
@@ -617,6 +620,16 @@ function ImageInfo(src) {
   return IDENTIFY.ImageInfo(src);
 }
 
+//------------------------------
+// LIST
+
+/**
+ * List all available fonts.
+ */
+function Fonts() {
+  return LIST.Fonts();
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -686,3 +699,5 @@ exports.RotateImage = RotateImage;
 exports.CreateGif = CreateGif;
 
 exports.ImageInfo = ImageInfo;
+
+exports.Fonts = Fonts;
