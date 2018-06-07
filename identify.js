@@ -363,7 +363,7 @@ function ParsePixelInfo(infoStr) {
 }
 
 //-------------------------
-// IMAGE
+// IMAGE INFO
 
 class Pixel {
   /**
@@ -550,4 +550,4 @@ class ImageInfo {
 // EXPORTS
 
 exports.Format = Format;
-exports.CreateImageInfo = ImageInfo.Create;
+exports.ImageInfo = ImageInfo.Create;
