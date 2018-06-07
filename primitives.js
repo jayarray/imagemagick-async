@@ -305,7 +305,7 @@ class Path extends PrimitiveBaseClass {
     let pointStringArr = this.PointsToString(this.xOffset_, this.yOffset_).split(' ');
 
     let drawString = `path 'M ${pointStringArr[0]} L ${pointStringArr[1]}`;
-    if (pointStrings.length > 2)
+    if (pointStringArr.length > 2)
       drawString += ` ${pointStringArr.slice(2).join(' ')}`;
 
     if (this.isClosed_)
