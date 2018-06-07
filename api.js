@@ -59,8 +59,8 @@ function ImageCanvas(width, height, src) {
  * @param {string} gravity
  * @returns {Layer} Returns a Layer object.
  */
-function LabelCanvas(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
-  return CANVAS.CreateLabelCanvas(width, height, text, font, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
+function LabelCanvas(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
+  return CANVAS.CreateLabelCanvas(width, height, text, font, fontSize, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity);
 }
 
 //--------------------------------------
@@ -613,8 +613,8 @@ function CreateGif(canvas, filepaths, loop, delay, dispose, outputPath) {
  * Get information about an image.
  * @param {string} src 
  */
-function Identify(src) {
-  return IDENTIFY.CreateImageInfo(src);
+function ImageInfo(src) {
+  return IDENTIFY.ImageInfo(src);
 }
 
 //-------------------------------
@@ -685,4 +685,4 @@ exports.RotateImage = RotateImage;
 
 exports.CreateGif = CreateGif;
 
-exports.Identify = Identify;
+exports.ImageInfo = ImageInfo;
