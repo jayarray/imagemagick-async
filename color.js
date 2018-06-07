@@ -671,7 +671,17 @@ class Transparency extends ColorBaseClass {
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-alpha', 'on', '-channel', 'a', '-evaluate', 'set', `${this.percent_}%`];
+    let adjustedTransPercent = 0;
+    if (this.percent_ > 100)
+      adjustedTransPercent = 100;
+    else if (this.percent_ < 0)
+      adjustedTransPercent = 0;
+    else
+      adjustedTransPercent = this.percent_;
+
+    let opaqueValue = (100 - adjustedTransPercent) / 100;
+
+    return ['-alpha', 'on', '-channel', 'a', '-evaluate', 'multiply', `${opaqueValue}`, '+channel'];
   }
 
   /**
@@ -726,7 +736,7 @@ class ChannelAdjust extends ColorBaseClass {
   RenderArgs() {
     return [this.src_].concat(this.Args());
   }
-  
+
   /**
    * @override
    */
