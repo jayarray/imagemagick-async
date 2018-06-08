@@ -2,7 +2,7 @@
   "name": "imagemagick-async",
   "version": "1.0.0",
   "description": "",
-  "main": "isasquared_logo_test.js",
+  "main": "isasquared_animation.js",
   "dependencies": {
     "ffmpeg-async": "^1.0.2",
     "linux-commands-async": "^1.2.0"
