@@ -38,7 +38,7 @@ class Swirl extends FxBaseClass {
    * @returns {Swirl} Returns a Swirl object. If inputs are invalid, it returns null.
    */
   static Create(src, degrees) {
-    if (!src || !degrees)
+    if (!src || isNaN(degrees))
       return null;
 
     return new Swirl(src, degrees);
