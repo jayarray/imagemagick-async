@@ -53,13 +53,19 @@ canvas.Render(canvasDest).then(success => {
     console.log('\nRendering composites...');
 
     // Prepare composite renders
+    swirlPaths = swirlPaths.reverse();
     let compPaths = [];
     let compActions = [];
     let gravity = 'Center';
+    let digitCount = frameCount.toString().length;
 
     for (let i = 0; i < swirlActions.length; ++i) {
       let comp = API.Composite([canvasDest, swirlPaths[i]], gravity);
-      let compPath = PATH.join(imageSeqDir, `comp_${i + 1}.${format}`);
+
+      let numberString = `${'0'.repeat(digitCount)}${i + 1}`;
+      numberString = numberString.substring(numberString.length - 3);
+
+      let compPath = PATH.join(imageSeqDir, `comp_${numberString}.${format}`);
       compActions.push(comp.Render(compPath));
       compPaths.push(compPath);
     }
