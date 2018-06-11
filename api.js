@@ -337,6 +337,26 @@ function Exclusion(src1, src2) {
   return COMPOSE.CreateExclusionMod(src1, src2);
 }
 
+/**
+ * Create a Unchanged PIxels mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ * @param {number} fuzz 
+ */
+function UnchangedPixels(src1, src2, fuzz) {
+  return COMPOSE.CreateUnchangedPixelsMod(src1, src2, fuzz);
+}
+
+/**
+ * Create a Changed PIxels mod.
+ * @param {string} src1 
+ * @param {string} src2 
+ * @param {number} fuzz 
+ */
+function ChangedPixels(src1, src2, fuzz) {
+  return COMPOSE.CreateChangedPixelsMod(src1, src2, fuzz);
+}
+
 // CUT
 
 /**
@@ -666,6 +686,8 @@ exports.Subtract = Subtract;
 exports.Union = Union;
 exports.Intersection = Intersection;
 exports.Difference = Difference;
+exports.ChangedPixels = ChangedPixels;
+exports.UnchangedPixels = UnchangedPixels;
 
 exports.CutIn = CutIn;
 exports.CutOut = CutOut;
