@@ -19,6 +19,58 @@ const GRAVITY_VALUES = [
   'West'
 ];
 
+const FX_NAMES = [
+  'Swirl',
+  'Implode',
+  'Wave',
+  'Blur',
+  'OilPainting',
+  'CharcoalSketch',
+  'ColoringBookSketch',
+  'PencilSketch'
+];
+
+const MOD_NAMES = [
+  'Add',
+  'AutoLevel',
+  'ChangedPixels',
+  'ChannelAdjust',
+  'Colorize',
+  'Compare',
+  'Composite',
+  'Crop',
+  'CutOut',
+  'CutIn',
+  'Difference',
+  'Exclusion',
+  'GrayscaleFormat',
+  'Intersection',
+  'MirrorHorizontal',
+  'MirrorVertical',
+  'MultiplyBlackTransparency',
+  'MultiplyWhiteTransparency',
+  'Negate',
+  'Offset',
+  'Replace',
+  'ResizeFillGivenArea',
+  'ResizeIgnoreAspectRatio',
+  'ResizeOnlyEnlargeSmaller',
+  'ResizeOnlyShrinkLarger',
+  'ResizePercentage',
+  'ResizePixelCountLimit',
+  'RgbFormat',
+  'Roll',
+  'RotateAroundCenter',
+  'RotateAroundPoint',
+  'RotateImage',
+  'Subtract',
+  'Transparency',
+  'Transpose',
+  'Transverse',
+  'UnchangedPixels',
+  'Union'
+];
+
 const CONSOLIDATED_EFFECTS =
   [
     'AutoLevel',
@@ -52,6 +104,8 @@ const CONSOLIDATED_EFFECTS =
 //------------------------------
 // EXPORTS
 
+exports.FX_NAMES = FX_NAMES;
+exports.MOD_NAMES = MOD_NAMES;
 exports.MIN_WIDTH = MIN_WIDTH;
 exports.MIN_HEIGHT = MIN_HEIGHT;
 exports.DISPOSE_VALUES = DISPOSE_VALUES;
