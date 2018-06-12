@@ -21,7 +21,8 @@ const GRAVITY_VALUES = [
 
 const CANVAS_NAMES = [
   'ColorCanvas',
-  'GradientCanvas',
+  'LinearGradientCanvas',
+  'RadialGradientCanvas',
   'ImageCanvas'
 ];
 
