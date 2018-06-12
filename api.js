@@ -460,11 +460,12 @@ function PencilSketch(src, radius, sigma, angle) {
 
 /**
  * Create a Roll mod.
+ * @param {string} src 
  * @param {number} horizontal 
  * @param {number} vertical 
  */
-function Roll(horizontal, vertical) {
-  return TRANSFORM.CreateRollMod(horizontal, vertical);
+function Roll(src, horizontal, vertical) {
+  return TRANSFORM.CreateRollMod(src, horizontal, vertical);
 }
 
 /**
@@ -606,10 +607,9 @@ function Crop(src, width, height, x, y, removeVirtualCanvas) {
  * Rotate an image.
  * @param {string} src 
  * @param {number} degrees 
- * @param {string} outputPath 
  */
-function RotateImage(src, degrees, outputPath) {
-  return TRANSFORM.CreateRotateImageMod(src, degrees, outputPath);
+function RotateImage(src, degrees) {
+  return TRANSFORM.CreateRotateImageMod(src, degrees);
 }
 
 //------------------------------
@@ -686,6 +686,7 @@ exports.Subtract = Subtract;
 exports.Union = Union;
 exports.Intersection = Intersection;
 exports.Difference = Difference;
+exports.Exclusion = Exclusion;
 exports.ChangedPixels = ChangedPixels;
 exports.UnchangedPixels = UnchangedPixels;
 
