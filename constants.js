@@ -19,6 +19,12 @@ const GRAVITY_VALUES = [
   'West'
 ];
 
+const CANVAS_NAMES = [
+  'ColorCanvas',
+  'GradientCanvas',
+  'ImageCanvas'
+];
+
 const FX_NAMES = [
   'Swirl',
   'Implode',
@@ -104,6 +110,7 @@ const CONSOLIDATED_EFFECTS =
 //------------------------------
 // EXPORTS
 
+exports.CANVAS_NAMES = CANVAS_NAMES;
 exports.FX_NAMES = FX_NAMES;
 exports.MOD_NAMES = MOD_NAMES;
 exports.MIN_WIDTH = MIN_WIDTH;
