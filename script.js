@@ -53,7 +53,10 @@ const PARAMETER_NAMES = [
   'vertical',
   'offset',
   'vector',
-  'center'
+  'center',
+  'color',
+  'startcolor',
+  'endcolor'
 ];
 
 //-----------------------------
@@ -66,7 +69,7 @@ function BuildCanvasObj(name, argDict) {
     obj = API.ColorCanvas(argDict.width, argDict.height, argDict.color);
   else if (name == 'ImageCanvas')
     obj = API.ImageCanvas(argDict.width, argDict.height, argDict.src);
-  else if (name == 'LinearGradient') {
+  else if (name == 'LinearGradientCanvas') {
     let vector = null;
     if (argDict.vector) {
       let vectorParts = argDict.vector.split(';');
@@ -78,8 +81,8 @@ function BuildCanvasObj(name, argDict) {
         let left = currParts[0];
 
         let rightParts = currParts[1].split(',');
-        let x = rightParts[0];
-        let y = rightParts[1];
+        let x = parseInt(rightParts[0]);
+        let y = parseInt(rightParts[1]);
 
         if (left == 'start')
           start = COORDINATES.Create(x, y);
@@ -90,8 +93,8 @@ function BuildCanvasObj(name, argDict) {
     }
 
     let boundingBox = null;
-    if (argDict.boundingBox) {
-      let boundingBoxParts = argDict.boundingBox.split(';');
+    if (argDict.boundingbox) {
+      let boundingBoxParts = argDict.boundingbox.split(';');
       let center = null;
       let width = null;
       let height = null;
@@ -103,8 +106,8 @@ function BuildCanvasObj(name, argDict) {
         let rightParts = currParts[1].split(',');
         if (left == 'center') {
           let rightParts = currParts[1].split(',');
-          let x = rightParts[0];
-          let y = rightParts[1];
+          let x = parseInt(rightParts[0]);
+          let y = parseInt(rightParts[1]);
           center = COORDINATES.Create(x, y);
         }
         else if (left == 'width')
@@ -115,12 +118,13 @@ function BuildCanvasObj(name, argDict) {
       boundingBox = GRADIENT.CreateBoundingBox(center, width, height);
     }
 
-    obj = GRADIENT.CreateLinearGradient(argDict.startColor, argDict.endColor, vector, argDict.angle, boundingBox, argDict.direction, argDict.extent);
+    let gradient = GRADIENT.CreateLinearGradient(argDict.startcolor, argDict.endcolor, vector, argDict.angle, boundingBox, argDict.direction, argDict.extent);
+    obj = API.GradientCanvas(argDict.width, argDict.height, gradient);
   }
-  else if (name == 'RadialGradient') {
+  else if (name == 'RadialGradientCanvas') {
     let boundingBox = null;
-    if (argDict.boundingBox) {
-      let boundingBoxParts = argDict.boundingBox.split(';');
+    if (argDict.boundingbox) {
+      let boundingBoxParts = argDict.boundingbox.split(';');
       let center = null;
       let width = null;
       let height = null;
@@ -132,8 +136,8 @@ function BuildCanvasObj(name, argDict) {
         let rightParts = currParts[1].split(',');
         if (left == 'center') {
           let rightParts = currParts[1].split(',');
-          let x = rightParts[0];
-          let y = rightParts[1];
+          let x = parseInt(rightParts[0]);
+          let y = parseInt(rightParts[1]);
           center = COORDINATES.Create(x, y);
         }
         else if (left == 'width')
@@ -147,12 +151,13 @@ function BuildCanvasObj(name, argDict) {
     let center = null;
     if (argDict.center) {
       let centerParts = argDict.center.split(',');
-      let x = centerParts[0];
-      let y = centerParts[1];
+      let x = parseInt(centerParts[0]);
+      let y = parseInt(centerParts[1]);
       center = COORDINATES.Create(x, y);
     }
 
-    obj = GRADIENT.CreateRadialGradient(argDict.startColor, argDict.endColor, center, argDict.radialWidth, argDict.radialHeight, argDict.angle, boundingBox, argDict.extent);
+    let gradient = GRADIENT.CreateRadialGradient(argDict.startcolor, argDict.endcolor, center, argDict.radialwidth, argDict.radialheight, argDict.angle, boundingBox, argDict.extent);
+    obj = API.GradientCanvas(argDict.width, argDict.height, gradient);
   }
 
   return obj;
@@ -176,16 +181,16 @@ function BuildFxObj(name, argDict) {
     obj = API.Wave(argDict.src, argDict.amplitude, argDict.frequency);
   }
   else if (name == 'Blur') {
-    obj = API.Blur(argDict.src, argDict.radius, argDict.sigma, argDict.hasTransparency);
+    obj = API.Blur(argDict.src, argDict.radius, argDict.sigma, argDict.hastransparency);
   }
   else if (name == 'OilPainting') {
-    obj = API.OilPainting(argDict.src, argDict.paintValue);
+    obj = API.OilPainting(argDict.src, argDict.paintvalue);
   }
   else if (name == 'CharcoalSketch') {
-    obj = API.CharcoalSketch(argDict.src, argDict.charcoalValue);
+    obj = API.CharcoalSketch(argDict.src, argDict.charcoalvalue);
   }
   else if (name == 'ColoringBookSketch') {
-    obj = API.ColoringBookSketch(argDict.src, argDict.isHeavilyShaded);
+    obj = API.ColoringBookSketch(argDict.src, argDict.isheavilyshaded);
   }
   else if (name == 'PencilSketch') {
     obj = API.PencilSketch(argDict.src, argDict.radius, argDict.sigma, argDict.angle);
@@ -216,22 +221,22 @@ function BuildModObj(name, argDict) {
     obj = API.ChannelAdjust(argDict.src, argDict.channel, argDict.value);
   }
   else if (name == 'Colorize') {
-    obj = API.Colorize(argDict.src, argDict.fillColor, argDict.percent);
+    obj = API.Colorize(argDict.src, argDict.fillcolor, argDict.percent);
   }
   else if (name == 'Compare') {
-    obj = API.Compare(argDict.src1, argDict.src2, argDict.highlightColor, argDict.lowlightColor);
+    obj = API.Compare(argDict.src1, argDict.src2, argDict.highlightcolor, argDict.lowlightcolor);
   }
   else if (name == 'Composite') {
     obj = API.Composite(argDict.filepaths, argDict.gravity);
   }
   else if (name == 'Crop') {
-    obj = API.Crop(argDict.src, argDict.width, argDict.height, argDict.x, argDict.y, argDict.removeVirtualCanvas);
+    obj = API.Crop(argDict.src, argDict.width, argDict.height, argDict.x, argDict.y, argDict.removevirtualcanvas);
   }
   else if (name == 'CutOut') {
-    obj = API.CutOut(argDict.baseImagePath, argDict.cutoutImagePath);
+    obj = API.CutOut(argDict.baseimagepath, argDict.cutoutimagepath);
   }
   else if (name == 'CutIn') {
-    obj = API.CutIn(argDict.baseImagePath, argDict.cutoutImagePath);
+    obj = API.CutIn(argDict.baseimagepath, argDict.cutoutimagepath);
   }
   else if (name == 'Difference') {
     obj = API.Difference(argDict.src1, argDict.src2);
@@ -264,7 +269,7 @@ function BuildModObj(name, argDict) {
     obj = API.Offset(argDict.src, argDict.x0, argDict.y0, argDict.x1, argDict.y1);
   }
   else if (name == 'Replace') {
-    obj = API.Replace(argDict.src, argDict.targetColor, argDict.desiredColor, argDict.fuzz);
+    obj = API.Replace(argDict.src, argDict.targetcolor, argDict.desiredcolor, argDict.fuzz);
   }
   else if (name == 'ResizeFillGivenArea') {
     obj = API.ResizeFillGivenArea(argDict.src, argDict.width, argDict.height);
@@ -393,7 +398,9 @@ function Validate(str) {
       if (!PARAMETER_NAMES.includes(thisParameterName.toLowerCase()))
         return { isValid: false, error: `invalid paramater found: ${thisParameterName}` };
 
-      if (thisParameterName.toLowerCase() == 'name')
+      thisParameterName = thisParameterName.toLowerCase();
+
+      if (thisParameterName == 'name')
         nameParameterIsDeclared = true;
 
       argDict[thisParameterName] = thisParameterValue;
@@ -422,7 +429,6 @@ function Validate(str) {
     // Check for layer name
     if (IsWhiteSpace(layerName))
       return { isValid: false, error: 'layer name cannot be whitespace' };
-
     if (ContainsWhiteSpace(layerName))
       return { isValid: false, error: 'layer name cannot contain whitespace' };
 
@@ -434,10 +440,8 @@ function Validate(str) {
 
     if (fxModLabel.toLowerCase() != 'name')
       return { isValid: false, error: `applied effect NAME must be declared immediately after layer name has been specified` };
-
     if (IsWhiteSpace(fxModValue))
       return { isValid: false, error: `applied effect NAME cannot be whitespace` };
-
     if (ContainsWhiteSpace(fxModValue))
       return { isValid: false, error: `applied effect NAME cannot contain whitespace` };
 
@@ -450,7 +454,7 @@ function Validate(str) {
 
     let argDict = {};
 
-    for (let i = 1; i < theseParts.length; ++i) {
+    for (let i = 0; i < theseParts.length; ++i) {
       let currPart = theseParts[i];
       let currPartParts = currPart.split(':');
       let thisParameterName = currPartParts[0];
@@ -459,8 +463,12 @@ function Validate(str) {
       if (!PARAMETER_NAMES.includes(thisParameterName.toLowerCase()))
         return { isValid: false, error: `invalid paramater found: ${thisParameterName}` };
 
+      thisParameterName = thisParameterName.toLowerCase();
       argDict[thisParameterName] = thisParameterValue;
     }
+
+    if (!argDict.src)
+      argDict.src = '-';
 
     let fxOrMod = Build(fxModValue, argDict);
     return { isValid: true, layer: fxOrMod, to: layerName, error: null };
@@ -493,7 +501,7 @@ function Validate(str) {
     return { isValid: true, to: toName, fromNames: fromNames, error: null };
   }
   else if (firstPart.toLowerCase() == 'render') {
-    if (otherParts != 2)
+    if (otherParts.length != 2)
       return { isValid: false, error: 'exactly 2 arguments are required: <layerName> <outputPath>' };
 
     // Check layer name
@@ -523,21 +531,22 @@ function Validate(str) {
  */
 function CheckSyntax(str) {
   let layers = [];
-  let layerdict = [];
+  let layerdict = {};
   let renderActions = [];
 
-  let lines = str.split('\n');
+  let lines = str.split('\n').filter(l => l && l != '' && l.trim() != '');
 
   for (let i = 0; i < lines.length; ++i) {
-    let validation = Validate(lines[i]);
+    let currLine = lines[i].trim();
+    let validation = Validate(currLine);
 
     if (validation.error)
       return { isValid: false, error: `Line ${i + 1}: ${validation.error}` };
 
-    let firstWord = str.split(' ')[0];
+    let firstWord = currLine.split(' ')[0];
     if (firstWord.toLowerCase() == 'layer') {
-      let name = argDict.name;
-      let layer = argDict.layer;
+      let name = validation.name;
+      let layer = validation.layer;
       if (!layerdict[name]) {
         layerdict[name] = layer;
         layers.push(layer);
@@ -548,10 +557,10 @@ function CheckSyntax(str) {
     else if (firstWord.toLowerCase() == 'apply') {
       let layerName = validation.to;
       if (!layerdict[layerName])
-        return { isValid: false, error: `Line ${i + 1}: layer name does not exist: ${name}` };
+        return { isValid: false, error: `Line ${i + 1}: layer name does not exist: ${layerName}` };
 
       let thisLayer = layerdict[layerName];
-      thisLayer.ApplyFxOrMod(validation.fxOrMod);
+      thisLayer.ApplyFxOrMod(validation.layer);
       layerdict[layerName] = thisLayer;
     }
     else if (firstWord.toLowerCase() == 'draw') {
@@ -612,7 +621,7 @@ function Parse(str) {
  */
 function Load(filepath) {
   return new Promise((resolve, reject) => {
-    LINUX_COMMANDS.File.Read(filepath).then(str => {
+    LINUX_COMMANDS.File.Read(filepath, LINUX_COMMANDS.Command.LOCAL).then(str => {
       let parsed = Parse(str);
       if (parsed.error) {
         reject(parsed.error);
