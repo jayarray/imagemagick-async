@@ -29,7 +29,7 @@ canvas.Render(canvasDest).then(success => {
   // Prepare swirl renders
   let degrees = 3160;
   let fps = 30;
-  let duration = 4;
+  let duration = 3;
   let frameCount = fps * duration;
   let degreeInterval = degrees / frameCount;
 
@@ -59,6 +59,8 @@ canvas.Render(canvasDest).then(success => {
     let gravity = 'Center';
     let digitCount = frameCount.toString().length;
 
+    let lastIndex = 0;
+
     for (let i = 0; i < swirlActions.length; ++i) {
       let comp = API.Composite([canvasDest, swirlPaths[i]], gravity);
 
@@ -68,6 +70,22 @@ canvas.Render(canvasDest).then(success => {
       let compPath = PATH.join(imageSeqDir, `comp_${numberString}.${format}`);
       compActions.push(comp.Render(compPath));
       compPaths.push(compPath);
+      lastIndex = i;
+    }
+
+    lastIndex += 1;
+
+    // Add additional 1-second worth of still unswirled logo
+    for (let i = 0; i < fps * 2 + 1; ++i) {
+      let comp = API.Composite([canvasDest, swirlPaths[swirlPaths.length - 1]], gravity);
+
+      let numberString = `${'0'.repeat(digitCount)}${lastIndex}`;
+      numberString = numberString.substring(numberString.length - 3);
+
+      let compPath = PATH.join(imageSeqDir, `comp_${numberString}.${format}`);
+      compActions.push(comp.Render(compPath));
+      compPaths.push(compPath);
+      lastIndex += 1;
     }
 
     // Render all comps
