@@ -21,7 +21,7 @@ function RotateImage(src, degrees, consolidatedEffects, outputPath) {
       // Build command
       let args = ['-size', `${hypotenuse}x${hypotenuse}`, 'canvas:none', '-gravity', 'Center', '-draw', `image over 0,0 0,0 '${src}'`];
       consolidatedEffects.forEach(c => args = args.concat(c.Args()));
-      args = args.concat(['-distort', 'SRT', degrees, outputPath]);
+      args = args.concat(['-distort', 'SRT', degrees, outputPath]); // Rotate around center
 
       // Render image
       LOCAL_COMMAND.Execute('convert', args).then(output => {
