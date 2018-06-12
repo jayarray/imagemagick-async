@@ -21,10 +21,7 @@ class Vector {
    * @returns {Vector} Returns a Vector object. If inputs are invalid, it returns null.
    */
   static Create(start, end) {
-    if (
-      start.constructor.name != 'Coordinates' ||
-      end.constructor.name != 'Coordinates'
-    )
+    if (!start || !end)
       return null;
 
     return new Vector(start, end);
@@ -120,30 +117,20 @@ class LinearGradient extends Gradient {
   Args() {
     let args = [];
 
-    if (this.vector_) {
+    if (this.vector_)
       args.push('-define', `gradient:vector=${this.vector_.start_.String()},${this.vector_.end_.String()}`);
-      optionCount++;
-    }
 
-    if (this.angle_) {
+    if (this.angle_)
       args.push('-define', `gradient:angle=${this.angle_}`);
-      optionCount++;
-    }
 
-    if (this.boundingBox_) {
+    if (this.boundingBox_)
       args.push('-define', `gradient:bounding-box=${this.boundingBox_.String()}`);
-      optionCount++;
-    }
 
-    if (this.direction_) {
+    if (this.direction_)
       args.push('-define', `gradient:direction=${this.direction_}`);
-      optionCount++;
-    }
 
-    if (this.extent_) {
+    if (this.extent_)
       args.push('-define', `gradient:extent=${this.extent_}`);
-      optionCount++;
-    }
 
     args.push(`gradient:${this.startColor_}-${this.endColor_}`);
 
@@ -210,10 +197,8 @@ class RadialGradient extends Gradient {
   Args() {
     let args = [];
 
-    if (this.center_) {
+    if (this.center_)
       args.push('-define', `gradient:center=${this.center_.String()}`);
-      optionCount++;
-    }
 
     if (this.radialWidth_ || this.radialHeight_) {
       if (this.radialWidth_ && this.radialHeight_)
@@ -224,23 +209,16 @@ class RadialGradient extends Gradient {
         else
           args.push('-define', `gradient:radii=${this.radialHeight_}, ${this.radialHeight_}`);
       }
-      optionCount++;
     }
 
-    if (this.angle_) {
+    if (this.angle_)
       args.push('-define', `gradient:angle=${this.angle_}`);
-      optionCount++;
-    }
 
-    if (this.boundingBox_) {
+    if (this.boundingBox_)
       args.push('-define', `gradient:bounding-box=${this.boundingBox_.String()}`);
-      optionCount++;
-    }
 
-    if (this.extent_) {
+    if (this.extent_)
       args.push('-define', `gradient:extent=${this.extent_}`);
-      optionCount++;
-    }
 
     args.push(`radial-gradient:${this.startColor_}-${this.endColor_}`);
 
