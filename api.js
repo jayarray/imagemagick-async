@@ -4,6 +4,7 @@ let COLOR = require('./color.js');
 let COMPARE = require('./compare.js');
 let COMPOSE = require('./compose.js');
 let CUT = require('./cut.js');
+let DIRECTION_FIELD = require('./directionfield.js');
 let FX = require('./fx.js');
 let IDENTIFY = require('./identify.js');
 let TRANSFORM = require('./transform.js');
@@ -650,6 +651,17 @@ function Fonts() {
   return LIST.Fonts();
 }
 
+//--------------------------------
+// DIRECTION FIELD
+
+/**
+ * Create a Direction Field object.
+ * @param {string} equation 
+ */
+function DirectionField(equation) {
+  return DIRECTION_FIELD.CreateDirectionField(equation);
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -724,3 +736,5 @@ exports.CreateGif = CreateGif;
 exports.ImageInfo = ImageInfo;
 
 exports.Fonts = Fonts;
+
+exports.DirectionField = DirectionField;
