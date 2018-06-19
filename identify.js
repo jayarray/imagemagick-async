@@ -505,7 +505,6 @@ class ImageInfo {
       let height = (endRow - startRow) + 1;
 
       let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, 'text:-'];
-      console.log(`CMD: convert ${args.join(' ')}`);
 
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
