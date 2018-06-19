@@ -162,7 +162,7 @@ class LayerBaseClass {
                 }).catch(error => reject(error));
               }
               else if (mainEffect.Name() == 'Reflect') {
-                RotateImage(mainEffect.src_, mainEffect.x0_, mainEffect.y0_, mainEffect.x1_, mainEffect.y1_, consolidatedEffects, tempOutputPath).then(success => {
+                ReflectImage(mainEffect.src_, mainEffect.x0_, mainEffect.y0_, mainEffect.x1_, mainEffect.y1_, consolidatedEffects, tempOutputPath).then(success => {
                   prevOutputPath = tempOutputPath;
                   resolve(apply(groups.slice(1)));
                 }).catch(error => reject(error));
