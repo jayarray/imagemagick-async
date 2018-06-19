@@ -727,7 +727,7 @@ exports.OilPainting = OilPainting;
 exports.PencilSketch = PencilSketch;
 
 exports.Roll = Roll;
-exports.Reflect = Reflect;
+//exports.Reflect = Reflect;
 exports.MirrorHorizontal = MirrorHorizontal;
 exports.MirrorVertical = MirrorVertical;
 exports.Transpose = Transpose;
