@@ -56,7 +56,11 @@ const PARAMETER_NAMES = [
   'center',
   'color',
   'startcolor',
-  'endcolor'
+  'endcolor',
+  'x0',
+  'y0',
+  'x1',
+  'y1'
 ];
 
 //-----------------------------
@@ -267,6 +271,9 @@ function BuildModObj(name, argDict) {
   }
   else if (name == 'Offset') {
     obj = API.Offset(argDict.src, argDict.x0, argDict.y0, argDict.x1, argDict.y1);
+  }
+  else if (name == 'Reflect') {
+    obj = API.Reflect(argDict.src, argDict.x0, argDict.y0, argDict.x1, argDict.y1);
   }
   else if (name == 'Replace') {
     obj = API.Replace(argDict.src, argDict.targetcolor, argDict.desiredcolor, argDict.fuzz);
