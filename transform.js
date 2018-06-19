@@ -226,6 +226,58 @@ class Transverse extends TransformBaseClass {
   }
 }
 
+//-----------------------------
+// REFLECT
+
+class Reflect extends TransformBaseClass {
+  constructor(src, x0, y0, x1, y1) {
+    super();
+    this.src_ = src;
+    this.x0_ = x0;
+    this.y0_ = y0;
+    this.x1_ = x1;
+    this.y1_ = y1;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
+  Args() {
+    return [];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [];
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Reflect';
+  }
+
+  /**
+   * Create a Reflect object. Reflect an image over the line created by two points.
+   * @param {string} src
+   * @param {numbers} x0 X-coordinate of first point.
+   * @param {numbers} y0 Y-coordinate of first point.
+   * @param {numbers} x1 X-coordinate of second point.
+   * @param {numbers} y1 Y-coordinate of second point.
+   * @returns {Reflect} Returns a RotateAroundCenter object. If inputs are invalid, it returns null.
+   */
+  static Create(src, x0, y0, x1, y1) {
+    if (!src || !x0 || !y0 || !x1 || !y1)
+      return null;
+
+    return new Reflect(src, x0, y0, x1, y1);
+  }
+}
+
+
 //-------------------------------
 //  OFFSET
 
@@ -750,6 +802,7 @@ exports.CreateMirrorVerticalMod = MirrorVertical.Create;
 exports.CreateTransposeMod = Transpose.Create;
 exports.CreateTransverseMod = Transverse.Create;
 exports.CreateOffsetMod = Offset.Create;
+exports.CreateReflectMod = Reflect.Create;
 exports.CreateRotateAroundCenterMod = RotateAroundCenter.Create;
 exports.CreateRotateAroundPointMod = RotateAroundPoint.Create;
 exports.CreateResizeIgnoreAspectRatioMod = ResizeIgnoreAspectRatio.Create;
