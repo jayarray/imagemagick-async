@@ -58,6 +58,7 @@ const MOD_NAMES = [
   'MultiplyWhiteTransparency',
   'Negate',
   'Offset',
+  'Reflect',
   'Replace',
   'ResizeFillGivenArea',
   'ResizeIgnoreAspectRatio',
