@@ -352,10 +352,15 @@ function ParsePixelInfo(infoStr) {
     // Color
     let hexStr = parts[2];
 
+    // Check transparency
+    let uniqueChars = Array.from(set(hexStr.replace('#', '').split('')));
+
+
     infos.push({
       x: x,
       y: y,
-      color: hexStr
+      color: hexStr,
+      isTransparent: uniqueChars.length == 1 && uniqueChars[0] == '0'
     });
   }
 
@@ -370,11 +375,13 @@ class Pixel {
    * @param {number} x X-coordinate
    * @param {number} y Y-coordinate
    * @param {string} color Hex color string
+   * @param {bool} isTransparent 
    */
-  constructor(x, y, color) {
+  constructor(x, y, color, isTransparent) {
     this.x = x;
     this.y = y;
     this.color = color;
+    this.isTransparent = isTransparent;
   }
 }
 
@@ -408,7 +415,7 @@ class ImageInfo {
         }
 
         let info = ParsePixelInfo(output.stdout.trim())[0];
-        let pixel = new Pixel(x, y, info.color);
+        let pixel = new Pixel(x, y, info.color, info.isTransparent);
         resolve(pixel);
       }).catch(error => `Failed to get pixel info: ${error}`);
     });
@@ -435,7 +442,7 @@ class ImageInfo {
         let pixels = [];
 
         let infos = ParsePixelInfo(output.stdout.trim());
-        infos.forEach(info => pixels.push(new Pixel(info.x, row, info.color)));
+        infos.forEach(info => pixels.push(new Pixel(info.x, row, info.color, info.isTransparent)));
         resolve(pixels);
       }).catch(error => `Failed to get pixel row info: ${error}`);
     });
@@ -462,7 +469,7 @@ class ImageInfo {
         let infos = ParsePixelInfo(output.stdout.trim())
 
         let pixels = [];
-        infos.forEach(info => pixels.push(new Pixel(column, info.y, info.color)));
+        infos.forEach(info => pixels.push(new Pixel(column, info.y, info.color, info.isTransparent)));
         resolve(pixels);
       }).catch(error => `Failed to get pixel column info: ${error}`);
     });
@@ -512,7 +519,7 @@ class ImageInfo {
         infos.forEach((info, i) => {
           let adjustedX = info.x + startColumn;
           let adjustedY = info.y + startRow;
-          pixels.push(new Pixel(adjustedX, adjustedY, info.color))
+          pixels.push(new Pixel(adjustedX, adjustedY, info.color, info.isTransparent))
         });
         resolve(pixels);
       }).catch(error => `Failed to get pixel range info: ${error}`);
