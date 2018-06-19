@@ -585,14 +585,14 @@ function CheckSyntax(str) {
 
         let fromLayer = layerdict[currFromName];
 
-        if (validation.argDict['offset']) {
+        if (validation.argDict && validation.argDict['offset']) {
           let offsetParts = validation.argDict['offset'].split(',');
           let xOffset = parseInt(offsetParts[0]);
           let yOffset = parseInt(offsetParts[1]);
           thisLayer.Draw(fromLayer, xOffset, yOffset);
         }
         else
-          thisLayer.Draw(fromLayer);
+          thisLayer.Draw(fromLayer, 0, 0);
       }
     }
     else if (firstWord.toLowerCase() == 'render') {
