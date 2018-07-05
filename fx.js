@@ -396,6 +396,7 @@ class PencilSketch extends FxBaseClass {
 
 class Pixelate extends FxBaseClass {
   constructor(src, aggressiveness, width, height) {
+    super();
     this.src_ = src;
     this.aggressiveness_ = aggressiveness;
     this.width_ = width;
