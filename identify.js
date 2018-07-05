@@ -1,5 +1,8 @@
 let VALIDATE = require('./validate.js');
+let GUID = require('./guid.js');
+let LINUX_COMMANDS = require('linux-commands-async');
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+let PATH = require('path');
 
 //---------------------------------
 // CONSTANTS
@@ -353,8 +356,7 @@ function ParsePixelInfo(infoStr) {
     let hexStr = parts[2];
 
     // Check transparency
-    let uniqueChars = Array.from(set(hexStr.replace('#', '').split('')));
-
+    let uniqueChars = Array.from(new Set(hexStr.replace('#', '').split('')));
 
     infos.push({
       x: x,
@@ -385,8 +387,11 @@ class Pixel {
   }
 }
 
+// IMAGE INFO
+
 class ImageInfo {
-  constructor(infoObj, isGif) {
+  constructor(src, infoObj, isGif) {
+    this.src_ = src;
     this.info_ = infoObj;
     this.isGif_ = isGif;
   }
@@ -504,7 +509,9 @@ class ImageInfo {
       let width = (endColumn - startColumn) + 1;
       let height = (endRow - startRow) + 1;
 
-      let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, 'text:-'];
+      let parentDir = LINUX_COMMANDS.Path.ParentDir(this.src_);
+      let tempFilepath = PATH.join(parentDir, GUID.Filename(GUID.DEFAULT_LENGTH, 'txt'));
+      let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, `text:${tempFilepath}`];
 
       LOCAL_COMMAND.Execute('convert', args).then(output => {
         if (output.stderr) {
@@ -512,17 +519,29 @@ class ImageInfo {
           return;
         }
 
-        let infos = ParsePixelInfo(output.stdout.trim())
-        let pixels = [];
+        // Read from file
+        LINUX_COMMANDS.File.Read(tempFilepath, LOCAL_COMMAND).then(text => {
+          let infos = ParsePixelInfo(text.trim())
+          let pixels = [];
 
-        infos.forEach((info, i) => {
-          let adjustedX = info.x + startColumn;
-          let adjustedY = info.y + startRow;
-          pixels.push(new Pixel(adjustedX, adjustedY, info.color, info.isTransparent))
-        });
-        resolve(pixels);
-      }).catch(error => `Failed to get pixel range info: ${error}`);
+          // Adjust pixel coordinates
+          infos.forEach((info, i) => {
+            let adjustedX = info.x + startColumn;
+            let adjustedY = info.y + startRow;
+            pixels.push(new Pixel(adjustedX, adjustedY, info.color, info.isTransparent))
+          });
+
+          // Clean up temp file
+          LINUX_COMMANDS.File.Remove(tempFilepath, LOCAL_COMMAND).then(success => {
+            resolve(pixels);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => reject(`Failed to get pixel range info: ${error}`));
     });
+  }
+
+  AllPixels(tempDir) {
+
   }
 
   /**
@@ -539,12 +558,12 @@ class ImageInfo {
       Format(src).then(format => {
         if (format == 'gif') {
           GetGifInfo(src).then(info => {
-            resolve(new ImageInfo(info, true));
+            resolve(new ImageInfo(src, info, true));
           }).catch(error => `Failed to get image info: ${error}`);
         }
         else {
           GetImageInfo(src).then(info => {
-            resolve(new ImageInfo(info, false));
+            resolve(new ImageInfo(src, info, false));
           }).catch(error => `Failed to get image info: ${error}`);
         }
       });
