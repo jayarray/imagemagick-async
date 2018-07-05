@@ -58,6 +58,7 @@ const MOD_NAMES = [
   'MultiplyWhiteTransparency',
   'Negate',
   'Offset',
+  'Pixelate',
   'Reflect',
   'Replace',
   'ResizeFillGivenArea',
@@ -75,6 +76,7 @@ const MOD_NAMES = [
   'Transparency',
   'Transpose',
   'Transverse',
+  'Trim',
   'UnchangedPixels',
   'Union'
 ];
