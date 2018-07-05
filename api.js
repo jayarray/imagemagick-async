@@ -457,6 +457,17 @@ function PencilSketch(src, radius, sigma, angle) {
   return FX.CreatePencilSketchFx(src, radius, sigma, angle);
 }
 
+/**
+ * Create a Pixelate mod.
+ * @param {string} src 
+ * @param {number} aggressiveness 
+ * @param {number} width 
+ * @param {number} height 
+ */
+function Pixelate(src, aggressiveness, width, height) {
+  return FX.CreatePixelateFx(src, aggressiveness, width, height);
+}
+
 // TRANSFORMS
 
 /**
@@ -605,12 +616,22 @@ function Crop(src, width, height, x, y, removeVirtualCanvas) {
 }
 
 /**
- * Rotate an image.
+ * Create a Rotate Image mod.
  * @param {string} src 
  * @param {number} degrees 
  */
 function RotateImage(src, degrees) {
   return TRANSFORM.CreateRotateImageMod(src, degrees);
+}
+
+/**
+ * Create a Trim mod.
+ * @param {string} src 
+ * @param {string} borderColor 
+ * @param {number} fuzz 
+ */
+function Trim(src, borderColor, fuzz) {
+  return TRANSFORM.CreateTrimMod(src, borderColor, fuzz);
 }
 
 //------------------------------
@@ -713,6 +734,7 @@ exports.CharcoalSketch = CharcoalSketch;
 exports.ColoringBookSketch = ColoringBookSketch;
 exports.OilPainting = OilPainting;
 exports.PencilSketch = PencilSketch;
+exports.Pixelate = Pixelate;
 
 exports.Roll = Roll;
 exports.MirrorHorizontal = MirrorHorizontal;
@@ -730,6 +752,7 @@ exports.ResizePercentage = ResizePercentage;
 exports.ResizePixelCountLimit = ResizePixelCountLimit;
 exports.Crop = Crop;
 exports.RotateImage = RotateImage;
+exports.Trim = Trim;
 
 exports.CreateGif = CreateGif;
 
