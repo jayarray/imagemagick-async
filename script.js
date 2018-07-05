@@ -608,7 +608,6 @@ function CheckSyntax(str) {
   return { isValid: true, layers: layers, layerdict: layerdict, renderActions: renderActions, error: null };
 }
 
-
 /**
  * Parse string of commands
  * @param {string} str 
