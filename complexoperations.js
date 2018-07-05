@@ -44,4 +44,3 @@ function RotateImage(src, degrees, consolidatedEffects, outputPath) {
 // EXPORTS
 
 exports.RotateImage = RotateImage;
-exports.ReflectImage = ReflectImage;
