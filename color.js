@@ -803,6 +803,141 @@ class AutoLevel extends ColorBaseClass {
 }
 
 //----------------------------
+// BRIGHTNESS
+
+class Brightness extends ColorBaseClass {
+  constructor(src, value) {
+    super();
+    this.src_ = src;
+    this.value_ = value;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
+  Args() {
+    return ['-modulate', this.value_];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Brightness';
+  }
+
+  /**
+   * Create a Brightness object. Modifies an image's brightness.
+   * @param {string} src
+   * @param {number} value Brightness value between 0 and 200. A value of 100 will make no changes.
+   * @returns {Brightness} Returns a Brightness object. If inputs are invalid, it returns null.
+   */
+  static Create(src, value) {
+    if (!src || !value)
+      return null;
+
+    return new Brightness(src, value);
+  }
+}
+
+//----------------------------
+// SATURATION
+
+class Saturation extends ColorBaseClass {
+  constructor(src, value) {
+    super();
+    this.src_ = src;
+    this.value_ = value;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
+  Args() {
+    return ['-modulate', `100,${this.value_}`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Saturation';
+  }
+
+  /**
+   * Create a Saturation object. Modifies an image's saturation levels.
+   * @param {string} src
+   * @param {number} value Saturation value between 0 and 200. A value of 100 will make no changes.
+   * @returns {Brightness} Returns a Brightness object. If inputs are invalid, it returns null.
+   */
+  static Create(src, value) {
+    if (!src || !value)
+      return null;
+
+    return new Saturation(src, value);
+  }
+}
+
+//---------------------------
+// HUE
+
+class Hue extends ColorBaseClass {
+  constructor(src, value) {
+    super();
+    this.src_ = src;
+    this.value_ = value;
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   */
+  Args() {
+    return ['-modulate', `100,100,${this.value_}`];
+  }
+
+  /**
+   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   */
+  RenderArgs() {
+    return [this.src_].concat(this.Args());
+  }
+
+  /**
+   * @override
+   */
+  Name() {
+    return 'Hue';
+  }
+
+  /**
+   * Create a Hue object. Modifies an image's hue.
+   * @param {string} src
+   * @param {number} value Hue value between 0 and 200. A value of 100 will make no changes.
+   * @returns {Brightness} Returns a Brightness object. If inputs are invalid, it returns null.
+   */
+  static Create(src, value) {
+    if (!src || !value)
+      return null;
+
+    return new Hue(src, value);
+  }
+}
+
+//----------------------------
 // CHANNELS
 
 /**
@@ -822,7 +957,6 @@ function Channels() {
   }).catch(error => `Failed to make transparent: ${error}`);
 }
 
-
 //------------------------------
 // EXPORTS
 
@@ -836,5 +970,8 @@ exports.CreateReplaceMod = Replace.Create;
 exports.CreateTransparencyMod = Transparency.Create;
 exports.CreateChannelAdjustMod = ChannelAdjust.Create;
 exports.CreateAutoLevelMod = AutoLevel.Create;
+exports.CreateBrightnessMod = Brightness.Create;
+exports.CreateSaturationMod = Saturation.Create;
+exports.CreateHueMod = Hue.Create;
 
 exports.Channels = Channels;
