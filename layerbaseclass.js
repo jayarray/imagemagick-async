@@ -98,11 +98,6 @@ class LayerBaseClass {
           resolve(outputPath);
         }).catch(error => reject(error));
       }
-      else if (this.Name() == 'Reflect') {
-        ReflectImage(this.src_, this.x0_, this.y0_, this.x1_, this.y1_, [], outputPath).then(success => {
-          resolve(outputPath);
-        }).catch(error => reject(error));
-      }
       else {
         let cmd = this.Command();
         let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
@@ -157,12 +152,6 @@ class LayerBaseClass {
 
               if (mainEffect.Name() == 'RotateImage') {
                 RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, mainEffect.degrees_, consolidatedEffects, tempOutputPath).then(success => {
-                  prevOutputPath = tempOutputPath;
-                  resolve(apply(groups.slice(1)));
-                }).catch(error => reject(error));
-              }
-              else if (mainEffect.Name() == 'Reflect') {
-                ReflectImage(mainEffect.src_, mainEffect.x0_, mainEffect.y0_, mainEffect.x1_, mainEffect.y1_, consolidatedEffects, tempOutputPath).then(success => {
                   prevOutputPath = tempOutputPath;
                   resolve(apply(groups.slice(1)));
                 }).catch(error => reject(error));
@@ -309,17 +298,6 @@ function RotateImage(layer, src, currXoffset, currYoffset, degrees, consolidated
       let newYoffset = currYoffset - rotationOffsets.yOffset;
       layer.SetOffsets(newXoffset, newYoffset);
 
-      resolve();
-    }).catch(error => reject(error));
-  });
-}
-
-//--------------------------------------
-// REFLECT
-
-function ReflectImage(src, x0, y0, x1, y1, consolidatedEffects, outputPath) {
-  return new Promise((resolve, reject) => {
-    COMPLEX_OPERATIONS.ReflectImage(src, x0, y0, x1, y1, consolidatedEffects, outputPath).then(success => {
       resolve();
     }).catch(error => reject(error));
   });
