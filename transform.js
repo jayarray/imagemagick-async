@@ -798,6 +798,7 @@ class Crop extends TransformBaseClass {
 
 class Trim extends TransformBaseClass {
   constructor(src, borderColor, fuzz) {
+    super();
     this.src_ = src;
     this.borderColor_ = borderColor;
     this.fuzz_ = fuzz;
@@ -824,7 +825,7 @@ class Trim extends TransformBaseClass {
    * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
    */
   RenderArgs() {
-    [this.src_].concat(this.Args());
+    return [this.src_].concat(this.Args());
   }
 
   /**
