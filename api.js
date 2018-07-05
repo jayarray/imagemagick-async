@@ -255,6 +255,34 @@ function AutoLevel(src) {
   return COLOR.CreateAutoLevelMod(src);
 }
 
+/**
+ * Create a Brightness mod.
+ * @param {string} src 
+ * @param {number} value 
+ */
+function Brightness(src, value) {
+  return COLOR.CreateBrightnessMod(src, value);
+}
+
+/**
+ * Create a Saturation mod.
+ * @param {string} src 
+ * @param {number} value 
+ */
+function Saturation(src, value) {
+  return COLOR.CreateSaturationMod(src, value);
+}
+
+/**
+ * Create a Hue mod.
+ * @param {string} src 
+ * @param {number} value 
+ */
+function Hue(src, value) {
+  return COLOR.CreateHueMod(src, value);
+}
+
+
 // COMPOSE
 
 /**
@@ -710,6 +738,9 @@ exports.Replace = Replace;
 exports.Transparency = Transparency;
 exports.ChannelAdjust = ChannelAdjust;
 exports.AutoLevel = AutoLevel;
+exports.Brightness = Brightness;
+exports.Saturation = Saturation;
+exports.Hue = Hue;
 
 exports.Composite = Composite;
 exports.MultiplyWhiteTransparency = MultiplyWhiteTransparency;
