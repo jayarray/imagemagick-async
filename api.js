@@ -470,18 +470,6 @@ function Roll(src, horizontal, vertical) {
 }
 
 /**
- * Create a Reflect mod.
- * @param {string} src 
- * @param {number} x0 
- * @param {number} y0 
- * @param {number} x1 
- * @param {number} y1 
- */
-function Reflect(src, x0, y0, x1, y1) {
-  return TRANSFORM.CreateReflectMod(src, x0, y0, x1, y1);
-}
-
-/**
  * Create a Mirror Horizontal object.
  * @param {string} src 
  */
@@ -727,7 +715,6 @@ exports.OilPainting = OilPainting;
 exports.PencilSketch = PencilSketch;
 
 exports.Roll = Roll;
-//exports.Reflect = Reflect;
 exports.MirrorHorizontal = MirrorHorizontal;
 exports.MirrorVertical = MirrorVertical;
 exports.Transpose = Transpose;
