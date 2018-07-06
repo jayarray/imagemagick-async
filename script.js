@@ -60,7 +60,10 @@ const PARAMETER_NAMES = [
   'x0',
   'y0',
   'x1',
-  'y1'
+  'y1',
+  'value',
+  'bordercolor',
+  'aggressiveness'
 ];
 
 //-----------------------------
@@ -199,6 +202,9 @@ function BuildFxObj(name, argDict) {
   else if (name == 'PencilSketch') {
     obj = API.PencilSketch(argDict.src, argDict.radius, argDict.sigma, argDict.angle);
   }
+  else if (name == 'Pixelate') {
+    obj = API.Pixelate(argDict.src, argDict.aggressiveness, argDict.width, argDict.height);
+  }
 
   return obj;
 }
@@ -322,6 +328,9 @@ function BuildModObj(name, argDict) {
   }
   else if (name == 'Transverse') {
     obj = API.Transverse(argDict.src);
+  }
+  else if (name == 'Trim') {
+    obj = API.Trim(argDict.src, argDict.bordercolor, argDict.fuzz);
   }
   else if (name == 'UnchangedPixels') {
     obj = API.UnchangedPixels(argDict.src1, argDict.src2, argDict.fuzz);
