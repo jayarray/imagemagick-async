@@ -129,7 +129,7 @@ class MultiplyWhiteTransparency extends ComposeBaseClass {
    * @returns {MultiplyWhiteTransparency} Returns a MultiplyWhiteTransparency object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new MultiplyWhiteTransparency(src1, src2);
