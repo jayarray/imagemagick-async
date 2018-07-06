@@ -194,7 +194,7 @@ class MultiplyBlackTransparency extends ComposeBaseClass {
    * @returns {MultiplyBlackTransparency} Returns a MultiplyBlackTransparency object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new MultiplyBlackTransparency(src1, src2);
@@ -259,7 +259,7 @@ class Add extends ComposeBaseClass {
    * @returns {Add} Returns an Add object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Add(src1, src2);
@@ -324,7 +324,7 @@ class Subtract extends ComposeBaseClass {
    * @returns {Subtract} Returns a Subtract object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Subtract(src1, src2);
@@ -389,7 +389,7 @@ class Union extends ComposeBaseClass {
    * @returns {Union} Returns a Union object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Union(src1, src2);
@@ -451,7 +451,7 @@ class Intersection extends ComposeBaseClass {
    * @returns {Intersectionion} Returns an Intersection object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Intersection(src1, src2);
@@ -513,7 +513,7 @@ class Difference extends ComposeBaseClass {
    * @returns {Difference} Returns a Difference object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Difference(src1, src2);
@@ -575,7 +575,7 @@ class Exclusion extends ComposeBaseClass {
    * @returns {Exclusion} Returns a Exclusion object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new Exclusion(src1, src2);
@@ -648,7 +648,7 @@ class ChangedPixels extends ComposeBaseClass {
    * @returns {ChangedPixels} Returns a ChangedPixels object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2, fuzz) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new ChangedPixels(src1, src2, fuzz);
@@ -718,7 +718,7 @@ class UnchangedPixels extends ComposeBaseClass {
    * @returns {UnchangedPixels} Returns a UnchangedPixels object. If inputs are invalid, it returns null.
    */
   static Create(src1, src2, fuzz) {
-    if (!src || !src2)
+    if (!src1 || !src2)
       return null;
 
     return new UnchangedPixels(src1, src2, fuzz);
