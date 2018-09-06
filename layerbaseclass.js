@@ -157,13 +157,11 @@ class LayerBaseClass {
                 }).catch(error => reject(error));
               }
               else {
-                let args = [mainEffect.Command()].concat(mainEffect.RenderArgs());
-                consolidatedEffects.forEach(c => args = args.concat(c.Args()));
+                let cmd = mainEffect.Command();
+                let args = mainEffect.RenderArgs();
                 args.push(tempOutputPath);
 
-                let cmd = args.join(' ');
-
-                LOCAL_COMMAND.Execute(cmd, []).then(output => {
+                LOCAL_COMMAND.Execute(cmd, args).then(output => {
                   if (output.stderr) {
                     reject(output.stderr);
                     return;
