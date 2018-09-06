@@ -124,7 +124,7 @@ class LayerBaseClass {
   RenderTempFileWithAppliedFxAndMods_(outputDir, format) {
     return new Promise((resolve, reject) => {
       let effectGroups = OPTIMIZER.GroupConsolableFxAndMods(this.appliedFxAndMods_);
-
+      console.log(`EFFECT_GROUPS: ${effectGroups.length}`);
       let prevOutputPath = null;
 
       // Create temp directory
@@ -132,7 +132,6 @@ class LayerBaseClass {
 
       LINUX_COMMANDS.Mkdir.MakeDirectory(tempDir, LOCAL_COMMAND).then(success => {
         this.RenderTempFile_(outputDir, format).then(outputPath => {
-
           let apply = (groups) => {
             return new Promise((resolve, reject) => {
               if (groups.length == 0) {
@@ -157,19 +156,70 @@ class LayerBaseClass {
                 }).catch(error => reject(error));
               }
               else {
-                let cmd = mainEffect.Command();
-                let args = mainEffect.RenderArgs();
-                args.push(tempOutputPath);
+                if (currGroup.length == 1) {
+                  let cmd = mainEffect.Command();
+                  let args = mainEffect.RenderArgs();
+                  args.push(tempOutputPath);
 
-                LOCAL_COMMAND.Execute(cmd, args).then(output => {
-                  if (output.stderr) {
-                    reject(output.stderr);
-                    return;
+                  LOCAL_COMMAND.Execute(cmd, args).then(output => {
+                    if (output.stderr) {
+                      reject(output.stderr);
+                      return;
+                    }
+
+                    prevOutputPath = tempOutputPath;
+                    resolve(apply(groups.slice(1)));
+                  }).catch(error => reject(error));
+                }
+                else {
+                  let firstCommand = null;
+                  let groupForNow = [];
+                  let groupAppendedToHead = false;
+
+                  for (let i = 0; i < currGroup.length; ++i) {
+                    let currFxOrMod = currGroup[i];
+                    let currCommand = currFxOrMod.Command();
+
+                    if (i == 0) {
+                      firstCommand = currCommand;
+                      groupForNow.push(currFxOrMod);
+                    }
+                    else {
+                      if (i == currGroup.length - 1 && currCommand == firstCommand) {
+                        groupForNow.push(currFxOrMod);
+                      }
+                      else {
+                        if (currCommand != firstCommand) {
+                          groups = [currGroup.slice(i)].concat(groups);
+                          groupAppendedToHead = true;
+                          groupForNow = currGroup.slice(0, i);
+                          break;
+                        }
+                        else {
+                          groupForNow.push(currFxOrMod);
+                        }
+                      }
+                    }
                   }
 
-                  prevOutputPath = tempOutputPath;
-                  resolve(apply(groups.slice(1)));
-                }).catch(error => reject(error));
+                  let args = [prevOutputPath];
+                  groupForNow.forEach(fxOrMod => args = args.concat(fxOrMod.Args()));
+                  args.push(tempOutputPath);
+
+                  LOCAL_COMMAND.Execute(firstCommand, args).then(output => {
+                    if (output.stderr) {
+                      reject(output.stderr);
+                      return;
+                    }
+
+                    prevOutputPath = tempOutputPath;
+
+                    if (groupAppendedToHead)
+                      resolve(apply(groups));
+                    else
+                      resolve(apply(groups.slice(1)));
+                  }).catch(error => reject(error));
+                }
               }
             });
           };
