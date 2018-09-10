@@ -61,7 +61,7 @@ exports.ChangedPixels = COMPOSE.CreateChangedPixelsMod;
 exports.UnchangedPixels = COMPOSE.CreateUnchangedPixelsMod;
 
 exports.CutIn = CUT.CreateCutInMod;
-exports.CutOut = Cut.CreateCutOutMod;
+exports.CutOut = CUT.CreateCutOutMod;
 
 exports.Swirl = FX.CreateSwirlFx;
 exports.Implode = FX.CreateImplodeFx;
