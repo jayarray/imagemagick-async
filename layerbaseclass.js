@@ -124,7 +124,6 @@ class LayerBaseClass {
   RenderTempFileWithAppliedFxAndMods_(outputDir, format) {
     return new Promise((resolve, reject) => {
       let effectGroups = OPTIMIZER.GroupConsolableFxAndMods(this.appliedFxAndMods_);
-      console.log(`EFFECT_GROUPS: ${effectGroups.length}`);
       let prevOutputPath = null;
 
       // Create temp directory
