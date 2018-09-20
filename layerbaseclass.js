@@ -139,7 +139,8 @@ class LayerBaseClass {
                 return;
               }
 
-              prevOutputPath = outputPath; // Keep track of most recent render
+              if (!prevOutputPath)
+                prevOutputPath = outputPath;
 
               let currGroup = groups[0];
 
