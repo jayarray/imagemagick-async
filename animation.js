@@ -29,9 +29,11 @@ function Gif(canvas, filepaths, loop, delay, dispose, outputPath) {
   if (filepaths.length < MIN_FILEPATHS)
     return Promise.reject(`Failed to draw composite image: ${MIN_FILEPATHS} or more filepaths are required`);
 
-  error = VALIDATE.IsInteger(loop);
-  if (loop != null && error)
-    return Promise.reject(`Failed to create GIF: loop is ${error}`);
+  if (loop) {
+    error = VALIDATE.IsInteger(loop);
+    if (loop != null && error)
+      return Promise.reject(`Failed to create GIF: loop is ${error}`);
+  }
 
   error = VALIDATE.IsIntegerInRange(loop, minLoopValue, null);
   if (error)
@@ -41,9 +43,11 @@ function Gif(canvas, filepaths, loop, delay, dispose, outputPath) {
   if (error)
     return Promise.reject(`Failed to create GIF: delay is ${error}`);
 
-  error = VALIDATE.IsStringInput(dispose);
-  if (error)
-    return Promise.reject(`Failed to create GIF: dispose is ${error}`);
+  if (dispose) {
+    error = VALIDATE.IsStringInput(dispose);
+    if (error)
+      return Promise.reject(`Failed to create GIF: dispose is ${error}`);
+  }
 
   error = VALIDATE.IsStringInput(outputPath);
   if (error)
