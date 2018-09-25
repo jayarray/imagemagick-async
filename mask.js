@@ -139,7 +139,7 @@ class ColorMask extends MaskBaseClass {
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-background', this.color_, '-alpha', 'shape'];
+    return ['-alpha', 'extract', '-background', this.color_, '-alpha', 'shape'];
   }
 
   /**
@@ -184,12 +184,7 @@ class FillMask extends MaskBaseClass {
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let args = ['-background', this.whiteReplacement_, '-alpha', 'shape'];
-
-    if (this.blackReplacement_)
-      args.push('-background', this.blackReplacement_, '-alpha', 'remove');
-
-    return args;
+    return ['-alpha', 'extract', '-background', this.whiteReplacement_, '-alpha', 'shape', '-background', this.blackReplacement_, '-alpha', 'remove'];
   }
 
   /**
@@ -207,14 +202,14 @@ class FillMask extends MaskBaseClass {
   }
 
   /**
-   * Create a FillMask object. 
+   * Create a FillMask object. Takes an image, creates a mask, and replaces the white and black colors with others.
    * @param {string} src
    * @param {string} whiteReplacement Color that will replace white part of mask.
    * @param {string} blackReplacement Color that will replace black part of mask.
    * @returns {Mask} Returns a FillMask object. If inputs are invalid, it returns null.
    */
   static Create(src, whiteReplacement, blackReplacement) {
-    if (!src || !whiteReplacement)
+    if (!src || !whiteReplacement || !blackReplacement)
       return null;
 
     return new FillMask(src, whiteReplacement, blackReplacement);
