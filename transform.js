@@ -56,7 +56,7 @@ class Roll extends TransformBaseClass {
    * @returns {Roll} Returns a Roll object. If inputs are invalid, it returns null.
    */
   static Create(src, horizontal, vertical) {
-    if (!src || isNan(horizontal) || isNan(vertical))
+    if (!src || isNaN(horizontal) || isNaN(vertical))
       return null;
 
     return new Roll(src, horizontal, vertical);
@@ -270,7 +270,7 @@ class Reflect extends TransformBaseClass {
    * @returns {Reflect} Returns a RotateAroundCenter object. If inputs are invalid, it returns null.
    */
   static Create(src, x0, y0, x1, y1) {
-    if (!src || isNan(x0) || isNan(y0) || isNan(x1) || isNan(y1))
+    if (!src || isNaN(x0) || isNaN(y0) || isNaN(x1) || isNaN(y1))
       return null;
 
     return new Reflect(src, x0, y0, x1, y1);
@@ -322,7 +322,7 @@ class Offset extends TransformBaseClass {
    * @returns {Offset} Returns an Offset object. If inputs are invalid, it returns null.
    */
   static Create(src, x0, y0, x1, y1) {
-    if (!src || isNan(x0) || isNan(y0) || isNan(x1) || isNan(y1))
+    if (!src || isNaN(x0) || isNaN(y0) || isNaN(x1) || isNaN(y1))
       return null;
 
     return new Offset(src, x0, y0, x1, y1);
@@ -413,7 +413,7 @@ class RotateAroundPoint extends TransformBaseClass {
    * @returns {RotateAroundPoint} Returns a RotateAroundPoint object. If inputs are invalid, it returns null.
    */
   static Create(src, x, y, degrees) {
-    if (!src || isNan(x) || isNan(y) || isNan(degrees))
+    if (!src || isNaN(x) || isNaN(y) || isNaN(degrees))
       return null;
 
     return new RotateAroundPoint(src, x, y, degrees);
@@ -786,7 +786,7 @@ class Crop extends TransformBaseClass {
    * @returns {Crop} Returns a Crop object. 
    */
   static Create(src, width, height, x, y, removeVirtualCanvas) {
-    if (!src || !width || !height || isNan(x) || isNan(y) || !removeVirtualCanvas)
+    if (!src || !width || !height || isNaN(x) || isNaN(y) || !removeVirtualCanvas)
       return null;
 
     return new Crop(src, width, height, x, y, removeVirtualCanvas);
