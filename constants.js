@@ -87,13 +87,17 @@ const MOD_NAMES = [
 const CONSOLIDATED_EFFECTS =
   [
     'AutoLevel',
+    'BlackMask',
     'Blur',
     'Brightness',
     'CharcoalSketch',
     'Colorize',
+    'ColorMask',
+    'FillMask',
     'GrayscaleFormat',
     'Hue',
     'Implode',
+    'Mask',
     'MirrorHorizontal',
     'MirrorVertical',
     'Negate',
@@ -114,7 +118,8 @@ const CONSOLIDATED_EFFECTS =
     'Swirl',
     'Transpose',
     'Transverse',
-    'Wave'
+    'Wave',
+    'WhiteMask'
   ];
 
 //------------------------------
