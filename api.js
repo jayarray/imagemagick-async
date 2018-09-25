@@ -9,6 +9,7 @@ let DIRECTION_FIELD = require('./directionfield.js');
 let FX = require('./fx.js');
 let GRADIENT = require('./gradient.js');
 let IDENTIFY = require('./identify.js');
+let MASK = require('./mask.js');
 let TRANSFORM = require('./transform.js');
 let PRIMITIVES = require('./primitives.js');
 let LIST = require('./list.js');
@@ -90,6 +91,12 @@ exports.ResizePixelCountLimit = TRANSFORM.CreateResizePixelCountLimitMod;
 exports.Crop = TRANSFORM.CreateCropMod;
 exports.RotateImage = TRANSFORM.CreateRotateImageMod;
 exports.Trim = TRANSFORM.CreateTrimMod;
+
+exports.Mask = MASK.CreateMaskMod;
+exports.WhiteMask = MASK.CreateWhiteMaskMod;
+exports.BlackMask = MASK.CreateBlackMaskMod;
+exports.ColorMask = MASK.CreateColorMaskMod;
+exports.FillMask = MASK.CreateFillMaskMod;
 
 exports.CreateGif = ANIMATION.CreateGif;
 
