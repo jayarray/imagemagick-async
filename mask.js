@@ -5,6 +5,7 @@ let MaskBaseClass = require('./maskbaseclass.js').MaskBaseClass;
 
 class Mask extends MaskBaseClass {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -47,6 +48,7 @@ class Mask extends MaskBaseClass {
 
 class WhiteMask extends MaskBaseClass {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -89,6 +91,7 @@ class WhiteMask extends MaskBaseClass {
 
 class BlackMask extends MaskBaseClass {
   constructor(src) {
+    super();
     this.src_ = src;
   }
 
@@ -131,6 +134,7 @@ class BlackMask extends MaskBaseClass {
 
 class ColorMask extends MaskBaseClass {
   constructor(src, color) {
+    super();
     this.src_ = src;
     this.color_ = color;
   }
@@ -175,6 +179,7 @@ class ColorMask extends MaskBaseClass {
 
 class FillMask extends MaskBaseClass {
   constructor(src, whiteReplacement, blackReplacement) {
+    super();
     this.src_ = src;
     this.whiteReplacement_ = whiteReplacement;
     this.blackReplacement_ = blackReplacement;
