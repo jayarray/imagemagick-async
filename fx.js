@@ -194,7 +194,7 @@ class Blur extends FxBaseClass {
    * @returns {Blur} Returns a Blur object. If inputs are invalid, it returns null.
    */
   static Create(src, radius, sigma, hasTransparency) {
-    if (!src || radius <= 0 || sigma < 0 || hasTransparency == null || hasTransparency === undefined)
+    if (!src || radius < 0 || sigma < 0 || hasTransparency == null || hasTransparency === undefined)
       return null;
 
     return new Blur(src, radius, sigma, hasTransparency);
