@@ -467,6 +467,7 @@ class RotateImage extends TransformBaseClass {
 
 class Resize extends TransformBaseClass {
   constructor(src, width, height) {
+    super();
     this.src_ = src;
     this.width_ = width;
     this.height_ = height;
@@ -643,6 +644,7 @@ class ResizeFillGivenArea extends Resize {
 
 class ResizePercentage extends TransformBaseClass {
   constructor(src, percent) {
+    super();
     this.src_ = src;
     this.percent_ = percent;
   }
@@ -684,6 +686,7 @@ class ResizePercentage extends TransformBaseClass {
 
 class ResizePixelCountLimit extends TransformBaseClass {
   constructor(src, pixels) {
+    super();
     this.src_ = src;
     this.pixels_ = pixels;
   }
@@ -728,6 +731,7 @@ class ResizePixelCountLimit extends TransformBaseClass {
 
 class Crop extends TransformBaseClass {
   constructor(src, width, height, x, y, removeVirtualCanvas) {
+    super();
     this.src_ = src;
     this.width_ = width;
     this.height_ = height;
