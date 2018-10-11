@@ -188,11 +188,17 @@ class Label extends CanvasBaseClass {
     if (this.width_ && this.height_)
       args.push('-size', `${this.width_}x${this.height_}`);
 
+    args.push('-background');
     if (this.backgroundColor_)
-      args.push('-background', this.backgroundColor_);
+      args.push(this.backgroundColor_);
+    else
+      args.push('none');
 
+    args.push('-fill');
     if (this.fillColor_)
-      args.push('-fill', this.fillColor_);
+      args.push(this.fillColor_);
+    else
+      args.push('none');
 
     if (this.font_)
       args.push('-font', this.font_);
@@ -212,7 +218,9 @@ class Label extends CanvasBaseClass {
     if (this.kerning_)
       args.push('-kerning', this.kerning_);
 
-    args.push('-pointsize', this.fontSize_);
+    if (this.fontSize_)
+      args.push('-pointsize', this.fontSize_);
+
     args.push(`label:${this.text_}`);
 
     if (this.Primitives().length > 0)
@@ -234,8 +242,8 @@ class Label extends CanvasBaseClass {
    * @param {number} height Height in pixels. (Optional) 
    * @param {string} text Text string
    * @param {string} font Font name (Optional) 
-   * @param {number} fontSize Font size
-   * @param {number} kerning Spacing between glyphs/symbols. Minimum value is 0.
+   * @param {number} fontSize Font size (Optional)
+   * @param {number} kerning Spacing between glyphs/symbols. Minimum value is 0. (Optional) 
    * @param {number} strokeWidth Thickness of the text outline. (Optional) 
    * @param {string} strokeColor The color of the text outline. (Optional) 
    * @param {string} fillColor The color inside of the text outline. (Optional) 
