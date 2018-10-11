@@ -179,26 +179,34 @@ function ParseImageInfo(infoStr) {
   object.statistics = {};
 
   // Red
+  object.statistics.red = null;
   line = GetLineContaining(lines, 'Red:');
-  let redLines = lines.slice(line.lineNumber);
-  let redStats = GetStats(redLines);
-  object.statistics.red = redStats;
+  if (line) {
+    let redLines = lines.slice(line.lineNumber);
+    let redStats = GetStats(redLines);
+    object.statistics.red = redStats;
+  }
 
   // Green
+  object.statistics.green = null;
   line = GetLineContaining(lines, 'Green:');
-  let greenLines = lines.slice(line.lineNumber);
-  let greenStats = GetStats(greenLines);
-  object.statistics.green = greenStats;
+  if (line) {
+    let greenLines = lines.slice(line.lineNumber);
+    let greenStats = GetStats(greenLines);
+    object.statistics.green = greenStats;
+  }
 
   // Blue
+  object.statistics.blue = null;
   line = GetLineContaining(lines, 'Blue:');
-  let blueLines = lines.slice(line.lineNumber);
-  let blueStats = GetStats(blueLines);
-  object.statistics.blue = blueStats;
+  if (line) {
+    let blueLines = lines.slice(line.lineNumber);
+    let blueStats = GetStats(blueLines);
+    object.statistics.blue = blueStats;
+  }
 
   // Alpha
   object.statistics.alpha = null;
-
   line = GetLineContaining(lines, 'Alpha:');
   if (line != null) {
     let alphaLines = lines.slice(line.lineNumber);
@@ -207,10 +215,16 @@ function ParseImageInfo(infoStr) {
   }
 
   // Overall
+  object.statistics.overall = null;
   line = GetLineContaining(lines, 'Overall:');
-  let overallLines = lines.slice(line.lineNumber);
-  let overallStats = GetStats(overallLines);
-  object.statistics.overall = overallStats;
+  if (line) {
+    let overallLines = lines.slice(line.lineNumber);
+    let overallStats = GetStats(overallLines);
+    object.statistics.overall = overallStats;
+  }
+
+  if (!object.statistics.red && !object.statistics.green && !object.statistics.blue && !object.statistics.alpha && !object.statistics.overall)
+    object.statistics = null;
 
   return object;
 }
