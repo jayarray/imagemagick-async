@@ -10,6 +10,7 @@ let FX = require('./fx.js');
 let GRADIENT = require('./gradient.js');
 let IDENTIFY = require('./identify.js');
 let MASK = require('./mask.js');
+let SHAPES = require('./shapes.js');
 let TRANSFORM = require('./transform.js');
 let PRIMITIVES = require('./primitives.js');
 let LIST = require('./list.js');
@@ -29,6 +30,8 @@ exports.Line = PRIMITIVES.CreateLine;
 exports.Path = PRIMITIVES.CreatePath;
 exports.Point = PRIMITIVES.CreatePoint;
 exports.Text = PRIMITIVES.CreateText;
+
+exports.Polygon = SHAPES.CreatePolygon;
 
 exports.Compare = COMPARE.CreateCompareMod;
 exports.Difference = COMPARE.CreateDifferenceMod;
