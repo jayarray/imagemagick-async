@@ -9,6 +9,7 @@ let DIRECTION_FIELD = require('./directionfield.js');
 let FX = require('./fx.js');
 let GRADIENT = require('./gradient.js');
 let IDENTIFY = require('./identify.js');
+let LINE_SEGMENTS = require('./linesegments.js');
 let MASK = require('./mask.js');
 let SHAPES = require('./shapes.js');
 let TRANSFORM = require('./transform.js');
@@ -28,10 +29,18 @@ exports.Circle = PRIMITIVES.CreateCircle;
 exports.Ellipse = PRIMITIVES.CreateEllipse;
 exports.Line = PRIMITIVES.CreateLine;
 exports.Path = PRIMITIVES.CreatePath;
+exports.PathComposite = PRIMITIVES.CreatePathComposite;
 exports.Point = PRIMITIVES.CreatePoint;
 exports.Text = PRIMITIVES.CreateText;
 
+exports.EllipticalArcSegment = LINE_SEGMENTS.CreateEllipticalArcSegment;
+exports.LineSegment = LINE_SEGMENTS.CreateLineSegment;
+exports.CubicBezierSegment = LINE_SEGMENTS.CreateCubicBezierSegment;
+exports.SmoothSegment = LINE_SEGMENTS.CreateSmoothSegment;
+exports.QuadraticBezier = LINE_SEGMENTS.CreateQuadraticBezierSegment;
+
 exports.Polygon = SHAPES.CreatePolygon;
+exports.Star = SHAPES.CreateStar;
 
 exports.Compare = COMPARE.CreateCompareMod;
 exports.Difference = COMPARE.CreateDifferenceMod;
