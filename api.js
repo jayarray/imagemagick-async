@@ -41,6 +41,7 @@ exports.QuadraticBezier = LINE_SEGMENTS.CreateQuadraticBezierSegment;
 
 exports.Polygon = SHAPES.CreatePolygon;
 exports.Star = SHAPES.CreateStar;
+exports.Annulus = SHAPES.CreateAnnulus;
 
 exports.Compare = COMPARE.CreateCompareMod;
 exports.Difference = COMPARE.CreateDifferenceMod;
