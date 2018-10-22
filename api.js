@@ -6,6 +6,7 @@ let COMPOSE = require('./compose.js');
 let COORDINATES = require('./coordinates.js');
 let CUT = require('./cut.js');
 let DIRECTION_FIELD = require('./directionfield.js');
+let DISTORT = require('./distort.js');
 let FX = require('./fx.js');
 let GRADIENT = require('./gradient.js');
 let IDENTIFY = require('./identify.js');
@@ -104,6 +105,12 @@ exports.ResizePixelCountLimit = TRANSFORM.CreateResizePixelCountLimitMod;
 exports.Crop = TRANSFORM.CreateCropMod;
 exports.RotateImage = TRANSFORM.CreateRotateImageMod;
 exports.Trim = TRANSFORM.CreateTrimMod;
+
+exports.ArcDistortion = DISTORT.CreateArcDistortionMod;
+exports.PolarDistortion = DISTORT.CreatePolarDistortionMod;
+exports.PolarDefaultDistortion = DISTORT.CreatePolarDefaultDistortionMod;
+exports.ThreePointDistortion = DISTORT.CreateThreePointDistortionMod;
+exports.FourPointDistortion - DISTORT.CreateFourPointDistortionMod;
 
 exports.Mask = MASK.CreateMaskMod;
 exports.WhiteMask = MASK.CreateWhiteMaskMod;
