@@ -41,5 +41,12 @@ exports.Dispose = Dispose;
 let Gravity = ["Center", "East", "North", "NorthEast", "NorthWest", "South", "SouthEast", "SouthWest", "West"];
 exports.Gravity = Gravity;
 
-//---------------------------------------
-//
+//----------------------------
+
+exports.Name = 'Constants';
+exports.ComponentType = 'multi'
+exports.Multi = [
+  { name: 'Color', obj: Color },
+  { name: 'Dispose', obj: Dispose },
+  { name: 'Gravity', obj: Gravity }
+];

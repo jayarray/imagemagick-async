@@ -56,3 +56,5 @@ function GetSlope(a, b) {
 
 exports.GetRotatedPoint = GetRotatedPoint;
 exports.GetSlope = GetSlope;
+
+exports.ComponentType = 'private';

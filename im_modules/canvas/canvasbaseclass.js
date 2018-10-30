@@ -74,3 +74,4 @@ class CanvasBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.CanvasBaseClass = CanvasBaseClass;
+exports.ComponentType = 'private';

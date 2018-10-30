@@ -44,3 +44,4 @@ class ComposeBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.ComposeBaseClass = ComposeBaseClass;
+exports.ComponentType = 'private';

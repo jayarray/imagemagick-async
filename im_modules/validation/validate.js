@@ -100,3 +100,5 @@ exports.IsNumber = IsNumber;
 exports.IsInteger = IsInteger;
 exports.IsIntegerInRange = IsIntegerInRange;
 exports.IsNumberInRange = IsNumberInRange;
+
+exports.ComponentType = 'private';

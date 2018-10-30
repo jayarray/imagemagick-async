@@ -23,3 +23,7 @@ function Channels() {
 // EXPORTS
 
 exports.Channels = Channels;
+
+exports.Name = 'Channels';
+exports.ComponentType = 'function';
+exports.Func = Channels;

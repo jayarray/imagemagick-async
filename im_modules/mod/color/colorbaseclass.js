@@ -58,3 +58,4 @@ class ColorBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.ColorBaseClass = ColorBaseClass;
+exports.ComponentType = 'private';

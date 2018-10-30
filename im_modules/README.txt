@@ -1,0 +1,58 @@
+********************************
+*  ADDING NEW FILES & MODULES  *
+********************************
+
+* Place your module in a folder with the desired or appropriate name.
+  NOTE: Your module will be accessable from a property with the same name as the folder.
+  EXAMPLE: Folder name is "do", module is name "stuff". To access, call: do.stuff
+
+* Determine what "ComponentType" your module is in order to load it correctly. It will be the first thing the loader checks. (See below)
+
+
+*********************
+*  COMPONENT TYPES  *
+*********************
+
+ComponentType = drawable | import | function | input | private
+
+1) drawable:
+  - Is any renderable or primitive type.
+  - Must have the following properties exported:
+    a) Create (static constructor)
+    b) Name
+    c) Layer (boolean)
+    d) Consolidate (boolean)
+    e) Dependencies (array of other drawable names)
+    f) ComponentType = 'drawable'
+
+2) import:
+  - Is any module that only requires importing.
+  - Must have the following properties exported:
+    a) Name
+    b) ComponentType = 'import'
+
+3) function:
+  - Is a module with only ONE function to export.
+  - Must have the following properties exported:
+    a) Name
+    b) ComponentType = 'function'
+    c) Func (function object)
+
+4) input:
+  - Is a module that can create an object used by other modules.
+  - Must have the following properties exported:
+    a) Create (static constructor)
+    b) Name
+    c) ComponentType = 'input'
+
+5) multi:
+  - Is a module with multiple exports.
+  - Must have the following properties exported:
+    a) ComponentType = 'multi'
+    b) Multi = Array<{name: string, obj: object}>
+    c) Name
+
+6) private
+  - Is used to indicate you do not want a module loaded or simply want it to be ignored by the loader.
+  - Must have the following properties exported:
+    a) ComponentType = 'private'

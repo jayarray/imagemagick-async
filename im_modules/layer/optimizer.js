@@ -199,3 +199,5 @@ function GroupConsolableFxAndMods(arr) {
 exports.Analyze = Analyze;
 exports.GroupIntoSeparateCanvases = GroupIntoSeparateCanvases;
 exports.GroupConsolableFxAndMods = GroupConsolableFxAndMods;
+
+exports.ComponentType = 'private';

@@ -32,3 +32,4 @@ class PrimitiveBaseClass {
 // EXPORTS
 
 exports.PrimitiveBaseClass = PrimitiveBaseClass;
+exports.ComponentType = 'private';

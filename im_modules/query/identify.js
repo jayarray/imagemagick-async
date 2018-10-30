@@ -587,3 +587,10 @@ class ImageInfo {
 
 exports.Format = Format;
 exports.ImageInfo = ImageInfo.Create;
+
+exports.Name = 'Identify';
+exports.ComponentType = 'multi';
+exports.Multi = [
+  { name: 'Format', obj: Format },
+  { name: 'ImageInfo', obj: ImageInfo }
+];

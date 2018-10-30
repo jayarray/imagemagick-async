@@ -26,3 +26,5 @@ class Vector {
 // EXPORTS
 
 exports.Create = Vector.Create;
+exports.Name = 'Vector';
+exports.ComponentType = 'input';

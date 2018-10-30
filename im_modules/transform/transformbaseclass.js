@@ -51,3 +51,4 @@ class TransformBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.TransformBaseClass = TransformBaseClass;
+exports.ComponentType = 'private';

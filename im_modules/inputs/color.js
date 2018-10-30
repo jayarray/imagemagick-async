@@ -425,6 +425,10 @@ class Color {
 //----------------------------
 // EXPORTS
 
-exports.CreateUsingRGBIntgers = Color.CreateUsingRGBIntgers;
-exports.CreateUsingRGBHexString = Color.CreateUsingRGBHexString;
-exports.CreateUsingPercents = Color.CreateUsingPercents;
+exports.Name = 'Color';
+exports.ComponentType = 'multi';
+exports.Multi = [
+  { name: 'CreateUsingRGBIntgers', obj: Color.CreateUsingRGBIntgers },
+  { name: 'CreateUsingRGBHexString', obj: Color.CreateUsingRGBHexString },
+  { name: 'CreateUsingPercents', obj: Color.CreateUsingPercents }
+];

@@ -1,6 +1,6 @@
 let PATH = require('path');
 let rootDir = PATH.dirname(require.main.filename);
-let VALIDATE = require(PATH.join(rootDir, 'im_modules', 'validation', 'layerbaseclass.js'));
+let VALIDATE = require(PATH.join(rootDir, 'im_modules', 'validation', 'validate.js'));
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //--------------------------------------
@@ -87,4 +87,6 @@ function Gif(filepaths, loop, delay, dispose, outputPath) {
 //---------------------------------
 // EXPORTS
 
-exports.Create = Gif.Create;
+exports.Funct = Gif;
+exports.Name = 'CreateGif';
+exports.ComponentType = 'function';

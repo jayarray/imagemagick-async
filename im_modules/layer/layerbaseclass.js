@@ -349,3 +349,4 @@ function RotateImage(layer, src, currXoffset, currYoffset, degrees, consolidated
 // EXPORTS
 
 exports.LayerBaseClass = LayerBaseClass;
+exports.ComponentType = 'private';

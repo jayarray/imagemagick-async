@@ -57,3 +57,4 @@ class CutBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.CutBaseClass = CutBaseClass;
+exports.ComponentType = 'private';

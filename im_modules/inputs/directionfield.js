@@ -40,3 +40,5 @@ class DirectionField {
 // EXPORTS
 
 exports.Create = DirectionField.Create;
+exports.Name = 'DirectionField';
+exports.ComponentType = 'input';

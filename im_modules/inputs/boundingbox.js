@@ -48,3 +48,5 @@ class BoundingBox {
 // EXPORTS
 
 exports.Create = BoundingBox.Create;
+exports.Name = 'BoundingBox';
+exports.ComponentType = 'input';

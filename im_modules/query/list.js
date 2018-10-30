@@ -49,3 +49,7 @@ function Fonts() {
 // EXPORTS
 
 exports.Fonts = Fonts;
+
+exports.Name = 'Fonts';
+exports.ComponentType = 'function';
+exports.Func = Fonts;

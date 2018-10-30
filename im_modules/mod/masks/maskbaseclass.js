@@ -51,3 +51,4 @@ class MaskBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.MaskBaseClass = MaskBaseClass;
+exports.ComponentType = 'private';

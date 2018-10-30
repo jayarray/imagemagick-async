@@ -81,3 +81,5 @@ class RadialGradient extends Gradient {
 // EXPORTs
 
 exports.Create = RadialGradient.Create;
+exports.Name = 'RadialGradient';
+exports.ComponentType = 'input';

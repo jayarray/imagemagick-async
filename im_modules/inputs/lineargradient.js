@@ -66,3 +66,5 @@ class LinearGradient {
 // EXPORTs
 
 exports.Create = LinearGradient.Create;
+exports.Name = 'LinearGradient';
+exports.ComponentType = 'input';

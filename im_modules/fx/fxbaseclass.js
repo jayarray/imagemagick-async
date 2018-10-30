@@ -51,3 +51,4 @@ class FxBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.FxBaseClass = FxBaseClass;
+exports.ComponentType = 'private';

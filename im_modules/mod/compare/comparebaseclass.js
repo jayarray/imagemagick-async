@@ -46,3 +46,4 @@ class CompareBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.CompareBaseClass = CompareBaseClass;
+exports.ComponentType = 'private';

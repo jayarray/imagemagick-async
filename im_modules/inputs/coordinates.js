@@ -42,3 +42,5 @@ class Coordinates {
 // EXPORTS
 
 exports.Create = Coordinates.Create;
+exports.Name = 'Coordinates';
+exports.ComponentType = 'input';
