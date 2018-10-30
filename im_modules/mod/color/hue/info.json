@@ -1,0 +1,6 @@
+{
+  "name": "Hue",
+  "layer": true,
+  "consolidate": true,
+  "dependencies": []
+}
