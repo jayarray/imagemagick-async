@@ -87,6 +87,8 @@ function Gif(filepaths, loop, delay, dispose, outputPath) {
 //---------------------------------
 // EXPORTS
 
-exports.Funct = Gif;
+exports.CreateGif = Gif;
+
+exports.Func = Gif;
 exports.Name = 'CreateGif';
 exports.ComponentType = 'function';
