@@ -3,7 +3,7 @@ let rootDir = PATH.dirname(require.main.filename);
 let GUID = require(PATH.join(__dirname, 'guid.js'));
 let OPTIMIZER = require(PATH.join(__dirname, 'optimizer.js'));
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
-let COMPLEX_OPERATIONS = require('./complexoperations.js');
+let COMPLEX_OPERATIONS = require(PATH.join(__dirname, 'complexoperations.js'));
 
 //---------------------------------
 
