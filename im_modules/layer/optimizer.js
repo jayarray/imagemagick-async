@@ -1,6 +1,6 @@
 let PATH = require('path');
 let rootDir = PATH.dirname(require.main.filename);
-let CONSTANTS = require(PATH.join(rootDir, 'im_modules', 'constants', 'constants.json'));
+let CONSOLIDATED_EFFECTS = require(PATH.join(rootDir, 'im_modules', 'layer', 'consolidatedeffects.json')).effects;
 
 //-------------------------------
 
@@ -175,7 +175,9 @@ function GroupConsolableFxAndMods(arr) {
     if (i == 0)
       currGroup.push(currFxOrMod);
     else {
-      if (CONSTANTS.CONSOLIDATED_EFFECTS.includes(currFxOrMod.Name()))
+      // Check if name exists
+      let isConsolidated = CONSOLIDATED_EFFECTS.filter(x => x.name == currFxOrMod.Name());
+      if (isConsolidated)
         currGroup.push(currFxOrMod);
       else {
         groups.push(currGroup);
