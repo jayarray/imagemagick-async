@@ -2,7 +2,7 @@
 *  ADDING NEW FILES & MODULES  *
 ********************************
 
-* Place your module in a folder with the desired or appropriate name.
+* Place your module in a folder with the desired or appropriate name. (Place folder inside of "im_modules" directory.)
   NOTE: Your module will be accessable from a property with the same name as the folder.
   EXAMPLE: Folder name is "do", module is name "stuff". To access, call: do.stuff
 
