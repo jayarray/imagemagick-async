@@ -1,7 +1,7 @@
 let PATH = require('path');
 let LINUX_COMMANDS = require('linux-commands-async');
 let projectDir = PATH.dirname(require.main.filename);
-let rootDir = PATH.join(projectDir, 'im_modules');
+let imModulesDir = PATH.join(projectDir, 'im_modules');
 
 //--------------------------------
 // API
@@ -95,7 +95,7 @@ class API {
    * @returns {Array<string>}
    */
   FilepathToParts_(path) {
-    return path.replace(rootDir, '').split(PATH.sep).filter(x => x && x != '' && x.trim() != '');
+    return path.replace(imModulesDir, '').split(PATH.sep).filter(x => x && x != '' && x.trim() != '');
   }
 
   /**
@@ -159,26 +159,27 @@ class API {
 
     switch (thisModule.ComponentType) {
       case 'drawable':
-        loaded = LoadDrawable_(currFilepath);
+        loaded = this.LoadDrawable_(filepath);
         obj = loaded.Create;
         break;
       case 'import':
-        loaded = LoadImport_(currFilepath);
+        loaded = this.LoadImport_(filepath);
         obj = loaded.Import;
         break;
       case 'input':
-        loaded = LoadInput_(currFilepath);
+        loaded = this.LoadInput_(filepath);
         obj = loaded.Create
         break;
       case 'function':
-        loaded = LoadFunction_(currFilepath);
+        loaded = this.LoadFunction_(filepath);
         obj = loaded.Func;
         break;
       case 'multi':
-        loaded = LoadMultiExport_(currFilepath);
+        loaded = this.LoadMultiExport_(filepath);
         obj = loaded.Object;
         break;
       default:
+        return;
         break;
     }
 
@@ -201,70 +202,95 @@ class API {
 // HELPER functions
 
 /**
- * Load a module directory
+ * Get drawable module properties.
+ * @param {string} filepath 
+ * @returns {Promise<{name: string, layer: boolean, consolidate: boolean, filepath: string}>}
+ */
+function GetDrawableProperties(filepath) {
+  return new Promise((resolve, reject) => {
+    console.log(`FILEPATH: ${filepath}`);
+    LINUX_COMMANDS.File.ReadLines(filepath, LINUX_COMMANDS.Command.LOCAL).then(lines => {
+      // Filter for all export lines
+      lines = lines.filter(x => x && x != '' && x.includes("exports.")).map(x => x.trim());
+
+      // Check if component is drawable
+      let componentType = lines.filter(x => x.includes('exports.ComponentType'))[0];
+      componentType = componentType.split('exports.ComponentType =')[1].trim();
+      componentType = componentType.split(`'`).join('');
+      componentType = componentType.replace(`;`, '');
+
+      if (componentType != 'drawable') {
+        resolve(null);
+        return;
+      }
+
+      // Get other properties
+      let name = lines.filter(x => x.includes("exports.Name"))[0];
+      name = name.split('exports.Name =')[1].trim();
+      name = name.split(`'`).join('');
+      name = name.replace(`;`, '');
+
+      let layer = lines.filter(x => x.includes("exports.Layer"))[0];
+      layer = layer.split('exports.Layer =')[1].trim();
+      layer = layer.split(`'`).join('');
+      layer = layer.replace(`;`, '');
+      layer = layer == 'true';
+
+      let consolidate = lines.filter(x => x.includes("exports.Consolidate"))[0];
+      consolidate = consolidate.split('exports.Consolidate =')[1].trim();
+      consolidate = consolidate.split(`'`).join('');
+      consolidate = consolidate.replace(`;`, '');
+      consolidate = consolidate == 'true';
+
+      resolve({
+        name: name,
+        layer: layer,
+        consolidate: consolidate,
+        filepath: filepath
+      });
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * Load the module directory.
  * @param {string} dirpath 
  * @returns {Promise} Returns a promise with the API object attached to it if successful. Else returns an error.
  */
 function Load(dirpath) {
   return new Promise((resolve, reject) => {
-    // Get all files
+    // Get all filepaths
     LINUX_COMMANDS.Find.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
-      let filepaths = results.paths;
+      let filepaths = results.paths.filter(x => x.endsWith('.js'));
 
-      let api = new API();
-      filepaths.forEach(x => api.Load(x));
+      // Get all drawable components
+      let componentChecks = filepaths.map(x => GetDrawableProperties(x));
+      Promise.all(componentChecks).then(checks => {
+        // Filter consolidated effects
+        let drawables = checks.filter(x => x != null);
+        let consolidatedEffects = drawables.filter(x => x.consolidate);
 
-      resolve(api);
-    }).catch(error => reject(`Failed to load modules: ${error}`));
-  });
-}
+        // Write JSON file
+        let jsonObj = { effects: consolidatedEffects };
+        let jsonStr = JSON.stringify(jsonObj);
+        let jsonOutputPath = PATH.join(imModulesDir, 'layer', 'consolidatedeffects.json'); // JSON filepath
+        LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
+          // Create API
+          let api = new API();
+          filepaths.forEach(x => api.Load(x));
 
-/**
- * Create a file holding a list of the consolidated effects. (Used by optimizer).
- * @param {Array<object>} drawables 
- * @param {string} outputPath
- */
-function CreateConsolidatedEffectsJSON(drawables, outputPath) {
-  return new Promise((resolve, reject) => {
-    let consolidatedEffects = [];
-
-    let filtered = drawables.filter(x => x.thisModule.Consolidate);
-    filtered.forEach(x => {
-      let e = {
-        name: x.thisModule.Name,
-        layer: x.thisModule.Layer,
-        dependencies: x.thisModule.Dependencies,
-        filepath: x.thisModule.Filepath
-      };
-
-      consolidatedEffects.push(e);
-    });
-
-    // Create JSON file
-    let jsonObj = { effects: consolidatedEffects };
-    let jsonStr = JSON.stringify(jsonObj);
-
-    LINUX_COMMANDS.File.Create(outputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
-      resolve();
-    }).catch(error => reject(`Failed to create Consolidated Effects JSON file: ${error}`));
+          resolve(api.GetAPI());
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
   });
 }
 
 //--------------------------------
 // LOAD MODULES
 
-let projectDir = PATH.dirname(require.main.filename);
-let imModulesDir = PATH.join(projectDir, 'im_modules');
-let layerDir = PATH.join(imModulesDir, 'layer');
-
 Load(imModulesDir).then(api => {
-  let jsonOutputPath = PATH.join(layerDir, 'consolidatedeffects.json');
-
-  CreateConsolidatedEffectsJSON(api.GetDrawables(), jsonOutputPath).then(success => {
-    console.log(`\nSuccessfully loaded modules.`);
-  }).catch(error => {
-    console.log(`\nERROR: ${error}`);
-  });
+  exports.API = api;
 }).catch(error => {
-  console.log(`\nERROR: ${error}`);
+  console.log(`\nFailed to load modules: ${error}`);
 });
