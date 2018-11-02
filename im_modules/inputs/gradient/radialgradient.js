@@ -1,10 +1,11 @@
 let PATH = require('path');
 let rootDir = PATH.dirname(require.main.filename);
 let VALIDATE = require(PATH.join(rootDir, 'im_modules', 'validation', 'validate.js'));
+let GRADIENT_BASECLASS = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
 
-class RadialGradient extends Gradient {
+class RadialGradient extends GRADIENT_BASECLASS {
   constructor(startColor, endColor, center, radialWidth, radialHeight, angle, boundingBox, extent) {
     super();
     this.startColor_ = startColor;
