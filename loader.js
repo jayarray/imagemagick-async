@@ -227,7 +227,6 @@ class API {
  */
 function GetDrawableProperties(filepath) {
   return new Promise((resolve, reject) => {
-    console.log(`FILEPATH: ${filepath}`);
     LINUX_COMMANDS.File.ReadLines(filepath, LINUX_COMMANDS.Command.LOCAL).then(lines => {
       // Filter for all export lines
       lines = lines.filter(x => x && x != '' && x.includes("exports.")).map(x => x.trim());
@@ -309,9 +308,10 @@ function Load(dirpath) {
 //--------------------------------
 // LOAD MODULES
 
+console.log('\nLoading Image Magick modules...');
 Load(imModulesDir).then(api => {
   exports.API = api;
-  console.log(`\nModules loaded successfully!`);
+  console.log(`Success!`);
 }).catch(error => {
   console.log(`\nFailed to load modules: ${error}`);
 });
