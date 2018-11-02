@@ -95,7 +95,9 @@ class API {
    * @returns {Array<string>}
    */
   FilepathToParts_(path) {
-    return path.replace(imModulesDir, '').split(PATH.sep).filter(x => x && x != '' && x.trim() != '');
+    let parts = path.replace(imModulesDir, '');
+    parts = parts.split(PATH.sep).filter(x => x && x != '' && x.trim() != '');
+    return parts;
   }
 
   /**
@@ -105,30 +107,32 @@ class API {
   UpdateAPI_(filepath, obj) {
     let parts = this.FilepathToParts_(filepath);
     let moduleDir = parts[0];
+    let parent = moduleDir;
 
     // Check if module dir exists
     let ref = this.api_[moduleDir];
     if (ref === undefined) {
-      this.api_[moduleDir] = null;  // Make it exist
-      ref = this.api_[moduleDir];   // Update ref
+      this.api_[moduleDir] = {};  // Make it exist
+      parent = moduleDir;   // Update parent
     }
     else {
-      ref = this.api_[moduleDir];   // Update ref
+      parent = moduleDir;
+      //ref = this.api_[moduleDir];   // Update parent
     }
 
     parts = parts.slice(1);
-    parts[-1] = parts[-1].replace('.js', ''); // Remove extension from filename
+    parts[parts.length - 1] = parts[parts.length - 1].replace('.js', '');  // Remove extension from filename
 
     for (let i = 0; i < parts.length; ++i) {
       let key = parts[i];
       let value = this.api_[key];
 
       if (value === undefined) {
-        ref[key] = null;   // Make it exist
-        ref = ref[key];    // Update ref
+        this.api_[parent] = { key: {} };   // Make it exist
+        parent = key;
       }
       else {
-        ref = ref[key];    // Update ref
+        parent = key;    // Update ref
       }
     }
     ref = obj;
