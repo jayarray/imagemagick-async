@@ -3,7 +3,7 @@ let COMPARE_BASECLASS = require(PATH.join(__dirname, 'comparebaseclass.js')).Com
 
 //------------------------------------
 
-class Difference extends CompareBaseClass {
+class Difference extends COMPARE_BASECLASS {
   constructor(src1, src2) {
     super();
     this.src1_ = src1;
