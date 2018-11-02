@@ -45,6 +45,23 @@ class API {
   }
 
   /**
+   * Load an import specific items from module.
+   * @param {string} filepath 
+   * @returns {{Name: string, Import: object}} 
+   */
+  LoadImportSpecific_(filepath) {
+    let myImport = require(filepath);
+
+    let o = {};
+    myImport.Specific.forEach(x => o[x.name] = x.obj);
+
+    return {
+      Name: myImport.Name,
+      Specific: o
+    };
+  }
+
+  /**
    * Load a function module.
    * @param {string} filepath 
    * @returns {{Name: string, Func: object}} 
@@ -163,6 +180,10 @@ class API {
       case 'import':
         loaded = this.LoadImport_(filepath);
         obj = loaded.Import;
+        break;
+      case 'import specific':
+        loaded = this.LoadImportSpecific_(filepath);
+        obj = loaded.Specific;
         break;
       case 'input':
         loaded = this.LoadInput_(filepath);
