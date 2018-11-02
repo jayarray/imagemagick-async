@@ -127,15 +127,11 @@ class API {
       let key = parts[i];
       let value = this.api_[key];
 
-      if (value === undefined) {
-        this.api_[parent] = { key: {} };   // Make it exist
-        parent = key;
-      }
-      else {
-        parent = key;    // Update ref
-      }
+      if (value === undefined)
+        this.api_[parent][key] = i < parts.length - 1 ? {} : obj; // Create path or set object
+      else
+        parent = key; // Update parent
     }
-    ref = obj;
   }
 
   /**
@@ -266,6 +262,7 @@ function Load(dirpath) {
     // Get all filepaths
     LINUX_COMMANDS.Find.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
       let filepaths = results.paths.filter(x => x.endsWith('.js'));
+      filepaths.sort();
 
       // Get all drawable components
       let componentChecks = filepaths.map(x => GetDrawableProperties(x));
@@ -295,6 +292,7 @@ function Load(dirpath) {
 
 Load(imModulesDir).then(api => {
   exports.API = api;
+  console.log(`\nModules loaded successfully!`);
 }).catch(error => {
   console.log(`\nFailed to load modules: ${error}`);
 });
