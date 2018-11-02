@@ -84,7 +84,7 @@ class API {
     myMulti.Multi.forEach(x => o[x.name] = x.obj);
 
     return {
-      Name: myModule.Name,
+      Name: myMulti.Name,
       Object: o
     };
   }
