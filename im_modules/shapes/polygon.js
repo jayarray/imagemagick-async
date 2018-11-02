@@ -1,7 +1,7 @@
 let PATH = require('path');
 let rootDir = PATH.dirname(require.main.filename);
 let PATH_PRIMITIVE = require(PATH.join(rootDir, 'im_modules', 'primitives', 'path.js')).Create;
-let PRIMITIVE_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'primitives', 'primitivebaseclass.js')).PrimitiveBaseClass;
+let PRIMITIVE_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'primitives', 'primitivesbaseclass.js')).PrimitiveBaseClass;
 let HELPER_FUNCTIONS = require(PATH.join(__dirname, 'helperfunctions.js'));
 
 //-------------------------------

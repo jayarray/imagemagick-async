@@ -3,7 +3,7 @@ let rootDir = PATH.dirname(require.main.filename);
 let COORDINATES = require(PATH.join(rootDir, 'im_modules', 'inputs', 'coordinates.js')).Create;
 let ELLIPSE = require(PATH.join(rootDir, 'im_modules', 'primitives', 'ellipse.js')).Create;
 let CIRCLE = require(PATH.join(rootDir, 'im_modules', 'primitives', 'circle.js')).Create;
-let PRIMITIVE_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'primitives', 'primitivebaseclass.js')).PrimitiveBaseClass;
+let PRIMITIVE_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'primitives', 'primitivesbaseclass.js')).PrimitiveBaseClass;
 
 //---------------------------------
 
