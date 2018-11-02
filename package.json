@@ -2,7 +2,7 @@
   "name": "imagemagick-async",
   "version": "1.0.28",
   "description": "An API for Image Magick commands.",
-  "main": "api.js",
+  "main": "loader.js",
   "dependencies": {
     "linux-commands-async": "^1.3.4"
   },
