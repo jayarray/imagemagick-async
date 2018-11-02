@@ -31,28 +31,35 @@ ComponentType = drawable | import | function | input | private
     a) Name
     b) ComponentType = 'import'
 
-3) function:
+3) import specific:
+  - Is any module that only requires importing very specific items.
+  - Must have the following properties exported:
+    a) Name
+    b) ComponentType = 'import specific'
+    c) Specific = Array<{name: string, obj: object}>
+
+4) function:
   - Is a module with only ONE function to export.
   - Must have the following properties exported:
     a) Name
     b) ComponentType = 'function'
     c) Func (function object)
 
-4) input:
+5) input:
   - Is a module that can create an object used by other modules.
   - Must have the following properties exported:
     a) Create (static constructor)
     b) Name
     c) ComponentType = 'input'
 
-5) multi:
+6) multi:
   - Is a module with multiple exports.
   - Must have the following properties exported:
     a) ComponentType = 'multi'
     b) Multi = Array<{name: string, obj: object}>
     c) Name
 
-6) private
+7) private
   - Is used to indicate you do not want a module loaded or simply want it to be ignored by the loader.
   - Must have the following properties exported:
     a) ComponentType = 'private'
