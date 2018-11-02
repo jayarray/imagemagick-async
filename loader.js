@@ -104,33 +104,31 @@ class API {
    * @param {string} filepath 
    * @param {object} obj 
    */
-  UpdateAPI_(filepath, obj) {
+  UpdateAPI_(filepath, name, obj) {
     let parts = this.FilepathToParts_(filepath);
     let moduleDir = parts[0];
-    let parent = moduleDir;
+    //let parent = moduleDir;
 
     // Check if module dir exists
     let ref = this.api_[moduleDir];
+
     if (ref === undefined) {
       this.api_[moduleDir] = {};  // Make it exist
-      parent = moduleDir;   // Update parent
-    }
-    else {
-      parent = moduleDir;
-      //ref = this.api_[moduleDir];   // Update parent
+      ref = this.api_[moduleDir]; // Update ref
     }
 
     parts = parts.slice(1);
-    parts[parts.length - 1] = parts[parts.length - 1].replace('.js', '');  // Remove extension from filename
+    parts[parts.length - 1] = name;  // Replace filename with specified name
 
     for (let i = 0; i < parts.length; ++i) {
       let key = parts[i];
-      let value = this.api_[key];
+      ref[key] = {}; // Make entry exist
 
-      if (value === undefined)
-        this.api_[parent][key] = i < parts.length - 1 ? {} : obj; // Create path or set object
-      else
-        parent = key; // Update parent
+      if (i == parts.length - 1) {
+        ref[key] = obj;
+      }
+
+      ref = ref[key]; // Update ref
     }
   }
 
@@ -183,7 +181,7 @@ class API {
         break;
     }
 
-    this.UpdateAPI_(filepath, obj);
+    this.UpdateAPI_(filepath, thisModule.Name, obj);
 
     if (thisModule.ComponentType == 'drawable')
       this.UpdateDrawables_(thisModule.Name, obj, thisModule);
@@ -274,7 +272,7 @@ function Load(dirpath) {
         // Write JSON file
         let jsonObj = { effects: consolidatedEffects };
         let jsonStr = JSON.stringify(jsonObj);
-        let jsonOutputPath = PATH.join(imModulesDir, 'layer', 'consolidatedeffects.json'); // JSON filepath
+        let jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'consolidatedeffects.json'); // JSON filepath
         LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
           // Create API
           let api = new API();
