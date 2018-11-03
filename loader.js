@@ -119,6 +119,7 @@ class API {
 
   /**
    * @param {string} filepath 
+   * @param {string} name
    * @param {object} obj 
    */
   UpdateAPI_(filepath, name, obj) {
@@ -134,19 +135,22 @@ class API {
       ref = this.api_[moduleDir]; // Update ref
     }
 
-    parts = parts.slice(1);
-    parts[parts.length - 1] = name;  // Replace filename with specified name
+    parts = parts.slice(1, -1);
 
     for (let i = 0; i < parts.length; ++i) {
       let key = parts[i];
-      ref[key] = {}; // Make entry exist
+      let value = ref[key];
 
-      if (i == parts.length - 1) {
-        ref[key] = obj;
+      if (!value) {
+        ref[key] = {};
+        ref = ref[key];
       }
-
-      ref = ref[key]; // Update ref
+      else {
+        ref = value;
+      }
     }
+
+    ref[name] = obj;
   }
 
   /**
