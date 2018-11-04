@@ -312,10 +312,8 @@ function Load(dirpath) {
 //--------------------------------
 // LOAD MODULES
 
-console.log('\nLoading Image Magick modules...');
 Load(imModulesDir).then(api => {
   exports.API = api;
-  console.log(`Success!`);
 }).catch(error => {
-  console.log(`\nFailed to load modules: ${error}`);
+  console.log(`\nFailed to load Image Magick modules: ${error}`);
 });
