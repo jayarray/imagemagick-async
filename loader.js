@@ -1,7 +1,6 @@
 let PATH = require('path');
 let LINUX_COMMANDS = require('linux-commands-async');
-let projectDir = PATH.dirname(require.main.filename);
-let imModulesDir = PATH.join(projectDir, 'im_modules');
+let imModulesDir = PATH.join(__dirname, 'im_modules');
 
 //--------------------------------
 // API
