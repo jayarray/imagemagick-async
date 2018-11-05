@@ -4,11 +4,10 @@ let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js'))
 //-----------------------------------
 
 class RotateAroundPoint extends TRANSFORM_BASECLASS {
-  constructor(src, x, y, degrees) {
+  constructor(src, point, degrees) {
     super();
     this.src_ = src;
-    this.x_ = x;
-    this.y_ = y;
+    this.point_ = point;
     this.degrees_ = degrees;
   }
 
@@ -16,7 +15,7 @@ class RotateAroundPoint extends TRANSFORM_BASECLASS {
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-distort', 'SRT', `${this.x_},${this.y_} ${this.degrees_}`];
+    return ['-distort', 'SRT', `${this.point_.x_},${this.point_.y_} ${this.degrees_}`];
   }
 
   /**
@@ -36,16 +35,15 @@ class RotateAroundPoint extends TRANSFORM_BASECLASS {
   /**
    * Create a RotateAroundPoint object. Rotate an image around a point.
    * @param {string} src
-   * @param {numbers} x X-coordinate of the point.
-   * @param {numbers} y Y-ccordinate of the point.
+   * @param {Coordinates} x Point to rotate about.
    * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
    * @returns {RotateAroundPoint} Returns a RotateAroundPoint object. If inputs are invalid, it returns null.
    */
-  static Create(src, x, y, degrees) {
-    if (!src || isNaN(x) || isNaN(y) || isNaN(degrees))
+  static Create(src, point, degrees) {
+    if (!src || !point || isNaN(degrees))
       return null;
 
-    return new RotateAroundPoint(src, x, y, degrees);
+    return new RotateAroundPoint(src, point, degrees);
   }
 }
 
