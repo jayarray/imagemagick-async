@@ -318,7 +318,6 @@ function Load(dirpath) {
 Load(imModulesDir).then(o => {
   exports.API = o.api;
   exports.Drawables = o.drawables;
-  exports.ModulesDir = imModulesDir;
 }).catch(error => {
   console.log(`\nFailed to load Image Magick modules: ${error}`);
 });
