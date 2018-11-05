@@ -4,13 +4,12 @@ let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js'))
 //-----------------------------------
 
 class Crop extends TRANSFORM_BASECLASS {
-  constructor(src, width, height, x, y, removeVirtualCanvas) {
+  constructor(src, width, height, corner, removeVirtualCanvas) {
     super();
     this.src_ = src;
     this.width_ = width;
     this.height_ = height;
-    this.x_ = x;
-    this.y_ = y;
+    this.corner_ = corner;
     this.removeVirtualCanvas_ = removeVirtualCanvas;
   }
 
@@ -22,15 +21,15 @@ class Crop extends TRANSFORM_BASECLASS {
 
     let cropStr = `${this.width_}x${this.height_}`;
 
-    if (this.x_ >= 0)
-      cropStr += `+${this.x_}`;
+    if (this.corner_.x_ >= 0)
+      cropStr += `+${this.corner_.x_}`;
     else
-      cropStr += this.x_.toString();
+      cropStr += this.corner_.x_.toString();
 
     if (this.y_ >= 0)
-      cropStr += `+${this._y}`;
+      cropStr += `+${this.corner_._y}`;
     else
-      cropStr += this.y_.toString();
+      cropStr += this.corner_.y_.toString();
     args.push(cropStr)
 
     if (this.removeVirtualCanvas_)
@@ -58,16 +57,15 @@ class Crop extends TRANSFORM_BASECLASS {
    * @param {string} src
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {number} x X-coordinate of the top-left corner of the crop area.
-   * @param {number} y Y-coordinate of the top-left corner of the crop area.
+   * @param {Coordinates} corner the top left corner where the image will be cropped from.
    * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
    * @returns {Crop} Returns a Crop object. 
    */
-  static Create(src, width, height, x, y, removeVirtualCanvas) {
-    if (!src || !width || !height || isNaN(x) || isNaN(y) || !removeVirtualCanvas)
+  static Create(src, width, height, corner, removeVirtualCanvas) {
+    if (!src || !width || !height || !corner || !removeVirtualCanvas)
       return null;
 
-    return new Crop(src, width, height, x, y, removeVirtualCanvas);
+    return new Crop(src, width, height, corner, removeVirtualCanvas);
   }
 }
 
