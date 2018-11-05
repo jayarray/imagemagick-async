@@ -6,7 +6,7 @@ let imModulesDir = PATH.join(projectDir, 'im_modules');
 //--------------------------------
 // API
 
-class API {
+class ApiBuilder {
   constructor() {
     this.api_ = {};
     this.drawables_ = [];
@@ -299,10 +299,13 @@ function Load(dirpath) {
         let jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'consolidatedeffects.json'); // JSON filepath
         LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
           // Create API
-          let api = new API();
-          filepaths.forEach(x => api.Load(x));
+          let apiBuilder = new ApiBuilder();
+          filepaths.forEach(x => apiBuilder.Load(x));
 
-          resolve(api.GetAPI());
+          resolve({
+            api: apiBuilder.GetAPI(),
+            drawables: apiBuilder.GetDrawables()
+          });
         }).catch(error => reject(error));
       }).catch(error => reject(error));
     }).catch(error => reject(error));
@@ -312,8 +315,9 @@ function Load(dirpath) {
 //--------------------------------
 // LOAD MODULES
 
-Load(imModulesDir).then(api => {
-  exports.API = api;
+Load(imModulesDir).then(o => {
+  exports.API = o.api;
+  exports.Drawables = o.drawables;
 }).catch(error => {
   console.log(`\nFailed to load Image Magick modules: ${error}`);
 });
