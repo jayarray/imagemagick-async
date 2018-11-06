@@ -314,10 +314,14 @@ function Load(dirpath) {
 //--------------------------------
 // LOAD MODULES
 
-Load(imModulesDir).then(o => {
-  exports.API = o.api;
-  exports.Drawables = o.drawables;
-  exports.ModulesDir = imModulesDir;
-}).catch(error => {
-  console.log(`\nFailed to load Image Magick modules: ${error}`);
+let Loaded = new Promise((resolve, reject) => {
+  Load(imModulesDir).then(o => {
+    resolve({
+      API: o.api,
+      Drawables: o.drawables,
+      ModulesDir: imModulesDir
+    });
+  }).catch(error => reject(`Failed to load Image Magick modules: ${error}`));
 });
+
+exports.Loaded = Loaded;
