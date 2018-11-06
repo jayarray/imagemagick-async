@@ -1,6 +1,9 @@
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
-let IDENTIFY = require(PATH.join(rootDir, 'im_modules', 'Query', 'identify.js'));
+
+let parts = __dirname.split(PATH.sep);
+let index = parts.findIndex(x => x == 'im_modules');
+let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let IDENTIFY = require(PATH.join(IM_MODULES_DIR, 'Query', 'identify.js'));
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
 
 //--------------------------------

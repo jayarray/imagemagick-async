@@ -1,9 +1,12 @@
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
-let COORDINATES = require(PATH.join(rootDir, 'im_modules', 'Inputs', 'coordinates.js')).Create;
-let ELLIPSE = require(PATH.join(rootDir, 'im_modules', 'Primitives', 'ellipse.js')).Create;
-let CIRCLE = require(PATH.join(rootDir, 'im_modules', 'Primitives', 'circle.js')).Create;
-let PRIMITIVE_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'Primitives', 'primitivesbaseclass.js')).PrimitiveBaseClass;
+
+let parts = __dirname.split(PATH.sep);
+let index = parts.findIndex(x => x == 'im_modules');
+let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let COORDINATES = require(PATH.join(IM_MODULES_DIR, 'Inputs', 'coordinates.js')).Create;
+let ELLIPSE = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'ellipse.js')).Create;
+let CIRCLE = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'circle.js')).Create;
+let PRIMITIVE_BASECLASS = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'primitivesbaseclass.js')).PrimitiveBaseClass;
 
 //---------------------------------
 

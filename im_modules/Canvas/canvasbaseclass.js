@@ -1,6 +1,9 @@
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
-let LAYER_BASECLASS = require(PATH.join(rootDir, 'im_modules', 'Layer', 'layerbaseclass.js')).LayerBaseClass;
+
+let parts = __dirname.split(PATH.sep);
+let index = parts.findIndex(x => x == 'im_modules');
+let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let LAYER_BASECLASS = require(PATH.join(IM_MODULES_DIR, 'Layer', 'layerbaseclass.js')).LayerBaseClass;
 
 //---------------------------------
 

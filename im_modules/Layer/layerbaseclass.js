@@ -1,5 +1,5 @@
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
+
 let GUID = require(PATH.join(__dirname, 'guid.js'));
 let OPTIMIZER = require(PATH.join(__dirname, 'optimizer.js'));
 let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;

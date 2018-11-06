@@ -1,6 +1,9 @@
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
-let COORDINATES = require(PATH.join(rootDir, 'im_modules', 'Inputs', 'coordinates.js')).Create;
+
+let parts = __dirname.split(PATH.sep);
+let index = parts.findIndex(x => x == 'im_modules');
+let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let COORDINATES = require(PATH.join(IM_MODULES_DIR, 'Inputs', 'coordinates.js')).Create;
 let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')).PrimitiveBaseClass;
 
 //-----------------------------------

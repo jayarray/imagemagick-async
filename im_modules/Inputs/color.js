@@ -1,7 +1,10 @@
 
 let PATH = require('path');
-let rootDir = PATH.dirname(require.main.filename);
-let VALIDATE = require(PATH.join(rootDir, 'im_modules', 'Validation', 'validate.js'));
+
+let parts = __dirname.split(PATH.sep);
+let index = parts.findIndex(x => x == 'im_modules');
+let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let VALIDATE = require(PATH.join(IM_MODULES_DIR, 'Validation', 'validate.js'));
 
 //-------------------------------------
 // CONSTANTS
