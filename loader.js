@@ -8,6 +8,7 @@ let imModulesDir = PATH.join(__dirname, 'im_modules');
 class ApiBuilder {
   constructor() {
     this.api_ = {};
+    this.resolveDict_ = {};
     this.drawables_ = [];
   }
 
@@ -117,6 +118,38 @@ class ApiBuilder {
   }
 
   /**
+   * @param {string} name 
+   * @param {object} obj 
+   * @param {object} thisModule
+   */
+  UpdateDrawables_(name, obj, thisModule) {
+    this.drawables_.push({
+      name: name,
+      obj: obj,
+      thisModule: thisModule
+    });
+  }
+
+  /**
+   * @param {string} filepath 
+   * @param {string} name
+   * @param {object} obj 
+   */
+  UpdateResolveDict_(filepath, name, obj) {
+    let existingValue = this.resolveDict_[name];
+    let o = { obj: obj, filepath: filepath };
+
+    if (!existingValue) {
+      this.resolveDict_[name] = [o];  // Create entry
+    }
+    else {
+      let arr = this.resolveDict_[name];
+      arr.push(o);
+      this.resolveDict_[name] = arr;  // Update entry
+    }
+  }
+
+  /**
    * @param {string} filepath 
    * @param {string} name
    * @param {object} obj 
@@ -150,19 +183,6 @@ class ApiBuilder {
     }
 
     ref[name] = obj;
-  }
-
-  /**
-   * @param {string} name 
-   * @param {object} obj 
-   * @param {object} thisModule
-   */
-  UpdateDrawables_(name, obj, thisModule) {
-    this.drawables_.push({
-      name: name,
-      obj: obj,
-      thisModule: thisModule
-    });
   }
 
   /**
@@ -206,6 +226,7 @@ class ApiBuilder {
     }
 
     this.UpdateAPI_(filepath, thisModule.Name, obj);
+    this.UpdateResolveDict_(filepath, thisModule.Name, obj);
 
     if (thisModule.ComponentType == 'drawable')
       this.UpdateDrawables_(thisModule.Name, obj, thisModule);
@@ -217,6 +238,42 @@ class ApiBuilder {
 
   GetDrawables() {
     return this.drawables_;
+  }
+
+  GetResolveDict() {
+    return this.resolveDict_;
+  }
+}
+
+class ImageMagickAPI {
+  constructor(api, resolveDict) {
+    this.api_ = api;
+    this.resolveDict_ = resolveDict;
+  }
+
+  GetAPI() {
+    return this.api_;
+  }
+
+  GetResolveDict() {
+    return this.resolveDict_;
+  }
+
+  /**
+   * Get the function object that matches the name specified. Providing the module name is optional.
+   * @param {string} name Name of the function object.
+   * @param {string} moduleName Name of the module this function is in.
+   * @returns {Array<{obj: object, filepath: string}>} Returns an array of objects. The size of the array tells you how many entries there are with the specified name.
+   */
+  Resolve(name, moduleName) {
+    let existingValue = this.resolveDict_[name];
+
+    if (existingValue) {
+      if (moduleName)
+        return existingValue.filter(x => x.filepath.split(PATH.sep).includes(moduleName)).map(x => x.obj);
+      return existingValue.map(x => x.obj);
+    }
+    return null;
   }
 }
 
@@ -302,7 +359,7 @@ function Load(dirpath) {
           filepaths.forEach(x => apiBuilder.Load(x));
 
           resolve({
-            api: apiBuilder.GetAPI(),
+            api: new ImageMagickAPI(apiBuilder.GetAPI()),
             drawables: apiBuilder.GetDrawables()
           });
         }).catch(error => reject(error));
