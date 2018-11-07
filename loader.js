@@ -194,8 +194,9 @@ class ApiBuilder {
     let thisModule = require(filepath);
     let loaded = null;
     let obj = null;
+    let componentType = thisModule.ComponentType;
 
-    switch (thisModule.ComponentType) {
+    switch (componentType) {
       case 'drawable':
         loaded = this.LoadDrawable_(filepath);
         obj = loaded.Create;
@@ -226,7 +227,18 @@ class ApiBuilder {
     }
 
     this.UpdateAPI_(filepath, thisModule.Name, obj);
-    this.UpdateResolveDict_(filepath, thisModule.Name, obj);
+
+    if (componentType == 'multi') {
+      let arr = thisModule.Multi;
+      arr.forEach(o => this.UpdateResolveDict_(filepath, o.name, o.obj));
+    }
+    else if (componentType == 'import specific') {
+      let arr = thisModule.Specific;
+      arr.forEach(o => this.UpdateResolveDict_(filepath, o.name, o.obj));
+    }
+    else {
+      this.UpdateResolveDict_(filepath, thisModule.Name, obj);
+    }
 
     if (thisModule.ComponentType == 'drawable')
       this.UpdateDrawables_(thisModule.Name, obj, thisModule);
