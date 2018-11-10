@@ -8,12 +8,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //----------------------------------
 
 class Image extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {string} src A list of points for the bezier curve to travel through.
-   * @param {Coordinates} corner The top-left corner from which the image will render.
-   * @param {number} width Desired width (if different from current width). Set to zero (or null) if you want preserve the original width and height.
-   * @param {number} height Desired height (if different from current height). Set to zero (or null) if you want preserve the original width and height.
-   */
   constructor(src, corner, width, height) {
     super();
     this.src_ = src;

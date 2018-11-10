@@ -4,14 +4,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-----------------------------------
 
 class PathComposite extends PRIMITIVE_BASECLASS {
-  /** 
-  * @param {Coordinates} start The start coordinates of your path. (Required)
-  * @param {Array<>} lineSegments A list of LineSegment objects to be connected in the order provided. (Required)
-  * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
-  * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
-  * @param {string} fillColor The color to fill the path with. (Valid color format string used in Image Magick) (Optional)
-  * @param {boolean} isClosed Set to true if you wish to connect the last point back to the first one (if not done already) with a straight line. Else, set to false.
-  */
   constructor(start, lineSegments, strokeColor, strokeWidth, fillColor, isClosed) {
     super();
     this.start_ = start;

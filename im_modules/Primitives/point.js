@@ -4,11 +4,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-----------------------------------
 
 class Point extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {number} x X-coordinate (Required)
-   * @param {number} y Y-coordinate (Required)
-   * @param {string} color Valid color format string used in Image Magick. (Optional)
-   */
   constructor(x, y, color) {
     super();
     this.x_ = x;

@@ -3,15 +3,6 @@ let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-/**
- * Apply blur filter to an image.
- * @param {string} src Source
- * @param {number} radius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
- * @param {number} sigma A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
- * @param {boolean} hasTransparency Assign as true if the image contains transparent pixels. False otherwise.
- * @param {string} outputPath The path where the resulting image will be rendered to.
- * @returns {Promise} Returns a Promise that resolves if successful. Otherwise, it returns an error.
- */
 class Blur extends FX_BASECLASS {
   constructor(src, radius, sigma, hasTransparency) {
     super();

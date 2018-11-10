@@ -9,12 +9,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-----------------------------------
 
 class Line extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {Coordinates} start Start coordinates (Required)
-   * @param {Coordinates} end End coordinates (Required)
-   * @param {string} color Valid color format string used in Image Magick. (Optional)
-   * @param {number} width Width of line. Larger values produce thicker lines. (Optional)
-   */
   constructor(start, end, color, width) {
     super();
     this.start_ = start;

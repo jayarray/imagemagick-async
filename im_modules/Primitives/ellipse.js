@@ -9,16 +9,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-----------------------------------
 
 class Ellipse extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {Coordinates} center Coordinates for the center of the ellipse. (Required)
-   * @param {number} width Width of of ellipse (in pixels). (Required)
-   * @param {number} height Height of ellipse (in pixels.). (Required)
-   * @param {string} strokeColor The outline color of the ellipse. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} strokeWidth Width of the outline of the ellipse. (Larger value produces a thicker line). (Optional)
-   * @param {string} fillColor The color of the inside of the ellipse. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} angleStart Angle at which to start drawing the ellipse. (0-degrees starts at 3-o'clock on the screen) (Optional)
-   * @param {number} angleEnd Angle at which to stop drawing the ellipse. (360-degrees stops at 3-o'clock on the screen) (Optional)
-   */
   constructor(center, width, height, strokeColor, strokeWidth, fillColor, angleStart, angleEnd) {
     super();
     this.center_ = center;

@@ -9,13 +9,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //------------------------------------
 
 class Circle extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {Coordinates} center Coordinates for center of circle. (Required)
-   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.) (Required)
-   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.) (Optional)
-   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick) (Optional)
-   */
   constructor(center, edge, strokeColor, strokeWidth, fillColor) {
     super();
     this.center_ = center;

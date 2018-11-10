@@ -4,20 +4,6 @@ let CANVAS_BASECLASS = require(PATH.join(__dirname, 'canvasbaseclass.js')).Canva
 //---------------------------
 
 class LabelCanvas extends CANVAS_BASECLASS {
-  /**
-   * @param {number} width Width in pixels. (Optional) 
-   * @param {number} height Height in pixels. (Optional)
-   * @param {string} text Text string
-   * @param {string} font Font name (Optional) 
-   * @param {number} fontSize Font size
-   * @param {number} kerning Spacing between glyphs/symbols. Minimum value is 0.
-   * @param {number} strokeWidth Thickness of the text outline. (Optional) 
-   * @param {string} strokeColor The color of the text outline. (Optional) 
-   * @param {string} fillColor The color inside of the text outline. (Optional) 
-   * @param {string} underColor The color under the text. (Different than background color). (Optional) 
-   * @param {string} backgroundColor The background color for the entire label. (Optional) 
-   * @param {string} gravity Gravity of the text. (Optional) 
-   */
   constructor(width, height, text, font, fontSize, kerning, strokeWidth, strokeColor, fillColor, underColor, backgroundColor, gravity) {
     super(width, height);
     this.text_ = text;

@@ -9,12 +9,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //----------------------------------
 
 class Bezier extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through. (Required)
-   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
-   * @param {string} fillColor The color to fill the bezier. (Valid color format string used in Image Magick) (Optional)
-   */
   constructor(points, strokeColor, strokeWidth, fillColor) {
     super();
     this.points_ = points;

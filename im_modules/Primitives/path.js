@@ -9,13 +9,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-----------------------------------
 
 class Path extends PRIMITIVE_BASECLASS {
-  /** 
-  * @param {Array<Coordinates>} points A list of coordinates to be connected by a line in the order provided. (Required)
-  * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
-  * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
-  * @param {string} fillColor The color to fill the path with. (Valid color format string used in Image Magick) (Optional)
-  * @param {boolean} isClosed Set to true if you wish to connect the last point back to the first one (if not done already). Else, set to false.
-  */
   constructor(points, strokeColor, strokeWidth, fillColor, isClosed) {
     super();
     this.points_ = points;

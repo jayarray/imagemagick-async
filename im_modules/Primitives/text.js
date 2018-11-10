@@ -4,15 +4,6 @@ let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')
 //-------------------------------------
 
 class Text extends PRIMITIVE_BASECLASS {
-  /**
-   * @param {string} string String containing text. (Required)
-   * @param {string} font Font name (Optional)
-   * @param {number} pointSize Point size (Optional)
-   * @param {string} gravity Gravity (Optional)
-   * @param {string} strokeColor The color of the outline of the text. (Optional)
-   * @param {number} strokeWidth The width of the outline of the text. (Optional)
-   * @param {string} fillColor The color to fill the text with.  (Valid color format string used in Image Magick) (Optional)
-   */
   constructor(string, font, pointSize, gravity, strokeColor, strokeWidth, fillColor) {
     super();
     this.string_ = string;
