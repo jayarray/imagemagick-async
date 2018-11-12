@@ -39,11 +39,11 @@ class ColorCanvas extends CANVAS_BASECLASS {
   }
 
   /**
-   * Create a Colorcanvas object with the specified properties.
+   * Create a ColorCanvas object with the specified properties.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
    * @param {string} color The color of the canvas. (Valid color format string used in Image Magick)
-   * @returns {ColorCanvas} Returns a PlainCanvas object. If inputs are invalid, it returns null.
+   * @returns {ColorCanvas} Returns a ColorCanvas object. If inputs are invalid, it returns null.
    */
   static Create(width, height, color) {
     if (width < MIN_WIDTH || height < MIN_HEIGHT)
