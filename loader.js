@@ -121,12 +121,14 @@ class ApiBuilder {
    * @param {string} name 
    * @param {object} obj 
    * @param {object} thisModule
+   * @param {string} filepath
    */
-  UpdateDrawables_(name, obj, thisModule) {
+  UpdateDrawables_(name, obj, thisModule, filepath) {
     this.drawables_.push({
       name: name,
       obj: obj,
-      thisModule: thisModule
+      thisModule: thisModule,
+      filepath: filepath
     });
   }
 
@@ -157,7 +159,6 @@ class ApiBuilder {
   UpdateAPI_(filepath, name, obj) {
     let parts = this.FilepathToParts_(filepath);
     let moduleDir = parts[0];
-    //let parent = moduleDir;
 
     // Check if module dir exists
     let ref = this.api_[moduleDir];
@@ -241,7 +242,7 @@ class ApiBuilder {
     }
 
     if (thisModule.ComponentType == 'drawable')
-      this.UpdateDrawables_(thisModule.Name, obj, thisModule);
+      this.UpdateDrawables_(thisModule.Name, obj, thisModule, filepath);
   }
 
   GetAPI() {
