@@ -1,8 +1,8 @@
 let PATH = require('path');
-
 let GUID = require(PATH.join(__dirname, 'guid.js'));
 let OPTIMIZER = require(PATH.join(__dirname, 'optimizer.js'));
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+let LINUX_COMMANDS = require('linux-commands-async');
+let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
 let COMPLEX_OPERATIONS = require(PATH.join(__dirname, 'complexoperations.js'));
 
 //---------------------------------
@@ -123,7 +123,7 @@ class LayerBaseClass {
       // Create temp directory
       let tempDir = PATH.join(outputDir, GUID.Create(GUID.DEFAULT_LENGTH));
 
-      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDir, LOCAL_COMMAND).then(success => {
+      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDir, LINUX_COMMANDS.Command.LOCAL).then(success => {
         this.RenderTempFile_(outputDir, format).then(outputPath => {
           let apply = (groups) => {
             return new Promise((resolve, reject) => {
@@ -223,9 +223,9 @@ class LayerBaseClass {
             let filename = LINUX_COMMANDS.Path.Filename(outputPath);
             let newOutputPath = PATH.join(outputDir, filename);
 
-            LINUX_COMMANDS.Move.Move(outputPath, newOutputPath, LOCAL_COMMAND).then(success => {
+            LINUX_COMMANDS.Move.Move(outputPath, newOutputPath, LINUX_COMMANDS.Command.LOCAL).then(success => {
               // Clean up temp directory
-              LINUX_COMMANDS.Directory.Remove(tempDir, LOCAL_COMMAND).then(success => {
+              LINUX_COMMANDS.Directory.Remove(tempDir, LINUX_COMMANDS.Command.LOCAL).then(success => {
                 resolve(newOutputPath);
               }).catch(error => reject(error));
             }).catch(error => reject(error));
@@ -247,7 +247,7 @@ class LayerBaseClass {
       let tempDirPath = PATH.join(parentDir, GUID.Create());
 
       // Create temp directory
-      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDirPath, LOCAL_COMMAND).then(success => {
+      LINUX_COMMANDS.Mkdir.MakeDirectory(tempDirPath, LINUX_COMMANDS.Command.LOCAL).then(success => {
 
         // Render all canvases into temp directory
         let canvasList = OPTIMIZER.GroupIntoSeparateCanvases(this);
@@ -293,7 +293,7 @@ class LayerBaseClass {
           // Render a composite image
           Composite(src, filepathOffsetTuples, gravity, outputPath).then(success => {
             // Clean up temp directory
-            LINUX_COMMANDS.Directory.Remove(tempDirPath, LOCAL_COMMAND).then(success => {
+            LINUX_COMMANDS.Directory.Remove(tempDirPath, LINUX_COMMANDS.Command.LOCAL).then(success => {
               resolve();
             }).catch(error => reject(error));
           }).catch(error => reject(error));
