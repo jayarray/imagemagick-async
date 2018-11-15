@@ -45,7 +45,7 @@ class BilinearCanvas extends CANVAS_BASECLASS {
    * Create a BilinearCanvas object with the specified properties. Requires exactly 4 points and colors. Results in a 4-point gradient.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {PointAndColor} pointAndColorArray Array of PointAndColor objects.
+   * @param {Array<PointAndColor>} pointAndColorArray Array of PointAndColor objects.
    * @param {boolean} softBlend Set to true if softer blend between colors is desired. Otherwise, blend will be harsher and colors slightly deeper.
    * @returns {BilinearCanvas} Returns a BilinearCanvas object. If inputs are invalid, it returns null.
    */

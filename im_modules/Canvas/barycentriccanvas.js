@@ -45,7 +45,7 @@ class BarycentricCanvas extends CANVAS_BASECLASS {
    * Create a BarycentricCanvas object with the specified properties. Requires exactly 3 points and colors. Results in a triangular gradient.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {PointAndColor} pointAndColorArray Array of PointAndColor objects.
+   * @param {Array<PointAndColor>} pointAndColorArray Array of PointAndColor objects.
    * @param {boolean} softBlend Set to true if softer blend between colors is desired. Otherwise, blend will be harsher and colors slightly deeper.
    * @returns {BarycentricCanvas} Returns a BarycentricCanvas object. If inputs are invalid, it returns null.
    */

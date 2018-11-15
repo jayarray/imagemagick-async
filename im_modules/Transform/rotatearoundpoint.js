@@ -35,7 +35,7 @@ class RotateAroundPoint extends TRANSFORM_BASECLASS {
   /**
    * Create a RotateAroundPoint object. Rotate an image around a point.
    * @param {string} src
-   * @param {Coordinates} x Point to rotate about.
+   * @param {Coordinates} point Point to rotate about.
    * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
    * @returns {RotateAroundPoint} Returns a RotateAroundPoint object. If inputs are invalid, it returns null.
    */

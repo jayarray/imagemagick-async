@@ -41,7 +41,7 @@ class ThreePointDistortion extends TRANSFORM_BASECLASS {
    * @param {string} src
    * @param {Vector} centerVector
    * @param {Vector} xAxisVector
-   * @param {string} yAxisVector
+   * @param {Vector} yAxisVector
    * @returns {ThreePointDistortion} Returns a ThreePointDistortion object. If inputs are invalid, it returns null.
    */
   static Create(src, centerVector, xAxisVector, yAxisVector) {

@@ -45,7 +45,7 @@ class ShepardsCanvas extends CANVAS_BASECLASS {
    * Create a ShepardsCanvas object with the specified properties. Can have any number of points and colors. Produces an image that looks like spotlights of color that interact with each other as the light spreads out to a uniform average of all the given colors.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {PointAndColor} pointAndColorArray Array of PointAndColor objects.
+   * @param {Array<PointAndColor>} pointAndColorArray Array of PointAndColor objects.
    * @param {boolean} softBlend Set to true if softer blend between colors is desired. Otherwise, blend will be harsher and colors slightly deeper.
    * @returns {ShepardsCanvas} Returns a ShepardsCanvas object. If inputs are invalid, it returns null.
    */

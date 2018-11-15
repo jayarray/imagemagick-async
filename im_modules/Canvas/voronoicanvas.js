@@ -45,7 +45,7 @@ class VoronoiCanvas extends CANVAS_BASECLASS {
    * Create a VoronoiCanvas object with the specified properties. Can have any number of points and colors. Maps each pixel to the closest color point you have provided. Divides the image into a set of polygonal cells around each point.
    * @param {number} width Width (in pixels)
    * @param {number} height Height (in pixels)
-   * @param {PointAndColor} pointAndColorArray Array of PointAndColor objects.
+   * @param {Array<PointAndColor>} pointAndColorArray Array of PointAndColor objects.
    * @param {boolean} softBlend Set to true if softer blend between colors is desired. Otherwise, blend will be harsher and colors slightly deeper.
    * @returns {VoronoiCanvas} Returns a VoronoiCanvas object. If inputs are invalid, it returns null.
    */
