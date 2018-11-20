@@ -333,11 +333,25 @@ function GetDrawableProperties(filepath) {
       consolidate = consolidate.replace(`;`, '');
       consolidate = consolidate == 'true';
 
+      let singlecommand = lines.filter(x => x.includes("exports.SingleCommand"));
+      if (singlecommand.length == 0) {
+        singlecommand = false;
+      }
+      else {
+        singlecommand = singlecommand[0];
+        singlecommand = singlecommand.split('exports.SingleCommand =')[1].trim();
+        singlecommand = singlecommand.split(`'`).join('');
+        singlecommand = singlecommand.replace(`;`, '');
+        singlecommand = singlecommand == 'true';
+      }
+
+
       resolve({
         name: name,
         layer: layer,
         consolidate: consolidate,
-        filepath: filepath
+        filepath: filepath,
+        singlecommand: singlecommand
       });
     }).catch(error => reject(error));
   });
@@ -359,22 +373,31 @@ function Load(dirpath) {
       let componentChecks = filepaths.map(x => GetDrawableProperties(x));
       Promise.all(componentChecks).then(checks => {
         // Filter consolidated effects
-        let drawables = checks.filter(x => x != null);
-        let consolidatedEffects = drawables.filter(x => x.consolidate);
+        let consolidatedEffects = checks.filter(x => x != null && x.consolidate);
 
         // Write JSON file
         let jsonObj = { effects: consolidatedEffects };
         let jsonStr = JSON.stringify(jsonObj);
         let jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'consolidatedeffects.json'); // JSON filepath
         LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
-          // Create API
-          let apiBuilder = new ApiBuilder();
-          filepaths.forEach(x => apiBuilder.Load(x));
+          // Filter single command effects
+          let singleCommandEffects = checks.filter(x => x != null && x.singlecommand);
 
-          resolve({
-            api: new ImageMagickAPI(apiBuilder.GetAPI()),
-            drawables: apiBuilder.GetDrawables()
-          });
+          // Write JSON file
+          jsonObj = { effects: singleCommandEffects };
+          jsonStr = JSON.stringify(jsonObj);
+          jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'singlecommandeffects.json'); // JSON filepath
+
+          LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
+            // Create API
+            let apiBuilder = new ApiBuilder();
+            filepaths.forEach(x => apiBuilder.Load(x));
+
+            resolve({
+              api: new ImageMagickAPI(apiBuilder.GetAPI()),
+              drawables: apiBuilder.GetDrawables()
+            });
+          }).catch(error => reject(error));
         }).catch(error => reject(error));
       }).catch(error => reject(error));
     }).catch(error => reject(error));
