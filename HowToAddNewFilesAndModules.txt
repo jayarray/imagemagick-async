@@ -8,6 +8,12 @@
 
 * Determine what "ComponentType" your module is in order to load it correctly. It will be the first thing the loader checks. (See below)
 
+** IMPORTANT: Make sure to delete the following files after adding a new file or module:
+      1)  /Layer/consolidatedeffects.json
+      2)  /Layer/singlecommandeffects.json
+   
+   This will make the package regenerate the files so that it includes any new drawable modules or files.
+
 
 *********************
 *  COMPONENT TYPES  *
