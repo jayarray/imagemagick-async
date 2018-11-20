@@ -2,6 +2,12 @@ let PATH = require('path');
 let LINUX_COMMANDS = require('linux-commands-async');
 let imModulesDir = PATH.join(__dirname, 'im_modules');
 
+//---------------------------------
+// CONSTANTS
+
+const CONSOLIDATED_EFFECTS_FILEPATH = PATH.join(imModulesDir, 'Layer', 'consolidatedeffects.json');
+const SINGLE_COMMAND_EFFECTS_FILEPATH = PATH.join(imModulesDir, 'Layer', 'singlecommandeffects.json');
+
 //--------------------------------
 // API
 
@@ -357,48 +363,147 @@ function GetDrawableProperties(filepath) {
   });
 }
 
-/**
- * Load the module directory.
- * @param {string} dirpath 
- * @returns {Promise} Returns a promise with the API object attached to it if successful. Else returns an error.
- */
-function Load(dirpath) {
+function StoreConsolidatedEffects(fxArr) {
   return new Promise((resolve, reject) => {
-    // Get all filepaths
-    LINUX_COMMANDS.Find.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
+    let remappedFx = fxArr.map(x => {
+      return {
+        name: name,
+        layer: layer,
+        consolidate: consolidate,
+        filepath: filepath,
+      };
+    });
+
+    let obj = { effects: remappedFx };
+    let str = JSON.stringify(obj);
+    let outputPath = CONSOLIDATED_EFFECTS_FILEPATH;
+
+    LINUX_COMMANDS.File.Create(outputPath, str, LINUX_COMMANDS.Command.LOCAL).then(success => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+function StoreSingleCommandEffects(fxArr) {
+  return new Promise((resolve, reject) => {
+    let remappedFx = fxArr.map(x => {
+      return {
+        name: name,
+        layer: layer,
+        consolidate: consolidate,
+        filepath: filepath,
+      };
+    });
+
+    let obj = { effects: remappedFx };
+    let str = JSON.stringify(obj);
+    let outputPath = SINGLE_COMMAND_EFFECTS_FILEPATH;
+
+    LINUX_COMMANDS.File.Create(outputPath, str, LINUX_COMMANDS.Command.LOCAL).then(success => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+function GetAllJsFilepaths(dirpath) {
+  return new Promise((resolve, reject) => {
+    LINUX_COMMANDS.File.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
       let filepaths = results.paths.filter(x => x.endsWith('.js'));
       filepaths.sort();
 
-      // Get all drawable components
-      let componentChecks = filepaths.map(x => GetDrawableProperties(x));
-      Promise.all(componentChecks).then(checks => {
-        // Filter consolidated effects
-        let consolidatedEffects = checks.filter(x => x != null && x.consolidate);
+      resolve(filepaths);
+    }).catch(error => reject(error));
+  });
+}
 
-        // Write JSON file
-        let jsonObj = { effects: consolidatedEffects };
-        let jsonStr = JSON.stringify(jsonObj);
-        let jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'consolidatedeffects.json'); // JSON filepath
-        LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
-          // Filter single command effects
-          let singleCommandEffects = checks.filter(x => x != null && x.singlecommand);
+function GetDrawableComponents(filepaths) {
+  return new Promise((resolve, reject) => {
+    let componentChecks = filepaths.map(x => GetDrawableProperties(x));
 
-          // Write JSON file
-          jsonObj = { effects: singleCommandEffects };
-          jsonStr = JSON.stringify(jsonObj);
-          jsonOutputPath = PATH.join(imModulesDir, 'Layer', 'singlecommandeffects.json'); // JSON filepath
+    Promise.all(componentChecks).then(results => {
+      results = results.filter(x => x != null);
+      resolve(results);
+    }).catch(error => reject(error));
+  });
+}
 
-          LINUX_COMMANDS.File.Create(jsonOutputPath, jsonStr, LINUX_COMMANDS.Command.LOCAL).then(success => {
-            // Create API
-            let apiBuilder = new ApiBuilder();
-            filepaths.forEach(x => apiBuilder.Load(x));
+function CreateApi(filepaths) {
+  let apiBuilder = new ApiBuilder();
+  filepaths.forEach(x => apiBuilder.Load(x));
+
+  return {
+    api: new ImageMagickAPI(apiBuilder.GetAPI()),
+    drawables: apiBuilder.GetDrawables()
+  }
+}
+
+/**
+ * Build API and generate essential JSON files.
+ * @param {string} dirpath Path to im_modules dir
+ * @returns {Promise<{api: object, drawables: Array<>}>} Returns a Promise that resolves if successful. Otherwise, it returns an error.
+ */
+function BuildApi(dirpath) {
+  return new Promise((resolve, reject) => {
+    GetAllJsFilepaths(dirpath).then(filepaths => {
+      GetDrawableComponents(filepaths).then(objArr => {
+        let consolidatedEffects = objArr.filter(x => x.consolidate);
+
+        StoreConsolidatedEffects(consolidatedEffects).then(success => {
+          let singleCommandEffects = objArr.filter(x => x.singlecommand);
+
+          StoreSingleCommandEffects(singleCommandEffects).then(success => {
+            let o = CreateApi(filepaths);
 
             resolve({
-              api: new ImageMagickAPI(apiBuilder.GetAPI()),
-              drawables: apiBuilder.GetDrawables()
+              api: o.api,
+              drawables: o.drawables
             });
           }).catch(error => reject(error));
         }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * Load API with existing essential JSON files.
+ * @returns {Promise<{api: object, drawables: Array<>}>}
+ */
+function LoadApi() {
+  return new Promise((resolve, reject) => {
+    let consolidatedFilepaths = require(CONSOLIDATED_EFFECTS_FILEPATH).effects.map(x => x.filepath);
+    let singleCommandFilepaths = require(SINGLE_COMMAND_EFFECTS_FILEPATH).effects.map(x => x.filepath);
+    let allFilepaths = consolidatedFilepaths.concat(singleCommandFilepaths);
+
+    let o = CreateApi(allFilepaths);
+
+    resolve({
+      api: o.api,
+      drawables: o.drawables
+    });
+  });
+}
+
+/**
+ * Load the module directory.
+ * @param {string} dirpath 
+ * @returns {Promise<{api: object, drawables: Array<>>} Returns a promise with the API object attached to it if successful. Else returns an error.
+ */
+function Load(dirpath) {
+  return new Promise((resolve, reject) => {
+    // Check if json files exist
+    LINUX_COMMANDS.Path.Exists(CONSOLIDATED_EFFECTS_FILEPATH, LINUX_COMMANDS.Command.LOCAL).then(cExists => {
+      LINUX_COMMANDS.Path.Exists(SINGLE_COMMAND_EFFECTS_FILEPATH, LINUX_COMMANDS.Command.LOCAL).then(sExists => {
+        if (!cExists || !sExists) {
+          BuildApi(dirpath).then(o => {
+            resolve(o);
+          }).catch(error => reject(error));
+        }
+        else {
+          LoadApi().then(o => {
+            resolve(o);
+          }).catch(error => reject(error));
+        }
       }).catch(error => reject(error));
     }).catch(error => reject(error));
   });
