@@ -22,9 +22,9 @@ class Aura extends FX_BASECLASS {
     let adjustedOpacity = 100 - this.opacity_;
 
     if (adjustedOpacity >= 1)
-      adjustedOpacity = Math.min(this.opacity_, 100);
+      adjustedOpacity = Math.min(adjustedOpacity, 100);
     else
-      adjustedOpacity = Math.max(this.opacity_, 0.1);
+      adjustedOpacity = Math.max(adjustedOpacity, 0.1);
 
     args.push('-level', `0,${adjustedOpacity}%`, '+channel', '+level-colors', this.color_, '\\)', '-compose', 'DstOver', '-composite');
 
@@ -48,8 +48,10 @@ class Aura extends FX_BASECLASS {
   /**
    * Create an Aura object. Applies an aura around the image.
    * @param {string} src 
-   * @param {number} radius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
-   * @param {number} sigma A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
+   * @param {string} color
+   * @param {number} opacity 
+   * @param {number} blurRadius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
+   * @param {number} blurSigma A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
    * @returns {Blur} Returns a Blur object. If inputs are invalid, it returns null.
    */
   static Create(src, color, opacity, blurRadius, blurSigma) {
