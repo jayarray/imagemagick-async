@@ -74,41 +74,6 @@ function GetLayerHierarchy(layer) {
   return { nodes: nodes.reverse(), flatlist: flatList };
 }
 
-//------------------------------
-
-function GroupByParent(flatlist) {
-  let currGroup = [];
-  let groups = [];
-
-  let prevParent = null;
-
-  for (let i = 0; flatlist.length; ++i) {
-    let currNode = flatlist[0];
-
-    if (prevParent) {
-      if (prevParent == currNode.Parent()) {
-        currGroup.push(currNode);
-      }
-      else {
-        groups.push(currGroup);
-        currGroup = [];
-        currGroup.push(currNode);
-        prevParent = currNode.Parent();
-      }
-    }
-    else {
-      prevParent = currNode.Parent();
-      currGroup.push(currNode);
-    }
-
-    if (i == flatlist.length - 1 && currGroup.length > 0) {
-      groups.push(currGroup);
-    }
-  }
-
-  return groups;
-}
-
 //----------------------------
 
 function HierarchyToString(nodes, indent) {
