@@ -4,6 +4,7 @@ let OPTIMIZER = require(PATH.join(__dirname, 'optimizer.js'));
 let LINUX_COMMANDS = require('linux-commands-async');
 let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
 let COMPLEX_OPERATIONS = require(PATH.join(__dirname, 'complexoperations.js'));
+let SINGLE_COMMAND_EFFECTS = require(PATH.join(__dirname, 'singlecommandeffects.json')).effects;
 
 //---------------------------------
 
@@ -86,18 +87,12 @@ class LayerBaseClass {
     return new Promise((resolve, reject) => {
       // Create temp file name
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
+      let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.includes(this.Name());
 
-      if (this.Name() == 'RotateImage') {
-        RotateImage(this, this.src_, this.xOffset_, this.yOffset_, this.degrees_, [], outputPath).then(success => {
-          resolve(outputPath);
-        }).catch(error => reject(error));
-      }
-      else {
-        let cmd = this.Command();
-        let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
-        args = args.concat(outputPath);
+      if (isSingleCommandEffect) {
+        let cmd = `${this.Command()} ${this.RenderArgs().join(' ')} ${outputPath}`;
 
-        LOCAL_COMMAND.Execute(cmd, args).then(output => {
+        LOCAL_COMMAND.Execute(cmd, []).then(output => {
           if (output.stderr) {
             reject(output.stderr);
             return;
@@ -105,6 +100,27 @@ class LayerBaseClass {
 
           resolve(outputPath);
         }).catch(error => reject(error));
+      }
+      else {
+        if (this.Name() == 'RotateImage') {
+          RotateImage(this, this.src_, this.xOffset_, this.yOffset_, this.degrees_, [], outputPath).then(success => {
+            resolve(outputPath);
+          }).catch(error => reject(error));
+        }
+        else {
+          let cmd = this.Command();
+          let args = this.Type() == 'canvas' ? this.Args() : this.RenderArgs();
+          args = args.concat(outputPath);
+
+          LOCAL_COMMAND.Execute(cmd, args).then(output => {
+            if (output.stderr) {
+              reject(output.stderr);
+              return;
+            }
+
+            resolve(outputPath);
+          }).catch(error => reject(error));
+        }
       }
     });
   }
@@ -143,76 +159,93 @@ class LayerBaseClass {
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
               let consolidatedEffects = currGroup.slice(1);
 
-              if (mainEffect.Name() == 'RotateImage') {
-                RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, mainEffect.degrees_, consolidatedEffects, tempOutputPath).then(success => {
+              let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.includes(mainEffect.Name());
+
+              if (isSingleCommandEffect) {
+                let cmd = `${mainEffect.Command()} ${mainEffect.RenderArgs().join(' ')} ${tempOutputPath}`; // CONT
+
+                LOCAL_COMMAND.Execute(cmd, []).then(output => {
+                  if (output.stderr) {
+                    reject(output.stderr);
+                    return;
+                  }
+
                   prevOutputPath = tempOutputPath;
                   resolve(apply(groups.slice(1)));
                 }).catch(error => reject(error));
               }
               else {
-                if (currGroup.length == 1) {
-                  let cmd = mainEffect.Command();
-                  let args = mainEffect.RenderArgs();
-                  args.push(tempOutputPath);
-
-                  LOCAL_COMMAND.Execute(cmd, args).then(output => {
-                    if (output.stderr) {
-                      reject(output.stderr);
-                      return;
-                    }
-
+                if (mainEffect.Name() == 'RotateImage') {
+                  RotateImage(mainEffect, mainEffect.src_, mainEffect.xOffset_, mainEffect.yOffset_, mainEffect.degrees_, consolidatedEffects, tempOutputPath).then(success => {
                     prevOutputPath = tempOutputPath;
                     resolve(apply(groups.slice(1)));
                   }).catch(error => reject(error));
                 }
                 else {
-                  let firstCommand = null;
-                  let groupForNow = [];
-                  let groupAppendedToHead = false;
+                  if (currGroup.length == 1) {
+                    let cmd = mainEffect.Command();
+                    let args = mainEffect.RenderArgs();
+                    args.push(tempOutputPath);
 
-                  for (let i = 0; i < currGroup.length; ++i) {
-                    let currFxOrMod = currGroup[i];
-                    let currCommand = currFxOrMod.Command();
+                    LOCAL_COMMAND.Execute(cmd, args).then(output => {
+                      if (output.stderr) {
+                        reject(output.stderr);
+                        return;
+                      }
 
-                    if (i == 0) {
-                      firstCommand = currCommand;
-                      groupForNow.push(currFxOrMod);
-                    }
-                    else {
-                      if (i == currGroup.length - 1 && currCommand == firstCommand) {
+                      prevOutputPath = tempOutputPath;
+                      resolve(apply(groups.slice(1)));
+                    }).catch(error => reject(error));
+                  }
+                  else {
+                    let firstCommand = null;
+                    let groupForNow = [];
+                    let groupAppendedToHead = false;
+
+                    for (let i = 0; i < currGroup.length; ++i) {
+                      let currFxOrMod = currGroup[i];
+                      let currCommand = currFxOrMod.Command();
+
+                      if (i == 0) {
+                        firstCommand = currCommand;
                         groupForNow.push(currFxOrMod);
                       }
                       else {
-                        if (currCommand != firstCommand) {
-                          groups = [currGroup.slice(i)].concat(groups);
-                          groupAppendedToHead = true;
-                          groupForNow = currGroup.slice(0, i);
-                          break;
+                        if (i == currGroup.length - 1 && currCommand == firstCommand) {
+                          groupForNow.push(currFxOrMod);
                         }
                         else {
-                          groupForNow.push(currFxOrMod);
+                          if (currCommand != firstCommand) {
+                            groups = [currGroup.slice(i)].concat(groups);
+                            groupAppendedToHead = true;
+                            groupForNow = currGroup.slice(0, i);
+                            break;
+                          }
+                          else {
+                            groupForNow.push(currFxOrMod);
+                          }
                         }
                       }
                     }
+
+                    let args = [prevOutputPath];
+                    groupForNow.forEach(fxOrMod => args = args.concat(fxOrMod.Args()));
+                    args.push(tempOutputPath);
+
+                    LOCAL_COMMAND.Execute(firstCommand, args).then(output => {
+                      if (output.stderr) {
+                        reject(output.stderr);
+                        return;
+                      }
+
+                      prevOutputPath = tempOutputPath;
+
+                      if (groupAppendedToHead)
+                        resolve(apply(groups));
+                      else
+                        resolve(apply(groups.slice(1)));
+                    }).catch(error => reject(error));
                   }
-
-                  let args = [prevOutputPath];
-                  groupForNow.forEach(fxOrMod => args = args.concat(fxOrMod.Args()));
-                  args.push(tempOutputPath);
-
-                  LOCAL_COMMAND.Execute(firstCommand, args).then(output => {
-                    if (output.stderr) {
-                      reject(output.stderr);
-                      return;
-                    }
-
-                    prevOutputPath = tempOutputPath;
-
-                    if (groupAppendedToHead)
-                      resolve(apply(groups));
-                    else
-                      resolve(apply(groups.slice(1)));
-                  }).catch(error => reject(error));
                 }
               }
             });
