@@ -24,6 +24,7 @@ ComponentType = drawable | import | function | input | private
     d) Consolidate (boolean)
     e) Dependencies (array of other drawable names)
     f) ComponentType = 'drawable'
+    g) (OPTIONAL) SingleCommand = true;  // Use when your command uses the IM stack
 
 2) import:
   - Is any module that only requires importing.
