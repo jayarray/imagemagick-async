@@ -87,7 +87,8 @@ class LayerBaseClass {
     return new Promise((resolve, reject) => {
       // Create temp file name
       let outputPath = PATH.join(outputDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
-      let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.includes(this.Name());
+
+      let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.filter(x => x.name == this.Name()).length > 0;
 
       if (isSingleCommandEffect) {
         let cmd = `${this.Command()} ${this.RenderArgs().join(' ')} ${outputPath}`;
@@ -159,7 +160,7 @@ class LayerBaseClass {
               let tempOutputPath = PATH.join(tempDir, GUID.Filename(GUID.DEFAULT_LENGTH, format));
               let consolidatedEffects = currGroup.slice(1);
 
-              let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.includes(mainEffect.Name());
+              let isSingleCommandEffect = SINGLE_COMMAND_EFFECTS.filter(x => x.name == mainEffect.Name()).length > 0;
 
               if (isSingleCommandEffect) {
                 let cmd = `${mainEffect.Command()} ${mainEffect.RenderArgs().join(' ')} ${tempOutputPath}`; // CONT
