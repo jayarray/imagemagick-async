@@ -367,10 +367,10 @@ function StoreConsolidatedEffects(fxArr) {
   return new Promise((resolve, reject) => {
     let remappedFx = fxArr.map(x => {
       return {
-        name: name,
-        layer: layer,
-        consolidate: consolidate,
-        filepath: filepath,
+        name: x.name,
+        layer: x.layer,
+        consolidate: x.consolidate,
+        filepath: x.filepath,
       };
     });
 
@@ -388,10 +388,10 @@ function StoreSingleCommandEffects(fxArr) {
   return new Promise((resolve, reject) => {
     let remappedFx = fxArr.map(x => {
       return {
-        name: name,
-        layer: layer,
-        consolidate: consolidate,
-        filepath: filepath,
+        name: x.name,
+        layer: x.layer,
+        consolidate: x.consolidate,
+        filepath: x.filepath,
       };
     });
 
@@ -407,7 +407,7 @@ function StoreSingleCommandEffects(fxArr) {
 
 function GetAllJsFilepaths(dirpath) {
   return new Promise((resolve, reject) => {
-    LINUX_COMMANDS.File.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
+    LINUX_COMMANDS.Find.FilesByName(dirpath, '*', null, LINUX_COMMANDS.Command.LOCAL).then(results => {
       let filepaths = results.paths.filter(x => x.endsWith('.js'));
       filepaths.sort();
 
@@ -432,7 +432,7 @@ function CreateApi(filepaths) {
   filepaths.forEach(x => apiBuilder.Load(x));
 
   return {
-    api: new ImageMagickAPI(apiBuilder.GetAPI()),
+    api: new ImageMagickAPI(apiBuilder.GetAPI(), apiBuilder.GetResolveDict()),
     drawables: apiBuilder.GetDrawables()
   }
 }
@@ -469,18 +469,16 @@ function BuildApi(dirpath) {
  * Load API with existing essential JSON files.
  * @returns {Promise<{api: object, drawables: Array<>}>}
  */
-function LoadApi() {
+function LoadApi(dirpath) {
   return new Promise((resolve, reject) => {
-    let consolidatedFilepaths = require(CONSOLIDATED_EFFECTS_FILEPATH).effects.map(x => x.filepath);
-    let singleCommandFilepaths = require(SINGLE_COMMAND_EFFECTS_FILEPATH).effects.map(x => x.filepath);
-    let allFilepaths = consolidatedFilepaths.concat(singleCommandFilepaths);
+    GetAllJsFilepaths(dirpath).then(filepaths => {
+      let o = CreateApi(filepaths);
 
-    let o = CreateApi(allFilepaths);
-
-    resolve({
-      api: o.api,
-      drawables: o.drawables
-    });
+      resolve({
+        api: o.api,
+        drawables: o.drawables
+      });
+    }).catch(error => reject(error));
   });
 }
 
@@ -500,7 +498,7 @@ function Load(dirpath) {
           }).catch(error => reject(error));
         }
         else {
-          LoadApi().then(o => {
+          LoadApi(dirpath).then(o => {
             resolve(o);
           }).catch(error => reject(error));
         }
