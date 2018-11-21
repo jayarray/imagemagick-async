@@ -17,7 +17,7 @@ class EllipticalArc {
    * @param {Coordinates} radius
    * @param {number} angle 
    * @param {boolean} largeFlag Set to true if longer path going around the center of the ellipse is desired. False results in a smaller arc not containing the center of the ellipse.
-   * @param {boolean} sweepFlag Set to true if 
+   * @param {boolean} sweepFlag Set to true if path should go below the center of the ellipse. False results in the path going above the center of the ellipse.
    * @param {Coordinates} edge
    * @returns {EllipticalArc} Returns an EllipticalArc object. If inputs are invalid, it returns null.
    */
@@ -25,7 +25,7 @@ class EllipticalArc {
     if (!radius || isNaN(angle) || !edge)
       return null;
 
-    return new EllipticalArc(points, strokeColor, strokeWidth, fillColor);
+    return new EllipticalArc(radius, angle, largeFlag, sweepFlag, edge);
   }
 }
 

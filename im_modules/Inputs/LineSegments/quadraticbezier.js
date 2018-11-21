@@ -12,13 +12,13 @@ class QuadraticBezier {
    * Create a Smooth object.
    * @param {Coordinates} control
    * @param {Coordinates} endPoint
-   * @returns {Smooth} Returns a Smooth object. If inputs are invalid, it returns null.
+   * @returns {QuadraticBezier} Returns a QuadraticBezier object. If inputs are invalid, it returns null.
    */
   static Create(control, endPoint) {
     if (!control || !endPoint)
       return null;
 
-    return new Smooth(control, endPoint);
+    return new QuadraticBezier(control, endPoint);
   }
 }
 
