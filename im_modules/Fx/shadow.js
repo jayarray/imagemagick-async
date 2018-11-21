@@ -38,7 +38,7 @@ class Shadow extends FX_BASECLASS {
    * @param {string} src 
    * @param {string} color 
    * @param {number} percentOpacity Value between 0 and 100 representing how opaque the shadow will be. 
-   * @param {number} sigma Represents the "spread" of pixels.
+   * @param {number} sigma Represents the 'spread' of pixels.
    * @returns {Shadow} Returns a Shadow object. If inputs are invalid, it returns null.
    */
   static Create(src, color, percentOpacity, sigma) {

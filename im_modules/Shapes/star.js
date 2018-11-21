@@ -89,7 +89,7 @@ class Star extends PRIMITIVE_BASECLASS {
    * @param {number} vertices Number of points on the star. (Required)
    * @param {Coordinates} center (Required)
    * @param {Coordinates} vertex (Required)
-   * @param {number} bloat Factor equal to or greater than zero that affects the thickness of the star. The higher the value, the more "bloated" the star will look, and will eventually invert. (Required)
+   * @param {number} bloat Factor equal to or greater than zero that affects the thickness of the star. The higher the value, the more 'bloated' the star will look, and will eventually invert. (Required)
    * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
    * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
    * @param {string} fillColor The color to fill the path with. (Valid color format string used in Image Magick) (Optional)
