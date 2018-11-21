@@ -328,7 +328,7 @@ class ImageMagickAPI {
    * @returns {Array<{obj: object, filepath: string}>} Returns an array of objects. The size of the array tells you how many entries there are with the specified name.
    */
   ResolveInput(name, moduleName) {
-    let inputs = this.inputs_.filter(x => x.name == name);
+    let inputs = this.inputs_.filter(x => x.funcName == name);
 
     if (inputs) {
       if (moduleName)
