@@ -16,6 +16,7 @@ class ApiBuilder {
     this.api_ = {};
     this.resolveDict_ = {};
     this.drawables_ = [];
+    this.inputs_ = [];
   }
 
   /**
@@ -139,6 +140,19 @@ class ApiBuilder {
   }
 
   /**
+   * @param {string} name 
+   * @param {object} obj 
+   * @param {string} filepath 
+   */
+  UpdateInputs_(name, obj, filepath) {
+    this.inputs_.push({
+      name: name,
+      obj: obj,
+      filepath: filepath
+    });
+  }
+
+  /**
    * @param {string} filepath 
    * @param {string} name
    * @param {object} obj 
@@ -243,6 +257,9 @@ class ApiBuilder {
       let arr = thisModule.Specific;
       arr.forEach(o => this.UpdateResolveDict_(filepath, o.name, o.obj));
     }
+    else if (componentType == 'input') {
+      this.UpdateInputs_(thisModule.Name, obj, filepath);
+    }
     else {
       this.UpdateResolveDict_(filepath, thisModule.Name, obj);
     }
@@ -262,12 +279,17 @@ class ApiBuilder {
   GetResolveDict() {
     return this.resolveDict_;
   }
+
+  GetInputs() {
+    return this.inputs_;
+  }
 }
 
 class ImageMagickAPI {
-  constructor(api, resolveDict) {
+  constructor(api, resolveDict, inputs) {
     this.api_ = api;
     this.resolveDict_ = resolveDict;
+    this.inputs_ = inputs;
   }
 
   GetAPI() {
@@ -276,6 +298,10 @@ class ImageMagickAPI {
 
   GetResolveDict() {
     return this.resolveDict_;
+  }
+
+  GetInputs() {
+    return this.inputs_;
   }
 
   /**
@@ -290,6 +316,23 @@ class ImageMagickAPI {
     if (existingValue) {
       if (moduleName)
         return existingValue.filter(x => x.filepath.split(PATH.sep).includes(moduleName)).map(x => x.obj);
+      return existingValue.map(x => x.obj);
+    }
+    return null;
+  }
+
+  /**
+   * Get the input object that matches the name specified. Providing the module name is optional.
+   * @param {string} name Name of the function object.
+   * @param {string} moduleName (Optional) Name of the module this input is in.
+   * @returns {Array<{obj: object, filepath: string}>} Returns an array of objects. The size of the array tells you how many entries there are with the specified name.
+   */
+  ResolveInput(name, moduleName) {
+    let inputs = this.inputs_.filter(x => x.name == name);
+
+    if (inputs) {
+      if (moduleName)
+        return inputs.filter(x => x.filepath.split(PATH.sep).includes(moduleName)).map(x => x.obj);
       return existingValue.map(x => x.obj);
     }
     return null;
@@ -432,7 +475,7 @@ function CreateApi(filepaths) {
   filepaths.forEach(x => apiBuilder.Load(x));
 
   return {
-    api: new ImageMagickAPI(apiBuilder.GetAPI(), apiBuilder.GetResolveDict()),
+    api: new ImageMagickAPI(apiBuilder.GetAPI(), apiBuilder.GetResolveDict(), apiBuilder.GetInputs()),
     drawables: apiBuilder.GetDrawables()
   }
 }
