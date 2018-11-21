@@ -19,7 +19,7 @@
 *  COMPONENT TYPES  *
 *********************
 
-ComponentType = drawable | import | function | input | private
+ComponentType = drawable | import | import specific | function | input | multi | private
 
 1) drawable:
   - Is any renderable or primitive type.
