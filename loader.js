@@ -322,7 +322,7 @@ class ImageMagickAPI {
   }
 
   /**
-   * Get the input object that matches the name specified. Providing the module name is optional.
+   * Get the input function object that matches the name specified. Providing the module name is optional.
    * @param {string} name Name of the function object.
    * @param {string} moduleName (Optional) Name of the module this input is in.
    * @returns {Array<{obj: object, filepath: string}>} Returns an array of objects. The size of the array tells you how many entries there are with the specified name.
