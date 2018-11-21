@@ -10,7 +10,7 @@ let VALIDATE = require(PATH.join(IM_MODULES_DIR, 'Validation', 'validate.js'));
 
 class PointAndColor {
   constructor(point, color) {
-    this.ppint_ = point;
+    this.point_ = point;
     this.color_ = color;
   }
 
