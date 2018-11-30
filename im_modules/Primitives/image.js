@@ -18,7 +18,7 @@ class Image extends PRIMITIVE_BASECLASS {
 
   /** 
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the bezier curve.
+   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the image.
   */
   Args() {
     return ['-draw', `image over ${this.corner_.x_},${this.corner_.y_} ${this.width_},${this.height_} ${this.src_}`];
@@ -26,7 +26,7 @@ class Image extends PRIMITIVE_BASECLASS {
 
   /**
    * Create an Image object with the specified properties.
-   * @param {string} src A list of points for the bezier curve to travel through.
+   * @param {string} src
    * @param {Coordinates} corner The top-left corner from which the image will render.
    * @param {number} width Desired width (if different from current width). Set to zero (or null) if you want preserve the original width and height.
    * @param {number} height Desired height (if different from current height). Set to zero (or null) if you want preserve the original width and height.
