@@ -72,7 +72,7 @@ class PathComposite extends PRIMITIVE_BASECLASS {
 // EXPORTS
 
 exports.Create = PathComposite.Create;
-exports.Name = 'Bezier';
+exports.Name = 'PathComposite';
 exports.Layer = false;
 exports.Consolidate = true;
 exports.Dependencies = null;
