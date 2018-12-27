@@ -10,8 +10,6 @@ let MIN_HEIGHT = 1;
 class VoronoiCanvas extends CANVAS_BASECLASS {
   constructor(width, height, pointAndColorArray, softBlend) {
     super(width, height);
-    this.startColor_ = startColor;
-    this.endColor_ = endColor;
     this.pointAndColorArray_ = pointAndColorArray;
     this.softBlend_ = softBlend;
   }

@@ -10,8 +10,6 @@ let MIN_HEIGHT = 1;
 class ShepardsPowerCanvas extends CANVAS_BASECLASS {
   constructor(width, height, pointAndColorArray, power, softBlend) {
     super(width, height);
-    this.startColor_ = startColor;
-    this.endColor_ = endColor;
     this.pointAndColorArray_ = pointAndColorArray;
     this.power_ = power;
     this.softBlend_ = softBlend;
