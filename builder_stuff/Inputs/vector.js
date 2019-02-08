@@ -22,6 +22,13 @@ class Vector {
   }
 
   /**
+   * @returns {string} A String representation in the form of: 'x1,y1,x2,y2'
+   */
+  String() {
+    return `${this.args.start.String()},${this.args.end.String()}`;
+  }
+
+  /**
    * @param {Coordinates} start Start coordinates 
    * @param {Coordinates} end End coordinates
    * @returns {Vector} Returns a Vector object.
