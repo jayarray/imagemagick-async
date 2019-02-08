@@ -159,67 +159,77 @@ class LinearGradient extends GRADIENT_BASECLASS {
 
     // Check optional args
 
-    if (!CHECKS.IsDefined(this.args.vector))
-      errors.push(`LINEAR_GRADIENT_ERROR: Vector is undefined.`);
-    else {
-      if (this.args.vector.name != 'vector')
-        errors.push(`LINEAR_GRADIENT_ERROR: Vector is not a vector object.`);
+    if (this.args.vector) {
+      if (!CHECKS.IsDefined(this.args.vector))
+        errors.push(`LINEAR_GRADIENT_ERROR: Vector is undefined.`);
       else {
-        let errs = this.args.vector.Erorrs();
-        if (errs.length > 0)
-          errors.push(`LINEAR_GRADIENT_ERROR: Vector has errors: ${err.sjoin(' ')}`);
-      }
-    }
-
-    if (!CHECKS.IsDefined(this.args.angle))
-      errors.push(`LINEAR_GRADIENT_ERROR: Angle is undefined.`);
-    else {
-      if (!CHECKS.IsNumber(this.args.angle))
-        errors.push(`LINEAR_GRADIENT_ERROR: Angle is not a number.`);
-    }
-
-    if (!CHECKS.IsDefined(this.args.boundingBox))
-      errors.push(`LINEAR_GRADIENT_ERROR: Bounding box is undefined.`);
-    else {
-      if (this.args.boundingBox.name != 'BoundinBox')
-        erorrs.push(`LINEAR_GRADIENT_ERROR: Bounding box is not a BoundingBox object.`);
-      else {
-        let errs = this.args.boundingBox.Errors();
-        if (errs.length > 0)
-          errors.push(`LINEAR_GRADIENT_ERROR: Bounding box has errors: ${errs.join(' ')}`);
-      }
-    }
-
-    if (!CHECKS.IsDefined(this.args.direction))
-      errors.push(`LINEAR_GRADIENT_ERROR: Direction is undefind.`);
-    else {
-      if (!CHECKS.IsString(this.args.direction))
-        errors.push(`LINEAR_GRADIENT_ERROR: Direction is not a string.`);
-      else {
-        if (CHECKS.IsEmptyString(this.args.direction))
-          errors.push(`LINEAR_GRADIENT_ERROR: Direction is empty string.`);
-        else if (CHECKS, IsWhitespace(this.args.direction))
-          erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is whitespace.`);
+        if (this.args.vector.name != 'vector')
+          errors.push(`LINEAR_GRADIENT_ERROR: Vector is not a vector object.`);
         else {
-          if (!ARG_INFO.direction.options.includes(this.args.direction))
-            erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is invalid. Assigned value is: ${this.args.direction}. Must be assigned one of the following values: ${ARG_INFO.direction.options.join(', ')}`);
+          let errs = this.args.vector.Erorrs();
+          if (errs.length > 0)
+            errors.push(`LINEAR_GRADIENT_ERROR: Vector has errors: ${err.sjoin(' ')}`);
         }
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.extent))
-      errors.push(`LINEAR_GRADIENT_ERROR: Extent is undefind.`);
-    else {
-      if (!CHECKS.IsString(this.args.extent))
-        errors.push(`LINEAR_GRADIENT_ERROR: Extent is not a string.`);
+    if (this.args.angle) {
+      if (!CHECKS.IsDefined(this.args.angle))
+        errors.push(`LINEAR_GRADIENT_ERROR: Angle is undefined.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.extent))
-          errors.push(`LINEAR_GRADIENT_ERROR: Extent is empty string.`);
-        else if (CHECKS, IsWhitespace(this.args.extent))
-          erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is whitespace.`);
+        if (!CHECKS.IsNumber(this.args.angle))
+          errors.push(`LINEAR_GRADIENT_ERROR: Angle is not a number.`);
+      }
+    }
+
+    if (this.args.boundingBox) {
+      if (!CHECKS.IsDefined(this.args.boundingBox))
+        errors.push(`LINEAR_GRADIENT_ERROR: Bounding box is undefined.`);
+      else {
+        if (this.args.boundingBox.name != 'BoundinBox')
+          erorrs.push(`LINEAR_GRADIENT_ERROR: Bounding box is not a BoundingBox object.`);
         else {
-          if (!ARG_INFO.extent.options.includes(this.args.extent))
-            erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${ARG_INFO.extent.options.join(', ')}`);
+          let errs = this.args.boundingBox.Errors();
+          if (errs.length > 0)
+            errors.push(`LINEAR_GRADIENT_ERROR: Bounding box has errors: ${errs.join(' ')}`);
+        }
+      }
+    }
+
+    if (this.args.direction) {
+      if (!CHECKS.IsDefined(this.args.direction))
+        errors.push(`LINEAR_GRADIENT_ERROR: Direction is undefind.`);
+      else {
+        if (!CHECKS.IsString(this.args.direction))
+          errors.push(`LINEAR_GRADIENT_ERROR: Direction is not a string.`);
+        else {
+          if (CHECKS.IsEmptyString(this.args.direction))
+            errors.push(`LINEAR_GRADIENT_ERROR: Direction is empty string.`);
+          else if (CHECKS, IsWhitespace(this.args.direction))
+            erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is whitespace.`);
+          else {
+            if (!ARG_INFO.direction.options.includes(this.args.direction))
+              erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is invalid. Assigned value is: ${this.args.direction}. Must be assigned one of the following values: ${ARG_INFO.direction.options.join(', ')}`);
+          }
+        }
+      }
+    }
+
+    if (this.args.extent) {
+      if (!CHECKS.IsDefined(this.args.extent))
+        errors.push(`LINEAR_GRADIENT_ERROR: Extent is undefind.`);
+      else {
+        if (!CHECKS.IsString(this.args.extent))
+          errors.push(`LINEAR_GRADIENT_ERROR: Extent is not a string.`);
+        else {
+          if (CHECKS.IsEmptyString(this.args.extent))
+            errors.push(`LINEAR_GRADIENT_ERROR: Extent is empty string.`);
+          else if (CHECKS, IsWhitespace(this.args.extent))
+            erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is whitespace.`);
+          else {
+            if (!ARG_INFO.extent.options.includes(this.args.extent))
+              erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${ARG_INFO.extent.options.join(', ')}`);
+          }
         }
       }
     }
