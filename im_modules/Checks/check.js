@@ -112,7 +112,3 @@ exports.IsNumber = IsNumber;
 exports.IsInteger = IsInteger;
 exports.IsFloat = IsFloat;
 exports.IsArray = IsArray;
-
-exports.LoaderInfo = {
-  ComponentType: 'private'
-}
