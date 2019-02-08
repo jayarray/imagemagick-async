@@ -39,9 +39,9 @@ class Vector {
       if (this.args.start.name != 'Coordinates')
         errors.push(`VECTOR_ERROR: Start is not a Coordinates object.`);
       else {
-        let errors = this.args.start.Errors();
-        if (errors.length > 0) {
-          errors.push(`VECTOR_ERROR: Start coordinates has errors: ${errors.join(' ')}`);
+        let errs = this.args.start.Errors();
+        if (errs.length > 0) {
+          errors.push(`VECTOR_ERROR: Start coordinates has errors: ${errs.join(' ')}`);
         }
       }
     }
@@ -52,9 +52,9 @@ class Vector {
       if (this.args.end.name != 'Coordinates')
         errors.push(`VECTOR_ERROR: End is not a Coordinates object.`);
       else {
-        let errors = this.args.end.Errors();
-        if (errors.length > 0) {
-          errors.push(`VECTOR_ERROR: End coordinates has errors: ${errors.join(' ')}`);
+        let errs = this.args.end.Errors();
+        if (errs.length > 0) {
+          errors.push(`VECTOR_ERROR: End coordinates has errors: ${errs.join(' ')}`);
         }
 
       }
