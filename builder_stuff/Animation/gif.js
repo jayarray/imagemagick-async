@@ -126,67 +126,67 @@ class Gif {
     // Check required args
 
     if (!CHECKS.IsDefined(this.args.filepaths))
-      errors.push('FILEPATHS_ERROR: Argument is undefined.');
+      errors.push('GIF_ERROR: Filepaths is undefined.');
     else {
       if (!CHECKS.IsArray(this.args.filepaths))
-        errors.push(`FILEPATHS_ERROR: Argument is not an array. Assigned value is: ${this.args.filepaths}.`);
+        errors.push(`GIF_ERROR: Filepaths is not an array.`);
       else {
         if (this.args.filepaths.length == 0)
-          errors.push('FILEPATHS_ERROR: No paths provided.');
+          errors.push('GIF_ERROR: No filepaths provided.');
         else if (this.args.filepaths.length < ARG_INFO.filepaths.min)
-          errors.push(`FILEPATHS_ERROR: Insufficient paths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${ARG_INFO.filepaths.min} paths.`);
+          errors.push(`GIF_ERROR: Insufficient filepaths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${ARG_INFO.filepaths.min} filepaths.`);
       }
     }
 
     if (!CHECKS.IsDefined(this.args.outputPath))
-      error.push(`OUTPUT_PATH_ERROR: Argument is undefined.`);
+      error.push(`GIF_ERROR: Output path is undefined.`);
     else {
       if (!CHECKS.IsString(this.args.outputPath))
-        errors.push(`OUTPUT_PATH_ERROR: Argument is not a string. Assigned value is: ${this.args.outputPath}.`);
+        errors.push(`GIF_ERROR: Output path is not a string.`);
       else {
         if (CHECKS.IsEmptyString(this.args.outputPath))
-          errors.push('OUTPUT_PATH_ERROR: Path is empty.');
+          errors.push('GIF_ERROR: Output path is empty.');
         else if (CHECKS.IsWhitespace(this.args.outputPath))
-          errors.push('OUTPUT_PATH_ERROR: Path is whitespace.');
+          errors.push('GIF_ERROR: Output path is whitespace.');
       }
     }
 
     // Check optional args
 
     if (!CHECKS.IsDefined(this.args.loop))
-      errors.push('LOOP_ERROR: Argument is undefined.');
+      errors.push('GIF_ERROR: Loop is undefined.');
     else {
       if (!CHECKS.IsNumber(this.args.loop))
-        errors.push(`LOOP_ERROR: Argument is not a number. Assigned value is: ${this.args.loop}.`);
+        errors.push(`GIF_ERROR: Loop is not a number.`);
       else {
         if (!CHECKS.IsInteger(this.args.loop))
-          errors.push('LOOP_ERROR: Argument is not an integer.');
+          errors.push('GIF_ERROR: Loop is not an integer.');
         else {
           if (this.args.loop < ARG_INFO.loop.min)
-            errors.push(`LOOP_ERROR: Value is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${ARG_INFO.loop.min}.`);
+            errors.push(`GIF_ERROR: Loop is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${ARG_INFO.loop.min}.`);
         }
       }
     }
 
     if (!CHECKS.IsDefined(this.args.delay))
-      errors.push('DELAY_ERROR: Argument is undefined.');
+      errors.push('GIF_ERROR: Delay is undefined.');
     else {
       if (!CHECKS.IsNumber(this.args.delay))
-        errors.push(`DELAY_ERROR: Argument is not a number. Assigned value is: ${this.args.delay}.`);
+        errors.push(`GIF_ERROR: Delay is not a number.`);
       else {
-        if (this.args.delay <= 0)
-          errors.push(`DELAY_ERROR: Value is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than 0.`);
+        if (this.args.delay <= ARG_INFO.delay.min)
+          errors.push(`GIF_ERROR: Delay is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than ${ARG_INFO.delay.min}.`);
       }
     }
 
     if (!CHECKS.IsDefined(this.args.dispose))
-      errors.push('DISPOSE_ERROR: Argument is undefined.');
+      errors.push('GIF_ERROR: Dispose is undefined.');
     else {
       if (!CHECKS.IsString(this.args.dispose))
-        errors.push(`DISPOSE_ERROR: Argument is not a string. Assigned value is: ${this.args.dispose}.`);
+        errors.push(`GIF_ERROR: Dispose is not a string.`);
       else {
         if (!ARG_INFO.dispose.options.includes(this.args.dispose))
-          errors.push(`DISPOSE_ERROR: Invalid value. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${ARG_INFO.dispose.options.join(', ')}.`);
+          errors.push(`GIF_ERROR: Dispose is invalid. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${ARG_INFO.dispose.options.join(', ')}.`);
       }
     }
 
