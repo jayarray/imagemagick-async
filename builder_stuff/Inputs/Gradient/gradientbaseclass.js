@@ -1,5 +1,8 @@
 class GradientBaseClass {
-  constructor() {
+  constructor(builder) {
+    this.name = builder.name;
+    this.args = builder.args;
+    this.type = 'gradient';
   }
 
   /** 
@@ -14,4 +17,3 @@ class GradientBaseClass {
 // EXPORTS
 
 exports.GradientBaseClass = GradientBaseClass;
-exports.ComponentType = 'private';
