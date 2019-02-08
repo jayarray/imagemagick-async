@@ -48,14 +48,14 @@ class Coordinates {
       errors.push('COORDINATES_ERROR: X-coordinate is undefined.');
     else {
       if (!CHECKS.IsNumber(this.args.x))
-        errors.push(`COORDINATES_ERROR: X-coordinate is not a number. Assigned value is: ${this.args.x}.`);
+        errors.push(`COORDINATES_ERROR: X-coordinate is not a number.`);
     }
 
     if (!CHECKS.IsDefined(this.args.y))
       errors.push('COORDINATES_ERROR: Y-coordinate is undefined.');
     else {
       if (!CHECKS.IsNumber(this.args.y))
-        errors.push(`COORDINATES_ERROR: Y-coordinate is not a number. Assigned value is: ${this.args.y}.`);
+        errors.push(`COORDINATES_ERROR: Y-coordinate is not a number.`);
     }
 
     return errors;
