@@ -50,10 +50,9 @@ class PointAndColor {
       if (this.args.point.name != 'Coordinates')
         errors.push(`POINT_AND_COLOR_ERROR: Point is not a Coordinates object.`);
       else {
-        let errors = this.args.point.Errors();
-
-        if (errors.length > 0)
-          errors.push(`POINT_AND_COLOR_ERROR: Point has errors: ${errors.join(' ')}`);
+        let errs = this.args.point.Errors();
+        if (errs.length > 0)
+          errors.push(`POINT_AND_COLOR_ERROR: Point has errors: ${errs.join(' ')}`);
       }
     }
 
