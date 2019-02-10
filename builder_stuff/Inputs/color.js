@@ -361,7 +361,7 @@ class Color {
        * @param {string} hexString 
        */
       hexString(hexString) {
-        this.args['hexString'] = hexString;
+        this.args.hexString = hexString;
         return this;
       }
 
@@ -383,7 +383,7 @@ class Color {
        * @param {number} red Integer value of red
        */
       red(red) {
-        this.args['red'] = red;
+        this.args.red = red;
         return this;
       }
 
@@ -391,7 +391,7 @@ class Color {
        * @param {number} green Integer value of green
        */
       green(green) {
-        this.args['green'] = green;
+        this.args.green = green;
         return this;
       }
 
@@ -399,7 +399,7 @@ class Color {
        * @param {number} blue Integer value of blue
        */
       blue(blue) {
-        this.args['blue'] = blue;
+        this.args.blue = blue;
         return this;
       }
 
@@ -407,7 +407,7 @@ class Color {
        * @param {number} alpha Integer value of alpha
        */
       alpha(alpha) {
-        this.args['alpha'] = alpha;
+        this.args.alpha = alpha;
         return this;
       }
 
@@ -429,7 +429,7 @@ class Color {
        * @param {number} red
        */
       red(red) {
-        this.args['red'] = red;
+        this.args.red = red;
         return this;
       }
 
@@ -437,7 +437,7 @@ class Color {
        * @param {number} red
        */
       green(green) {
-        this.args['green'] = green;
+        this.args.green = green;
         return this;
       }
 
@@ -445,7 +445,7 @@ class Color {
        * @param {number} red
        */
       blue(blue) {
-        this.args['blue'] = blue;
+        this.args.blue = blue;
         return this;
       }
 
@@ -453,7 +453,7 @@ class Color {
        * @param {number} alpha Integer value of alpha
        */
       alpha(alpha) {
-        this.args['alpha'] = alpha;
+        this.args.alpha = alpha;
         return this;
       }
 

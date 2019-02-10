@@ -33,7 +33,7 @@ class BoundingBox {
        * @param {Coordinates} center Coordinates for the center of the bounding box.
        */
       center(center) {
-        this.args['center'] = center;
+        this.args.center = center;
         return this;
       }
 
@@ -41,7 +41,7 @@ class BoundingBox {
        * @param {number} width Width (in pixels)
        */
       width(width) {
-        this.args['width'] = width;
+        this.args.width = width;
         return this;
       }
 
@@ -49,7 +49,7 @@ class BoundingBox {
        * @param {number} height Height (in pixels)
        */
       height(height) {
-        this.args['height'] = height;
+        this.args.height = height;
         return this;
       }
 

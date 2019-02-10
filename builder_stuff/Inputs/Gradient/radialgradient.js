@@ -38,7 +38,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {string} startColor Start color for radial gradient.
        */
       startColor(startColor) {
-        this.args['startColor'] = startColor;
+        this.args.startColor = startColor;
         return this;
       }
 
@@ -46,7 +46,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {string} endColor End color for radial gradient.
        */
       endColor(endColor) {
-        this.args['endColor'] = endColor;
+        this.args.endColor = endColor;
         return this;
       }
 
@@ -54,7 +54,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {Coordinates} center Coordinates for the center of the radial gradient. (Optional)
        */
       center(center) {
-        this.center = center;
+        this.args.center = center;
         return this;
       }
 
@@ -63,7 +63,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {number} radialWidth Width of the radial gradient. (Optional)
        */
       radialWidth(radialWidth) {
-        this.radialWidth = radialWidth;
+        this.args.radialWidth = radialWidth;
         return this;
       }
 
@@ -72,7 +72,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {number} radialHeight Height of the radial gradient. (Optional)
        */
       radialHeight(radialHeight) {
-        this.radialHeight = radialHeight;
+        this.args.radialHeight = radialHeight;
         return this;
       }
 
@@ -80,7 +80,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
        */
       angle(angle) {
-        this.args['angle'] = angle;
+        this.args.angle = angle;
         return this;
       }
 
@@ -88,7 +88,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {BoundingBox} boundingBox Limits the gradient to a larger or smaller region than the image dimensions. If the region defined by the bounding box is smaller than the image, then startColor will be the color of the background. (Optional)
        */
       boundingBox(boundingBox) {
-        this.args['boundingBox'] = boundingBox;
+        this.args.boundingBox = boundingBox;
         return this;
       }
 
@@ -96,7 +96,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
        * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
        */
       extent(extent) {
-        this.args['extent'] = extent;
+        this.args.extent = extent;
         return this;
       }
 

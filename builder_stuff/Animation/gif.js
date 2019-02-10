@@ -39,7 +39,7 @@ class Gif {
        * @param {Array<string>} filepaths
        */
       filepaths(filepaths) {
-        this.args['filepaths'] = filepaths;
+        this.args.filepaths = filepaths;
         return this;
       }
 
@@ -48,7 +48,7 @@ class Gif {
        * @param {number} loop
        */
       loop(loop) {
-        this.args['loop'] = loop;
+        this.args.loop = loop;
         return this;
       }
 
@@ -57,7 +57,7 @@ class Gif {
        * @param {number} delay
        */
       delay(delay) {
-        this.args['delay'] = delay;
+        this.args.delay = delay;
         return this;
       }
 
@@ -66,7 +66,7 @@ class Gif {
        * @param {string} dispose
        */
       dispose(dispose) {
-        this.args['dispose'] = dispose;
+        this.args.dispose = dispose;
         return this;
       }
 
@@ -75,7 +75,7 @@ class Gif {
        * @param {string} outputPath
        */
       outputPath(outputPath) {
-        this.args['outputPath'] = outputPath;
+        this.args.outputPath = outputPath;
         return this;
       }
 
