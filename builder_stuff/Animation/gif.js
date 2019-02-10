@@ -2,6 +2,7 @@ let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let ANIMATION_BASECLASS = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
 let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 
@@ -19,11 +20,10 @@ const ARG_INFO = ARG_DICT_BUILDER()
 //--------------------------------------
 // GIF
 
-class Gif {
+class Gif extends ANIMATION_BASECLASS {
   constructor(builder) {
-    this.name = builder.name;
+    super(builder);
     this.command = builder.command;
-    this.args = builder.args;
   }
 
   static get Builder() {
@@ -87,6 +87,7 @@ class Gif {
   }
 
   /**
+   * @override
    * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
@@ -117,7 +118,7 @@ class Gif {
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
