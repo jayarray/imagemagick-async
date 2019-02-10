@@ -124,4 +124,4 @@ class BoundingBox {
 // EXPORTS
 
 exports.ARG_INFO = ARG_INFO;
-exports.Create = BoundingBox.Create;
+exports.Builder = BoundingBox.Builder;
