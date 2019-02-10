@@ -96,7 +96,6 @@ class LinearGradient extends GRADIENT_BASECLASS {
   }
 
   /** 
-   * @override
    * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
@@ -123,7 +122,7 @@ class LinearGradient extends GRADIENT_BASECLASS {
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {

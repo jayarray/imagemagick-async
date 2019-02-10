@@ -1,12 +1,8 @@
 class AnimationBaseClass {
-  constructor(builder) {
+  constructor(properties) {
     this.category = 'animation';
-    this.name = builder.name;
-    this.args = builder.args;
-  }
-
-  Args() {
-    // override
+    this.name = properties.name;
+    this.args = properties.args;
   }
 
   Errors() {

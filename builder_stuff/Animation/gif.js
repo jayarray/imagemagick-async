@@ -87,7 +87,6 @@ class Gif extends ANIMATION_BASECLASS {
   }
 
   /**
-   * @override
    * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {

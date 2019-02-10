@@ -1,8 +1,9 @@
 let PATH = require('path');
 
 let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
+let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 
@@ -15,10 +16,9 @@ const ARG_INFO = ARG_DICT_BUILDER()
 
 //-----------------------------
 
-class PointAndColor {
-  constructor(point, color) {
-    this.name = 'PointAndColor';
-    this.args = { point: point, color: color };
+class PointAndColor extends INPUTS_BASECLASS {
+  constructor(properties) {
+    super(properties);
   }
 
   /** 
@@ -34,11 +34,17 @@ class PointAndColor {
    * @returns {PointAndColor} Returns a PointAndColor object.
    */
   static Create(point, color) {
-    return new PointAndColor(point, color);
+    let properties = {
+      type: 'pointandcolor',
+      name: 'PointAndColor',
+      args: { point: point, color: color }
+    };
+
+    return new PointAndColor(properties);
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {

@@ -3,6 +3,7 @@ let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 
@@ -15,10 +16,9 @@ const ARG_INFO = ARG_DICT_BUILDER()
 
 //-----------------------------
 
-class Coordinates {
-  constructor(x, y) {
-    this.name = 'Coordinates';
-    this.args = { x: x, y: y };
+class Coordinates extends INPUTS_BASECLASS {
+  constructor(properties) {
+    super(properties);
   }
 
   /** 
@@ -34,11 +34,17 @@ class Coordinates {
    * @returns {Coordinates} Returns a Coordinates object.
    */
   static Create(x, y) {
-    return new Coordinates(x, y);
+    let properties = {
+      type: 'coordinates',
+      name: 'Coordinates',
+      args: { x: x, y: y }
+    };
+
+    return new Coordinates(properties);
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {

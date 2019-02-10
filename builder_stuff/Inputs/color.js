@@ -4,6 +4,7 @@ let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 
@@ -343,17 +344,17 @@ function ParseHextString(hexStr) {
 //------------------------------------
 // COLOR
 
-class Color {
+class Color extends INPUTS_BASECLASS {
   constructor(builder) {
-    this.name = 'Color';
-    this.type = builder.type;
-    this.args = builder.args;
+    super(builder)
   }
 
   static get FromHexStringBuilder() {
     class FromHexStringBuilder {
       constructor() {
-        this.type = 'string';
+        this.format = 'string';
+        this.type = 'color';
+        this.name = 'Color';
         this.args = {};
       }
 
@@ -375,7 +376,9 @@ class Color {
   static get FromRgbIntegersBuilder() {
     class FromRgbIntegersBuilder {
       constructor() {
-        this.type = 'integers';
+        this.format = 'integers';
+        this.type = 'color';
+        this.name = 'Color';
         this.args = {};
       }
 
@@ -421,7 +424,9 @@ class Color {
   static get FromRgbPercentsBuilder() {
     class FromHexBuilder {
       constructor() {
-        this.type = 'percents';
+        this.format = 'percents';
+        this.type = 'color';
+        this.name = 'Color';
         this.args = {};
       }
 
@@ -450,7 +455,7 @@ class Color {
       }
 
       /**
-       * @param {number} alpha Integer value of alpha
+       * @param {number} alpha
        */
       alpha(alpha) {
         this.args.alpha = alpha;
@@ -470,14 +475,14 @@ class Color {
   Info() {
     let parsedInfo = null;
 
-    if (this.type == 'string') {
+    if (this.format == 'string') {
       parsedInfo = ParseHextString(this.args.hexString.toLowerCase());
     }
-    else if (this.type == 'integers') {
+    else if (this.format == 'integers') {
       let hexStr = RGBAIntegersToHexString(r, g, b, a);
       parsedInfo = ParseHextString(hexStr.toLowerCase());
     }
-    else if (this.type == 'percents') {
+    else if (this.format == 'percents') {
       let hexStr = RGBAPercentsToHexString(r, g, b, a);
       parsedInfo = ParseHextString(hexStr.toLowerCase());
     }
@@ -485,28 +490,31 @@ class Color {
     return parsedInfo;
   }
 
+  /**
+   * @returns {string} Returns the string representation of this color.
+   */
   String() {
     let info = this.Info();
     let str = '';
 
-    if (this.type == 'string')
+    if (this.format == 'string')
       str = info.hex.string;
-    else if (this.type == 'integers')
+    else if (this.format == 'integers')
       str = info.numbers.string;
-    else if (this.type == 'percents')
+    else if (this.format == 'percents')
       str = info.percents.string;
 
     return str;
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (this.type == 'string') {
+    if (this.format == 'string') {
       // Check formatting as well
       if (!CHECKS.IsDefined(this.args.hexString))
         errors.push(`COLOR_ERROR: Hex string is undefined.`);
@@ -545,7 +553,7 @@ class Color {
         }
       }
     }
-    else if (this.type == 'integers') {
+    else if (this.format == 'integers') {
       // Check if all inputs are integers
       if (!CHECKS.IsDefined(this.args.red))
         errors.push('COLOR_ERROR: Red value is undefined.');
@@ -568,7 +576,7 @@ class Color {
         }
       }
     }
-    else if (this.type == 'percents') {
+    else if (this.format == 'percents') {
       // Check if all inputs are numbers
       if (!CHECKS.IsDefined(this.args.red))
         errors.push('COLOR_ERROR: Red value is undefined.');

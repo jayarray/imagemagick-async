@@ -143,7 +143,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {

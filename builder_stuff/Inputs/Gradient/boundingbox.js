@@ -4,6 +4,7 @@ let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
+let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
 let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 
 //-----------------------------
@@ -16,16 +17,16 @@ const ARG_INFO = ARG_DICT_BUILDER()
 
 //------------------------------
 
-class BoundingBox {
+class BoundingBox extends INPUTS_BASECLASS {
   constructor(builder) {
-    this.name = builder.name;
-    this.args = builder.args;
+    super(builder);
   }
 
   static get Builder() {
     class Builder {
       constructor() {
-        this.name = 'BoundingBox';
+        this.type = 'boundingbox';
+        this.name = 'BoundingBox'
         this.args = {};
       }
 
@@ -68,7 +69,7 @@ class BoundingBox {
   }
 
   /**
-   * Check for any input errors.
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
