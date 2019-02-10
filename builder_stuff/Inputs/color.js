@@ -595,6 +595,25 @@ class Color {
 //----------------------------
 // EXPORTS
 
+exports.HEX_CHARS = HEX_CHARS;
+exports.RGB_CHARS = RGB_CHARS;
+exports.RGBA_CHARS = RGBA_CHARS;
+exports.RGB1_LENGTH = RGB1_LENGTH;
+exports.RGB1_FORMAT = RGB1_FORMAT;
+exports.RGB2_LENGTH = RGB2_LENGTH
+exports.RGB2_FORMAT = RGB2_FORMAT;
+exports.RGBA2_LENGTH = RGBA2_LENGTH;
+exports.RGBA2_FORMAT = RGBA2_FORMAT;
+exports.RGB4_LENGTH = RGB4_LENGTH
+exports.RGB4_FORMAT = RGB4_FORMAT;
+exports.RGBA4_LENGTH = RGBA4_LENGTH;
+exports.RGBA4_FORMAT = RGBA4_FORMAT;
+exports.RGB_MIN = RGB_MIN;
+exports.RGB_8_BIT_MAX = RGB_8_BIT_MAX;
+exports.RGB_16_BIT_MAX = RGB_16_BIT_MAX;
+exports.PERCENT_MIN = PERCENT_MIN;
+exports.PERCENT_MAX = PERCENT_MAX;
+
 exports.ARG_INFO = ARG_INFO;
 exports.FromHexStringBuilder = Color.FromHexStringBuilder;
 exports.FromRgbIntegersBuilder = Color.FromRgbIntegersBuilder;
