@@ -10,14 +10,6 @@ let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictio
 //-------------------------------------
 // CONSTANTS
 
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('red', { type: 'number', default: 0 })
-  .add('green', { type: 'number', default: 0 })
-  .add('blue', { type: 'number', default: 0 })
-  .add('alpha', { type: 'number', default: 0 })
-  .add('hextString', { type: 'string' })
-  .build();
-
 const HEX_CHARS = Array.from('0123456789abcdef');
 
 const RGB_CHARS = ['r', 'g', 'b'];
@@ -36,7 +28,7 @@ const RGB4_LENGTH = RGB_CHARS.length * 4; // #rrrrggggbbbb      (16-bit per chan
 const RGB4_FORMAT = '#rrrrggggbbbb';
 
 const RGBA4_LENGTH = RGB4_LENGTH + 4;     // #rrrrggggbbbbaaaa  (16-bit per channel)
-const RGB4_FORMAT = '#rrrrggggbbbbaaaa';
+const RGBA4_FORMAT = '#rrrrggggbbbbaaaa';
 
 const RGB_MIN = 0;
 const RGB_8_BIT_MAX = 255;
@@ -45,29 +37,14 @@ const RGB_16_BIT_MAX = Math.pow(RGB_8_BIT_MAX, 2);
 const PERCENT_MIN = 0;
 const PERCENT_MAX = 100;
 
-//-------------------------------------
-// ERROR CHECKS
 
-function FormatValidator(hexString) {
-  let error = VALIDATE.IsStringInput(hexString);
-  if (error)
-    return `is ${error}`;
-
-  if (!hexString.startsWith('#'))
-    return `is invalid. Must start with a '#' symbol.`;
-
-  let hex = hexString.substring(1);
-  if (
-    hex.length != RGB1_LENGTH &&
-    hex.length != RGB2_LENGTH &&
-    hex.length != RGBA2_LENGTH &&
-    hex.length != RGB4_LENGTH &&
-    hex.length != RGBA4_LENGTH
-  )
-    return `is invalid. Must have length ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`;
-
-  return null;
-}
+const ARG_INFO = ARG_DICT_BUILDER()
+  .add('red', { type: 'number', min: RGB_MIN, default: 0 })
+  .add('green', { type: 'number', min: RGB_MIN, default: 0 })
+  .add('blue', { type: 'number', min: RGB_MIN, default: 0 })
+  .add('alpha', { type: 'number', min: RGB_MIN, default: 0 })
+  .add('hextString', { type: 'string' })
+  .build();
 
 //-------------------------------------
 // HELPERS
@@ -508,6 +485,20 @@ class Color {
     return parsedInfo;
   }
 
+  String() {
+    let info = this.Info();
+    let str = '';
+
+    if (this.type == 'string')
+      str = info.hex.string;
+    else if (this.type == 'integers')
+      str = info.numbers.string;
+    else if (this.type == 'percents')
+      str = info.percents.string;
+
+    return str;
+  }
+
   /**
    * Check for any input errors.
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
@@ -548,101 +539,56 @@ class Color {
               invalidChars = Array.from(new Set(invalidChars));
 
               if (invalidChars.length > 0)
-                errors.push(`COLOR_ERROR: Hex string is invalid. Contains invalid characters: ${invalidChars}.`);
+                errors.push(`COLOR_ERROR: Hex string is invalid. Contains the following invalid characters: ${invalidChars.join(', ')}.`);
             }
           }
         }
       }
     }
     else if (this.type == 'integers') {
-      // Check all inputs are integers
+      // Check if all inputs are integers
+      if (!CHECKS.IsDefined(this.args.red))
+        errors.push('COLOR_ERROR: Red value is undefined.');
+      else {
+        if (!CHECKS.IsNumber(this.args.red))
+          errors.push('COLOR_ERROR: Red value is not a number.');
+        else {
+          if (!CHECKS.IsInteger(this.args.red))
+            errors.push('COLOR_ERROR: Red value is not an integer.');
+          else {
+            if (this.args.red < ARG_INFO.red.min)
+              errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${ARG_INFO.red.min}.`);
+            else if (this.args.green < ARG_INFO.green.min)
+              errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${ARG_INFO.green.min}.`);
+            else if (this.args.blue < ARG_INFO.blue.min)
+              errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${ARG_INFO.blue.min}.`);
+            else if (this.args.alpha && this.args.alpha < ARG_INFO.alpha.min)
+              errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${ARG_INFO.alpha.min}.`);
+          }
+        }
+      }
     }
     else if (this.type == 'percents') {
-      // Check all inputs are numbers
+      // Check if all inputs are numbers
+      if (!CHECKS.IsDefined(this.args.red))
+        errors.push('COLOR_ERROR: Red value is undefined.');
+      else {
+        if (!CHECKS.IsNumber(this.args.red))
+          errors.push('COLOR_ERROR: Red value is not a number.');
+        else {
+          if (this.args.red < ARG_INFO.red.min)
+            errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${ARG_INFO.red.min}.`);
+          else if (this.args.green < ARG_INFO.green.min)
+            errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${ARG_INFO.green.min}.`);
+          else if (this.args.blue < ARG_INFO.blue.min)
+            errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${ARG_INFO.blue.min}.`);
+          else if (this.args.alpha && this.args.alpha < ARG_INFO.alpha.min)
+            errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${ARG_INFO.alpha.min}.`);
+        }
+      }
     }
 
     return errors;
-  }
-}
-
-
-class Color {
-  /**
-   * @param {string} hexStr
-   */
-  constructor(hexStr) {
-    let o = ParseHextString(hexStr.toLowerCase());
-    this.hex = o.hex;
-    this.numbers = o.numbers;
-    this.percents = o.percents;
-    this.alphaChannel = o.alphaChannel;
-    this.bitsPerChannel = o.bitsPerChannel;
-  }
-
-  /**
-   * Create a Color object using RGB integers.
-   * @param {number} r Red integer value between 0 and 255.
-   * @param {number} g Green integer value between 0 and 255.
-   * @param {number} b Blue integer value between 0 and 255.
-   * @param {number} a Alpha float value between 0 (fully transparent) and 255 (fully opaque).
-   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
-   */
-  static CreateUsingRGBIntgers(r, g, b, a) {
-    // Validate rgb values
-    if (
-      VALIDATE.IsInteger(r) ||
-      VALIDATE.IsIntegerInRange(r, RGB_MIN, RGB_8_BIT_MAX) ||
-      VALIDATE.IsInteger(g) ||
-      VALIDATE.IsIntegerInRange(g, RGB_MIN, RGB_8_BIT_MAX) ||
-      VALIDATE.IsInteger(b) ||
-      VALIDATE.IsIntegerInRange(b, RGB_MIN, RGB_8_BIT_MAX) ||
-      VALIDATE.IsInteger(a) ||
-      VALIDATE.IsIntegerInRange(a, RGB_MIN, RGB_8_BIT_MAX)
-    )
-      return null;
-
-    // Create object
-    let hexStr = RGBAIntegersToHexString(r, g, b, a);
-    return new Color(hexStr);
-  }
-
-  /**
-   * Create a Color object using RGB percents.
-   * @param {number} r Red float value between 0 and 100.
-   * @param {number} g Green float value between 0 and 100.
-   * @param {number} b Blue float value between 0 and 100.
-   * @param {number} a Alpha float value between 0 (fully transparent) and 100 (fully opaque).
-   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
-   */
-  static CreateUsingPercents(r, g, b, a) {
-    // Validate percent values
-    if (
-      VALIDATE.IsNumber(r) ||
-      VALIDATE.IsNumberInRange(r, PERCENT_MIN, PERCENT_MAX) ||
-      VALIDATE.IsNumber(g) ||
-      VALIDATE.IsNumberInRange(g, PERCENT_MIN, PERCENT_MAX) ||
-      VALIDATE.IsNumber(b) ||
-      VALIDATE.IsNumberInRange(b, PERCENT_MIN, PERCENT_MAX) ||
-      VALIDATE.IsNumber(a) ||
-      VALIDATE.IsNumberInRange(a, PERCENT_MIN, PERCENT_MAX)
-    )
-      return null;
-
-    // Create object
-    let hexStr = RGBAPercentsToHexString(r, g, b, a);
-    return new Color(hexStr);
-  }
-
-  /**
-   * Create a Color object using RGB hex string.
-   * @param {string} hexStr Must follow one of the following formats: #rgb, #rrggbb, #rrggbbaa, #rrrrggggbbbb, #rrrrggggbbbbaaaa.
-   * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
-   */
-  static CreateUsingRGBHexString(hexStr) {
-    if (FormatValidator(hexStr))
-      return null;
-
-    return new Color(hexStr);
   }
 }
 
