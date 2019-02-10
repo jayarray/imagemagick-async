@@ -2,20 +2,41 @@
 let PATH = require('path');
 
 let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
+let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let VALIDATE = require(PATH.join(IM_MODULES_DIR, 'Validation', 'validate.js'));
+let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
+let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 
 //-------------------------------------
 // CONSTANTS
 
+const ARG_INFO = ARG_DICT_BUILDER()
+  .add('red', { type: 'number', default: 0 })
+  .add('green', { type: 'number', default: 0 })
+  .add('blue', { type: 'number', default: 0 })
+  .add('alpha', { type: 'number', default: 0 })
+  .add('hextString', { type: 'string' })
+  .build();
+
+const HEX_CHARS = Array.from('0123456789abcdef');
+
 const RGB_CHARS = ['r', 'g', 'b'];
+const RGBA_CHARS = RGB_CHARS.concat('a');
 
 const RGB1_LENGTH = RGB_CHARS.length;     // #rgb               (reduced, simplified notation)
+const RGB1_FORMAT = '#rgb';
+
 const RGB2_LENGTH = RGB_CHARS.length * 2; // #rrggbb            (8-bit per channel)
+const RGB2_FORMAT = '#rrggbb';
+
 const RGBA2_LENGTH = RGB2_LENGTH + 2;     // #rrggbbaa          (8-bit per channel)
+const RGBA2_FORMAT = '#rrggbbaa';
+
 const RGB4_LENGTH = RGB_CHARS.length * 4; // #rrrrggggbbbb      (16-bit per channel)
+const RGB4_FORMAT = '#rrrrggggbbbb';
+
 const RGBA4_LENGTH = RGB4_LENGTH + 4;     // #rrrrggggbbbbaaaa  (16-bit per channel)
+const RGB4_FORMAT = '#rrrrggggbbbbaaaa';
 
 const RGB_MIN = 0;
 const RGB_8_BIT_MAX = 255;
@@ -346,6 +367,206 @@ function ParseHextString(hexStr) {
 // COLOR
 
 class Color {
+  constructor(builder) {
+    this.name = 'Color';
+    this.type = builder.type;
+    this.args = builder.args;
+  }
+
+  static get FromHexStringBuilder() {
+    class FromHexStringBuilder {
+      constructor() {
+        this.type = 'string';
+        this.args = {};
+      }
+
+      /**
+       * @param {string} hexString 
+       */
+      hexString(hexString) {
+        this.args['hexString'] = hexString;
+        return this;
+      }
+
+      build() {
+        return new Color(this);
+      }
+    }
+    return FromHexStringBuilder;
+  }
+
+  static get FromRgbIntegersBuilder() {
+    class FromRgbIntegersBuilder {
+      constructor() {
+        this.type = 'integers';
+        this.args = {};
+      }
+
+      /**
+       * @param {number} red Integer value of red
+       */
+      red(red) {
+        this.args['red'] = red;
+        return this;
+      }
+
+      /**
+       * @param {number} green Integer value of green
+       */
+      green(green) {
+        this.args['green'] = green;
+        return this;
+      }
+
+      /**
+       * @param {number} blue Integer value of blue
+       */
+      blue(blue) {
+        this.args['blue'] = blue;
+        return this;
+      }
+
+      /**
+       * @param {number} alpha Integer value of alpha
+       */
+      alpha(alpha) {
+        this.args['alpha'] = alpha;
+        return this;
+      }
+
+      build() {
+        return new Color(this);
+      }
+    }
+    return FromRgbIntegersBuilder;
+  }
+
+  static get FromRgbPercentsBuilder() {
+    class FromHexBuilder {
+      constructor() {
+        this.type = 'percents';
+        this.args = {};
+      }
+
+      /**
+       * @param {number} red
+       */
+      red(red) {
+        this.args['red'] = red;
+        return this;
+      }
+
+      /**
+       * @param {number} red
+       */
+      green(green) {
+        this.args['green'] = green;
+        return this;
+      }
+
+      /**
+       * @param {number} red
+       */
+      blue(blue) {
+        this.args['blue'] = blue;
+        return this;
+      }
+
+      /**
+       * @param {number} alpha Integer value of alpha
+       */
+      alpha(alpha) {
+        this.args['alpha'] = alpha;
+        return this;
+      }
+
+      build() {
+        return new Color(this);
+      }
+    }
+    return FromRgbPercentsBuilder;
+  }
+
+  /**
+   * @returns {{hex: {r: string, g: string, b:string, a: string, string: string, simplifiedString: string}, numbers: {r: number, g: number, b: number, a: number, string: string}, percents: {r: number, g: number, b: number, a: number, string: string}, alphaChannel: boolean, bitsPerChannel: number}} Returns an object with info pertaining to this color.  
+   */
+  Info() {
+    let parsedInfo = null;
+
+    if (this.type == 'string') {
+      parsedInfo = ParseHextString(this.args.hexString.toLowerCase());
+    }
+    else if (this.type == 'integers') {
+      let hexStr = RGBAIntegersToHexString(r, g, b, a);
+      parsedInfo = ParseHextString(hexStr.toLowerCase());
+    }
+    else if (this.type == 'percents') {
+      let hexStr = RGBAPercentsToHexString(r, g, b, a);
+      parsedInfo = ParseHextString(hexStr.toLowerCase());
+    }
+
+    return parsedInfo;
+  }
+
+  /**
+   * Check for any input errors.
+   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
+   */
+  Errors() {
+    let errors = [];
+
+    if (this.type == 'string') {
+      // Check formatting as well
+      if (!CHECKS.IsDefined(this.args.hexString))
+        errors.push(`COLOR_ERROR: Hex string is undefined.`);
+      else {
+        if (!CHECKS.IsString(this.args.hexString))
+          errors.push(`COLOR_ERROR: Hex string is not a string.`);
+        else {
+          if (CHECKS.IsEmptyString(this.args.hexString))
+            errors.push(`COLOR_ERROR: Hex string is empty string.`);
+          else if (CHECKS.IsWhitespace(this.args.hexString))
+            errors.push(`COLOR_ERROR: Hex string is whitespace.`);
+          else {
+            // Check if hex string format is correct
+
+            if (!this.args.hexString.startsWith('#'))
+              errors.push(`COLOR_ERROR: Hex string is invalid. Must start with a '#' symbol.`);
+
+            let hex = this.args.hexString.substring(1);
+            let supposeToContainAlpha = this.args.hexString.length == RGBA2_LENGTH || this.args.hexString == RGBA4_LENGTH;
+            let lengthIsInvalid = hex.length != RGB1_LENGTH
+              || hex.length != RGB2_LENGTH
+              || hex.length != RGBA2_LENGTH
+              || hex.length != RGB4_LENGTH
+              || hex.length != RGBA4_LENGTH;
+
+            if (!lengthIsInvalid)
+              errors.push(`COLOR_ERROR: Hex string length is invalid. Must have the following number of alphanumeric characters: ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`);
+            else {
+              let invalidChars = Array.from(hex).filter(x => !HEX_CHARS.includes(x));
+              invalidChars = Array.from(new Set(invalidChars));
+
+              if (invalidChars.length > 0)
+                errors.push(`COLOR_ERROR: Hex string is invalid. Contains invalid characters: ${invalidChars}.`);
+            }
+          }
+        }
+      }
+    }
+    else if (this.type == 'integers') {
+      // Check all inputs are integers
+    }
+    else if (this.type == 'percents') {
+      // Check all inputs are numbers
+    }
+
+    return errors;
+  }
+}
+
+
+class Color {
   /**
    * @param {string} hexStr
    */
@@ -363,7 +584,7 @@ class Color {
    * @param {number} r Red integer value between 0 and 255.
    * @param {number} g Green integer value between 0 and 255.
    * @param {number} b Blue integer value between 0 and 255.
-   * @param {number} a Alpha float value between 0 (fully transparent) and 225 (fully opaque).
+   * @param {number} a Alpha float value between 0 (fully transparent) and 255 (fully opaque).
    * @returns {Color} Returns a Color object. If inputs are invalid, it returns null.
    */
   static CreateUsingRGBIntgers(r, g, b, a) {
@@ -428,10 +649,8 @@ class Color {
 //----------------------------
 // EXPORTS
 
-exports.Name = 'Color';
-exports.ComponentType = 'multi';
-exports.Multi = [
-  { name: 'CreateUsingRGBIntgers', obj: Color.CreateUsingRGBIntgers },
-  { name: 'CreateUsingRGBHexString', obj: Color.CreateUsingRGBHexString },
-  { name: 'CreateUsingPercents', obj: Color.CreateUsingPercents }
-];
+exports.ARG_INFO = ARG_INFO;
+exports.FromHexStringBuilder = Color.FromHexStringBuilder;
+exports.FromRgbIntegersBuilder = Color.FromRgbIntegersBuilder;
+exports.FromRgbPercentsBuilder = Color.FromRgbPercentsBuilder;
+
