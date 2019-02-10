@@ -271,4 +271,4 @@ class RadialGradient extends GRADIENT_BASECLASS {
 // EXPORTs
 
 exports.ARG_INFO = ARG_INFO;
-exports.Create = RadialGradient.Create;
+exports.Builder = RadialGradient.Builder;
