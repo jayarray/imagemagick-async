@@ -9,6 +9,7 @@ let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).Input
 
 class LineSegmentBaseClass extends INPUTS_BASECLASS {
   constructor(properties) {
+    super(properties);
     this.type = 'linesegment';
   }
 }
