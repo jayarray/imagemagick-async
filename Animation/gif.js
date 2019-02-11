@@ -108,6 +108,7 @@ class Gif extends AnimationBaseClass {
    * @override
    */
   Errors() {
+    let params = Gif.Parameters();
     let errors = [];
 
     // Check required args
@@ -120,8 +121,8 @@ class Gif extends AnimationBaseClass {
       else {
         if (this.args.filepaths.length == 0)
           errors.push('GIF_ERROR: No filepaths provided.');
-        else if (this.args.filepaths.length < ARG_INFO.filepaths.min)
-          errors.push(`GIF_ERROR: Insufficient filepaths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${ARG_INFO.filepaths.min} filepaths.`);
+        else if (this.args.filepaths.length < params.filepaths.min)
+          errors.push(`GIF_ERROR: Insufficient filepaths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${params.filepaths.min} filepaths.`);
       }
     }
 
@@ -149,8 +150,8 @@ class Gif extends AnimationBaseClass {
         if (!Validate.IsInteger(this.args.loop))
           errors.push('GIF_ERROR: Loop is not an integer.');
         else {
-          if (this.args.loop < ARG_INFO.loop.min)
-            errors.push(`GIF_ERROR: Loop is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${ARG_INFO.loop.min}.`);
+          if (this.args.loop < params.loop.min)
+            errors.push(`GIF_ERROR: Loop is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${params.loop.min}.`);
         }
       }
     }
@@ -161,8 +162,8 @@ class Gif extends AnimationBaseClass {
       if (!Validate.IsNumber(this.args.delay))
         errors.push(`GIF_ERROR: Delay is not a number.`);
       else {
-        if (this.args.delay <= ARG_INFO.delay.min)
-          errors.push(`GIF_ERROR: Delay is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than ${ARG_INFO.delay.min}.`);
+        if (this.args.delay <= params.delay.min)
+          errors.push(`GIF_ERROR: Delay is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than ${params.delay.min}.`);
       }
     }
 
@@ -172,8 +173,8 @@ class Gif extends AnimationBaseClass {
       if (!Validate.IsString(this.args.dispose))
         errors.push(`GIF_ERROR: Dispose is not a string.`);
       else {
-        if (!ARG_INFO.dispose.options.includes(this.args.dispose))
-          errors.push(`GIF_ERROR: Dispose is invalid. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${ARG_INFO.dispose.options.join(', ')}.`);
+        if (!params.dispose.options.includes(this.args.dispose))
+          errors.push(`GIF_ERROR: Dispose is invalid. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${params.dispose.options.join(', ')}.`);
       }
     }
 
