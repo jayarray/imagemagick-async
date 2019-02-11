@@ -1,21 +1,9 @@
 let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
+let index = parts.findIndex(x => x == 'im_modules');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
 let ANIMATION_BASECLASS = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-
-//--------------------------------------
-// CONSTANTS
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('filepaths', { type: 'string', isArray: true, min: 2 })
-  .add('loop', { type: 'number', subtype: 'integer', min: 0, default: 0 }) // 0 = Infinite loop
-  .add('delay', { type: 'number', min: 0, default: 1 }) // In 1/100th of a second
-  .add('dispose', { type: 'string', min: 0, default: 'Undefined', options: ['Undefined', 'None', 'Previous', 'Background'] })
-  .add('outputPath', { type: 'string', default: '' })
-  .build();
 
 //--------------------------------------
 // GIF
@@ -26,9 +14,13 @@ class Gif extends ANIMATION_BASECLASS {
     this.command = builder.command;
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
+        this.type = 'Gif';
         this.name = 'Gif';
         this.args = {};
         this.command = 'convert';
@@ -87,7 +79,7 @@ class Gif extends ANIMATION_BASECLASS {
   }
 
   /**
-   * @returns {Array} Returns a list of arguments needed for rendering.
+   * @override
    */
   Args() {
     let args = ['delay'];
@@ -118,7 +110,6 @@ class Gif extends ANIMATION_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
@@ -192,10 +183,42 @@ class Gif extends ANIMATION_BASECLASS {
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      filepaths: {
+        type: 'string',
+        isArray: true,
+        min: 2
+      },
+      loop: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0,
+        default: 0  // infinite loop
+      },
+      delay: {
+        type: 'number',
+        min: 0,
+        default: 1 // In 1/100th of a second
+      },
+      dispose: {
+        type: 'string',
+        default: 'Undefined',
+        options: ['Undefined', 'None', 'Previous', 'Background']
+      },
+      outputPath: {
+        type: 'string',
+        default: ''
+      }
+    };
+  }
 }
 
 //---------------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = Gif.Builder;
+exports.Gif = Gif;
