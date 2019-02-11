@@ -1,16 +1,13 @@
-class InputsBaseClass {
-  constructor(properties) {
-    this.category = 'inputs';
-    this.type = properties.type;  // all lowercase, no spaces
-    this.name = properties.name;  // Capitalize first letter -OR- camel case if multiple words
-    this.args = properties.args;
-  }
+let ObjectInterface = require('./objectinterface.js').ObjectInterface;
 
-  /**
-   * @override
-   */
-  Errors() {
-    // override
+//--------------------------------------
+
+class InputsBaseClass extends ObjectInterface {
+  constructor(properties) {
+    super({ category: 'input' });
+    this.type = properties.type;
+    this.name = properties.name;
+    this.args = properties.args;
   }
 }
 
