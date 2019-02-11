@@ -7,17 +7,24 @@ class ObjectInterface {
   }
 
   /**
-   * @override
-   * @returns {object} Returns an object containing parameter properties.
+   * @returns {object} Returns an object constructed from.
    */
-  static Parameters() {
+  static get Builder() {
+    // override
   }
 
   /**
-   * @override
+   * @returns {object} Returns an object containing parameter properties.
+   */
+  static Parameters() {
+    // override
+  }
+
+  /**
    * @returns {Array<string>} Returns a list of errors produced by invalid arguments. (Is empty if no errors were found).
    */
   Errors() {
+    // override
   }
 }
 
