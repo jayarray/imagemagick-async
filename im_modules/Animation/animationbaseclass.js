@@ -2,11 +2,11 @@ let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'im_modules');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let OBJECT_INTERFACE = require(PATH.join(__dirname, 'objectinterface.js')).ObjectInterface;
+let ObjectInterface = require(PATH.join(__dirname, 'objectinterface.js')).ObjectInterface;
 
 //--------------------------------------
 
-class AnimationBaseClass extends OBJECT_INTERFACE {
+class AnimationBaseClass extends ObjectInterface {
   constructor(properties) {
     super({ category: 'animation' });
     this.type = properties.type;

@@ -2,13 +2,13 @@ let PATH = require('path');
 let parts = __dirname.split(PATH.sep);
 let index = parts.findIndex(x => x == 'im_modules');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let ANIMATION_BASECLASS = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
+let AnimationBaseClass = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 
 //--------------------------------------
 // GIF
 
-class Gif extends ANIMATION_BASECLASS {
+class Gif extends AnimationBaseClass {
   constructor(builder) {
     super(builder);
     this.command = builder.command;
