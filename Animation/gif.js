@@ -1,9 +1,5 @@
-let PATH = require('path');
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
 let AnimationBaseClass = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
+let Validate = require('./validate.js');
 
 //--------------------------------------
 // GIF
@@ -116,10 +112,10 @@ class Gif extends AnimationBaseClass {
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.args.filepaths))
+    if (!Validate.IsDefined(this.args.filepaths))
       errors.push('GIF_ERROR: Filepaths is undefined.');
     else {
-      if (!CHECKS.IsArray(this.args.filepaths))
+      if (!Validate.IsArray(this.args.filepaths))
         errors.push(`GIF_ERROR: Filepaths is not an array.`);
       else {
         if (this.args.filepaths.length == 0)
@@ -129,28 +125,28 @@ class Gif extends AnimationBaseClass {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.outputPath))
+    if (!Validate.IsDefined(this.args.outputPath))
       error.push(`GIF_ERROR: Output path is undefined.`);
     else {
-      if (!CHECKS.IsString(this.args.outputPath))
+      if (!Validate.IsString(this.args.outputPath))
         errors.push(`GIF_ERROR: Output path is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.outputPath))
+        if (Validate.IsEmptyString(this.args.outputPath))
           errors.push('GIF_ERROR: Output path is empty.');
-        else if (CHECKS.IsWhitespace(this.args.outputPath))
+        else if (Validate.IsWhitespace(this.args.outputPath))
           errors.push('GIF_ERROR: Output path is whitespace.');
       }
     }
 
     // Check optional args
 
-    if (!CHECKS.IsDefined(this.args.loop))
+    if (!Validate.IsDefined(this.args.loop))
       errors.push('GIF_ERROR: Loop is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.loop))
+      if (!Validate.IsNumber(this.args.loop))
         errors.push(`GIF_ERROR: Loop is not a number.`);
       else {
-        if (!CHECKS.IsInteger(this.args.loop))
+        if (!Validate.IsInteger(this.args.loop))
           errors.push('GIF_ERROR: Loop is not an integer.');
         else {
           if (this.args.loop < ARG_INFO.loop.min)
@@ -159,10 +155,10 @@ class Gif extends AnimationBaseClass {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.delay))
+    if (!Validate.IsDefined(this.args.delay))
       errors.push('GIF_ERROR: Delay is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.delay))
+      if (!Validate.IsNumber(this.args.delay))
         errors.push(`GIF_ERROR: Delay is not a number.`);
       else {
         if (this.args.delay <= ARG_INFO.delay.min)
@@ -170,10 +166,10 @@ class Gif extends AnimationBaseClass {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.dispose))
+    if (!Validate.IsDefined(this.args.dispose))
       errors.push('GIF_ERROR: Dispose is undefined.');
     else {
-      if (!CHECKS.IsString(this.args.dispose))
+      if (!Validate.IsString(this.args.dispose))
         errors.push(`GIF_ERROR: Dispose is not a string.`);
       else {
         if (!ARG_INFO.dispose.options.includes(this.args.dispose))
