@@ -1,12 +1,5 @@
-
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
+let InputsBaseClass = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
+let Validate = require('./validate.js');
 
 //-------------------------------------
 // CONSTANTS
@@ -38,14 +31,7 @@ const RGB_16_BIT_MAX = Math.pow(RGB_8_BIT_MAX, 2);
 const PERCENT_MIN = 0;
 const PERCENT_MAX = 100;
 
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('red', { type: 'number', min: RGB_MIN, default: 0 })
-  .add('green', { type: 'number', min: RGB_MIN, default: 0 })
-  .add('blue', { type: 'number', min: RGB_MIN, default: 0 })
-  .add('alpha', { type: 'number', min: RGB_MIN, default: 0 })
-  .add('hextString', { type: 'string' })
-  .build();
+const FORMATS = ['string', 'integers', 'percents'];
 
 //-------------------------------------
 // HELPERS
@@ -344,42 +330,29 @@ function ParseHextString(hexStr) {
 //------------------------------------
 // COLOR
 
-class Color extends INPUTS_BASECLASS {
-  constructor(builder) {
-    super(builder)
+class Color extends InputsBaseClass {
+  constructor(properties) {
+    super(properties);
+    this.format = properties.format;
   }
 
-  static get FromHexStringBuilder() {
-    class FromHexStringBuilder {
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
       constructor() {
-        this.format = 'string';
-        this.type = 'color';
+        this.type = 'Color';
         this.name = 'Color';
         this.args = {};
       }
 
       /**
-       * @param {string} hexString 
+       * @param {string} hexString Hex string representation of the desired color.
        */
       hexString(hexString) {
         this.args.hexString = hexString;
         return this;
-      }
-
-      build() {
-        return new Color(this);
-      }
-    }
-    return FromHexStringBuilder;
-  }
-
-  static get FromRgbIntegersBuilder() {
-    class FromRgbIntegersBuilder {
-      constructor() {
-        this.format = 'integers';
-        this.type = 'color';
-        this.name = 'Color';
-        this.args = {};
       }
 
       /**
@@ -414,51 +387,11 @@ class Color extends INPUTS_BASECLASS {
         return this;
       }
 
-      build() {
-        return new Color(this);
-      }
-    }
-    return FromRgbIntegersBuilder;
-  }
-
-  static get FromRgbPercentsBuilder() {
-    class FromHexBuilder {
-      constructor() {
-        this.format = 'percents';
-        this.type = 'color';
-        this.name = 'Color';
-        this.args = {};
-      }
-
       /**
-       * @param {number} red
+       * @param {string} format The input format that determines how the color is constructed. The formats are: 'string' (for using a hex string), 'integers' (for using rgb values), or 'percents' (for using percent values). 
        */
-      red(red) {
-        this.args.red = red;
-        return this;
-      }
-
-      /**
-       * @param {number} red
-       */
-      green(green) {
-        this.args.green = green;
-        return this;
-      }
-
-      /**
-       * @param {number} red
-       */
-      blue(blue) {
-        this.args.blue = blue;
-        return this;
-      }
-
-      /**
-       * @param {number} alpha
-       */
-      alpha(alpha) {
-        this.args.alpha = alpha;
+      format(format) {
+        this.format = format;
         return this;
       }
 
@@ -466,7 +399,6 @@ class Color extends INPUTS_BASECLASS {
         return new Color(this);
       }
     }
-    return FromRgbPercentsBuilder;
   }
 
   /**
@@ -509,94 +441,133 @@ class Color extends INPUTS_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
+    let params = Color.Parameters();
     let errors = [];
 
-    if (this.format == 'string') {
-      // Check formatting as well
-      if (!CHECKS.IsDefined(this.args.hexString))
-        errors.push(`COLOR_ERROR: Hex string is undefined.`);
+    if (!Validate.IsDefined(this.format))
+      errors.push('COLOR_ERROR: Format is undefined.');
+    else {
+      if (FORMATS.includes(this.format))
+        errors.push(`COLOR_ERROR: Format is invalid. Assigned value is: ${this.format}. Must be assigned one of the following values: ${FORMATS.join(' ')}.`);
       else {
-        if (!CHECKS.IsString(this.args.hexString))
-          errors.push(`COLOR_ERROR: Hex string is not a string.`);
-        else {
-          if (CHECKS.IsEmptyString(this.args.hexString))
-            errors.push(`COLOR_ERROR: Hex string is empty string.`);
-          else if (CHECKS.IsWhitespace(this.args.hexString))
-            errors.push(`COLOR_ERROR: Hex string is whitespace.`);
+        if (this.format == 'string') {
+          // Check formatting as well
+          if (!Validate.IsDefined(this.args.hexString))
+            errors.push(`COLOR_ERROR: Hex string is undefined.`);
           else {
-            // Check if hex string format is correct
-
-            if (!this.args.hexString.startsWith('#'))
-              errors.push(`COLOR_ERROR: Hex string is invalid. Must start with a '#' symbol.`);
-
-            let hex = this.args.hexString.substring(1);
-            let supposeToContainAlpha = this.args.hexString.length == RGBA2_LENGTH || this.args.hexString == RGBA4_LENGTH;
-            let lengthIsInvalid = hex.length != RGB1_LENGTH
-              || hex.length != RGB2_LENGTH
-              || hex.length != RGBA2_LENGTH
-              || hex.length != RGB4_LENGTH
-              || hex.length != RGBA4_LENGTH;
-
-            if (!lengthIsInvalid)
-              errors.push(`COLOR_ERROR: Hex string length is invalid. Must have the following number of alphanumeric characters: ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`);
+            if (!Validate.IsString(this.args.hexString))
+              errors.push(`COLOR_ERROR: Hex string is not a string.`);
             else {
-              let invalidChars = Array.from(hex).filter(x => !HEX_CHARS.includes(x));
-              invalidChars = Array.from(new Set(invalidChars));
+              if (Validate.IsEmptyString(this.args.hexString))
+                errors.push(`COLOR_ERROR: Hex string is empty string.`);
+              else if (Validate.IsWhitespace(this.args.hexString))
+                errors.push(`COLOR_ERROR: Hex string is whitespace.`);
+              else {
+                // Check if hex string format is correct
 
-              if (invalidChars.length > 0)
-                errors.push(`COLOR_ERROR: Hex string is invalid. Contains the following invalid characters: ${invalidChars.join(', ')}.`);
+                if (!this.args.hexString.startsWith('#'))
+                  errors.push(`COLOR_ERROR: Hex string is invalid. Must start with a '#' symbol.`);
+
+                let hex = this.args.hexString.substring(1);
+                let supposeToContainAlpha = this.args.hexString.length == RGBA2_LENGTH || this.args.hexString == RGBA4_LENGTH;
+                let lengthIsInvalid = hex.length != RGB1_LENGTH
+                  || hex.length != RGB2_LENGTH
+                  || hex.length != RGBA2_LENGTH
+                  || hex.length != RGB4_LENGTH
+                  || hex.length != RGBA4_LENGTH;
+
+                if (!lengthIsInvalid)
+                  errors.push(`COLOR_ERROR: Hex string length is invalid. Must have the following number of alphanumeric characters: ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`);
+                else {
+                  let invalidChars = Array.from(hex).filter(x => !HEX_CHARS.includes(x));
+                  invalidChars = Array.from(new Set(invalidChars));
+
+                  if (invalidChars.length > 0)
+                    errors.push(`COLOR_ERROR: Hex string is invalid. Contains the following invalid characters: ${invalidChars.join(', ')}.`);
+                }
+              }
+            }
+          }
+        }
+        else if (this.format == 'integers') {
+          // Check if all inputs are integers
+          if (!Validate.IsDefined(this.args.red))
+            errors.push('COLOR_ERROR: Red value is undefined.');
+          else {
+            if (!Validate.IsNumber(this.args.red))
+              errors.push('COLOR_ERROR: Red value is not a number.');
+            else {
+              if (!Validate.IsInteger(this.args.red))
+                errors.push('COLOR_ERROR: Red value is not an integer.');
+              else {
+                if (this.args.red < params.red.min)
+                  errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${params.red.min}.`);
+                else if (this.args.green < params.green.min)
+                  errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${params.green.min}.`);
+                else if (this.args.blue < params.blue.min)
+                  errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${params.blue.min}.`);
+                else if (this.args.alpha && this.args.alpha < params.alpha.min)
+                  errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${params.alpha.min}.`);
+              }
+            }
+          }
+        }
+        else if (this.format == 'percents') {
+          // Check if all inputs are numbers
+          if (!Validate.IsDefined(this.args.red))
+            errors.push('COLOR_ERROR: Red value is undefined.');
+          else {
+            if (!Validate.IsNumber(this.args.red))
+              errors.push('COLOR_ERROR: Red value is not a number.');
+            else {
+              if (this.args.red < params.red.min)
+                errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${params.red.min}.`);
+              else if (this.args.green < params.green.min)
+                errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${params.green.min}.`);
+              else if (this.args.blue < params.blue.min)
+                errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${params.blue.min}.`);
+              else if (this.args.alpha && this.args.alpha < params.alpha.min)
+                errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${params.alpha.min}.`);
             }
           }
         }
       }
     }
-    else if (this.format == 'integers') {
-      // Check if all inputs are integers
-      if (!CHECKS.IsDefined(this.args.red))
-        errors.push('COLOR_ERROR: Red value is undefined.');
-      else {
-        if (!CHECKS.IsNumber(this.args.red))
-          errors.push('COLOR_ERROR: Red value is not a number.');
-        else {
-          if (!CHECKS.IsInteger(this.args.red))
-            errors.push('COLOR_ERROR: Red value is not an integer.');
-          else {
-            if (this.args.red < ARG_INFO.red.min)
-              errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${ARG_INFO.red.min}.`);
-            else if (this.args.green < ARG_INFO.green.min)
-              errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${ARG_INFO.green.min}.`);
-            else if (this.args.blue < ARG_INFO.blue.min)
-              errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${ARG_INFO.blue.min}.`);
-            else if (this.args.alpha && this.args.alpha < ARG_INFO.alpha.min)
-              errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${ARG_INFO.alpha.min}.`);
-          }
-        }
-      }
-    }
-    else if (this.format == 'percents') {
-      // Check if all inputs are numbers
-      if (!CHECKS.IsDefined(this.args.red))
-        errors.push('COLOR_ERROR: Red value is undefined.');
-      else {
-        if (!CHECKS.IsNumber(this.args.red))
-          errors.push('COLOR_ERROR: Red value is not a number.');
-        else {
-          if (this.args.red < ARG_INFO.red.min)
-            errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${ARG_INFO.red.min}.`);
-          else if (this.args.green < ARG_INFO.green.min)
-            errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${ARG_INFO.green.min}.`);
-          else if (this.args.blue < ARG_INFO.blue.min)
-            errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${ARG_INFO.blue.min}.`);
-          else if (this.args.alpha && this.args.alpha < ARG_INFO.alpha.min)
-            errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${ARG_INFO.alpha.min}.`);
-        }
-      }
-    }
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      red: {
+        type: 'number',
+        min: RGB_MIN,
+        default: 0
+      },
+      green: {
+        type: 'number',
+        min: RGB_MIN,
+        default: 0
+      },
+      blue: {
+        type: 'number',
+        min: RGB_MIN,
+        default: 0
+      },
+      alpha: {
+        type: 'number',
+        min: RGB_MIN,
+        default: 0
+      },
+      hextString: {
+        type: 'string'
+      }
+    };
   }
 }
 
@@ -622,8 +593,5 @@ exports.RGB_16_BIT_MAX = RGB_16_BIT_MAX;
 exports.PERCENT_MIN = PERCENT_MIN;
 exports.PERCENT_MAX = PERCENT_MAX;
 
-exports.ARG_INFO = ARG_INFO;
-exports.FromHexStringBuilder = Color.FromHexStringBuilder;
-exports.FromRgbIntegersBuilder = Color.FromRgbIntegersBuilder;
-exports.FromRgbPercentsBuilder = Color.FromRgbPercentsBuilder;
+exports.Color = Color;
 
