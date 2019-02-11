@@ -1,7 +1,4 @@
-let PATH = require('path');
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let ObjectInterface = require(PATH.join(__dirname, 'objectinterface.js')).ObjectInterface;
+let ObjectInterface = require('./objectinterface.js').ObjectInterface;
 
 //--------------------------------------
 
