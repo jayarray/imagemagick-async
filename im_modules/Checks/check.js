@@ -98,6 +98,14 @@ function IsArray(o) {
   return Array.isArray(o);
 }
 
+/**
+ * @param {object} o 
+ * @returns {boolean} Returns true if object is a boolean. False otherwise.
+ */
+function IsBoolean(o) {
+  return typeof o == 'boolean' || o instanceof Boolean;
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -112,3 +120,4 @@ exports.IsNumber = IsNumber;
 exports.IsInteger = IsInteger;
 exports.IsFloat = IsFloat;
 exports.IsArray = IsArray;
+exports.IsBoolean = IsBoolean;
