@@ -1,35 +1,21 @@
-class PrimitiveBaseClass {
-  constructor() {
-    this.xOffset_ = 0;
-    this.yOffset_ = 0;
+class PrimitivesBaseClass {
+  constructor(builder) {
+    this.name = builder.name;
+    this.args = builder.args;
+    this.type = 'primitive';
+    this.offset = { x: 0, y: 0 };
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
+   * @override
+   * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
     // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the type name.
-   */
-  Type() {
-    return 'primitive';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the primitive.
-   */
-  Command() {
-    return null;
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.PrimitiveBaseClass = PrimitiveBaseClass;
-exports.ComponentType = 'private';
+exports.PrimitivesBaseClass = PrimitivesBaseClass;

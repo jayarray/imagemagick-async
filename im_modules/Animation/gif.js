@@ -1,78 +1,81 @@
 let PATH = require('path');
-
 let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
+let index = parts.findIndex(x => x == 'builder_stuff');
 let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
+let ANIMATION_BASECLASS = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
+let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
 let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
 
 //--------------------------------------
 // CONSTANTS
 
-const MIN_FILEPATHS = 2;
-const DISPOSE_OPTIONS = ['Undefined', 'None', 'Previous', 'Background'];
-const DISPOSE_DEFAULT = 'Undefined';
-const LOOP_DEFAULT = 0;  // Infinite loop
-const DELAY_DEFAULT = 1; // In 1/100th of a second
+const ARG_INFO = ARG_DICT_BUILDER()
+  .add('filepaths', { type: 'string', isArray: true, min: 2 })
+  .add('loop', { type: 'number', subtype: 'integer', min: 0, default: 0 }) // 0 = Infinite loop
+  .add('delay', { type: 'number', min: 0, default: 1 }) // In 1/100th of a second
+  .add('dispose', { type: 'string', min: 0, default: 'Undefined', options: ['Undefined', 'None', 'Previous', 'Background'] })
+  .add('outputPath', { type: 'string', default: '' })
+  .build();
 
 //--------------------------------------
 // GIF
 
-class Gif {
-  constructor(build) {
-    this.filepaths = build.filepaths;
-    this.loop = build.loop;
-    this.delay = build.delays;
-    this.dispose = build.dispose;
-    this.outputPath = build.outputPath;
+class Gif extends ANIMATION_BASECLASS {
+  constructor(builder) {
+    super(builder);
+    this.command = builder.command;
   }
 
   static get Builder() {
     class Builder {
       constructor() {
+        this.name = 'Gif';
+        this.args = {};
+        this.command = 'convert';
       }
 
       /**
        * List of filepaths.
-       * @param {string} filepaths 
+       * @param {Array<string>} filepaths
        */
       filepaths(filepaths) {
-        this.filepaths = filepaths;
+        this.args.filepaths = filepaths;
         return this;
       }
 
       /**
-       * Number of times the GIF will cycle through the image sequence before stopping.
-       * @param {number} loop 
+       * Number of times the GIF will cycle through the image sequence before stopping. (Optional)
+       * @param {number} loop
        */
       loop(loop) {
-        this.loop = loop;
+        this.args.loop = loop;
         return this;
       }
 
       /**
-       * The time delay to pause after drawing the images that are read in.
-       * @param {number} delay 
+       * The time delay to pause after drawing the images that are read in. (Optional)
+       * @param {number} delay
        */
       delay(delay) {
-        this.delay = delay;
+        this.args.delay = delay;
         return this;
       }
 
       /**
-       * What the following image should do with the previous result of the GIF animation.
-       * @param {string} dispose 
+       * What the following image should do with the previous result of the GIF animation. (Optional)
+       * @param {string} dispose
        */
       dispose(dispose) {
-        this.dispose = dispose;
+        this.args.dispose = dispose;
         return this;
       }
 
       /**
        * The destination for the newly created GIF.
-       * @param {string} outputPath 
+       * @param {string} outputPath
        */
       outputPath(outputPath) {
-        this.outputPath = outputPath;
+        this.args.outputPath = outputPath;
         return this;
       }
 
@@ -84,45 +87,37 @@ class Gif {
   }
 
   /**
-   * @returns {Array} Returns a list of arguments.
+   * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
     let args = ['delay'];
 
     // Add delay
-    if (this.delay)
-      args.push(this.delay)
+    if (this.args.delay)
+      args.push(this.args.delay);
     else
       args.push(DELAY_DEFAULT);
 
     // Add dispose
     args.push('-dispose');
-    if (this.dispose)
-      args.push(this.dispose);
+    if (this.args.dispose)
+      args.push(this.args.dispose);
     else
       args.push(DISPOSE_DEFAULT);
 
     // Add loop
     args.push('-loop');
-    if (this.loop)
-      args.push(this.loop);
+    if (this.args.loop)
+      args.push(this.args.loop);
     else
       args.push(LOOP_DEFAULT);
 
     // Add filepaths
-    args = args.concat(this.filepaths).concat(this.outputPath);
-  }
-
-  RenderArgs() {
-    return ['convert'].concat(this.Args());
-  }
-
-  Name() {
-    return 'Gif';
+    args = args.concat(this.args.filepaths).concat(this.args.outputPath);
   }
 
   /**
-   * Check for any input errors. 
+   * @override
    * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
@@ -130,64 +125,68 @@ class Gif {
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.filepaths))
-      errors.push('FILEPATHS_ERROR: Argument is undefined.');
+    if (!CHECKS.IsDefined(this.args.filepaths))
+      errors.push('GIF_ERROR: Filepaths is undefined.');
     else {
-      if (!CHECKS.IsArray(this.filepaths))
-        errors.push(`FILEPATHS_ERROR: Argument is not an array. Assigned value is: ${this.filepaths}.`);
+      if (!CHECKS.IsArray(this.args.filepaths))
+        errors.push(`GIF_ERROR: Filepaths is not an array.`);
       else {
-        if (this.filepaths.length == 0)
-          errors.push('FILEPATHS_ERROR: No paths provided.');
-        else if (this.filepaths.length < MIN_FILEPATHS)
-          errors.push(`FILEPATHS_ERROR: Insufficient paths. Only ${this.filepaths.length} path(s) provided. Must provide at least ${MIN_FILEPATHS}.`);
+        if (this.args.filepaths.length == 0)
+          errors.push('GIF_ERROR: No filepaths provided.');
+        else if (this.args.filepaths.length < ARG_INFO.filepaths.min)
+          errors.push(`GIF_ERROR: Insufficient filepaths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${ARG_INFO.filepaths.min} filepaths.`);
       }
     }
 
-    if (!CHECKS.IsDefined(outputPath))
-      error.push(`OUTPUT_PATH_ERROR: Argument is undefined.`);
+    if (!CHECKS.IsDefined(this.args.outputPath))
+      error.push(`GIF_ERROR: Output path is undefined.`);
     else {
-      if (!CHECKS.IsString(outputPath))
-        errors.push(`OUTPUT_PATH_ERROR: Argument is not a string. Assigned value is: ${outputPath}.`);
+      if (!CHECKS.IsString(this.args.outputPath))
+        errors.push(`GIF_ERROR: Output path is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(outputPath))
-          errors.push('OUTPUT_PATH_ERROR: Path is empty.');
-        else if (CHECKS.IsWhitespace(outputPath))
-          errors.push('OUTPUT_PATH_ERROR: Path is whitespace.');
+        if (CHECKS.IsEmptyString(this.args.outputPath))
+          errors.push('GIF_ERROR: Output path is empty.');
+        else if (CHECKS.IsWhitespace(this.args.outputPath))
+          errors.push('GIF_ERROR: Output path is whitespace.');
       }
     }
 
     // Check optional args
 
-    if (!CHECKS.IsDefined(this.loop))
-      errors.push('LOOP_ERROR: Argument is undefined.');
+    if (!CHECKS.IsDefined(this.args.loop))
+      errors.push('GIF_ERROR: Loop is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.loop))
-        errors.push(`LOOP_ERROR: Argument is not a number. Assigned value is: ${this.loop}.`);
+      if (!CHECKS.IsNumber(this.args.loop))
+        errors.push(`GIF_ERROR: Loop is not a number.`);
       else {
-        if (!CHECKS.IsInteger(this.loop))
-          errors.push('LOOP_ERROR: Argument is not an integer.');
+        if (!CHECKS.IsInteger(this.args.loop))
+          errors.push('GIF_ERROR: Loop is not an integer.');
+        else {
+          if (this.args.loop < ARG_INFO.loop.min)
+            errors.push(`GIF_ERROR: Loop is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${ARG_INFO.loop.min}.`);
+        }
       }
     }
 
-    if (!CHECKS.IsDefined(this.delay))
-      errors.push('DELAY_ERROR: Argument is undefined.');
+    if (!CHECKS.IsDefined(this.args.delay))
+      errors.push('GIF_ERROR: Delay is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.delay))
-        errors.push(`DELAY_ERROR: Argument is not a number. Assigned value is: ${this.delay}.`);
+      if (!CHECKS.IsNumber(this.args.delay))
+        errors.push(`GIF_ERROR: Delay is not a number.`);
       else {
-        if (this.delay <= 0)
-          errors.push(`DELAY_ERROR: Value is out of bounds. Value must be greater than 0. Assigned value is: ${this.delay}.`);
+        if (this.args.delay <= ARG_INFO.delay.min)
+          errors.push(`GIF_ERROR: Delay is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than ${ARG_INFO.delay.min}.`);
       }
     }
 
-    if (!CHECKS.IsDefined(this.dispose))
-      errors.push('DISPOSE_ERROR: Argument is not defined.');
+    if (!CHECKS.IsDefined(this.args.dispose))
+      errors.push('GIF_ERROR: Dispose is undefined.');
     else {
-      if (!CHECKS.IsString(this.dispose))
-        errors.push(`DISPOSE_ERROR: Argument is not a string. Assigned value is: ${this.dispose}.`);
+      if (!CHECKS.IsString(this.args.dispose))
+        errors.push(`GIF_ERROR: Dispose is not a string.`);
       else {
-        if (!DISPOSE_OPTIONS.includes(this.dispose))
-          errors.push(`DISPOSE_ERROR: Invalid value. Assigned value is: ${this.dispose}. Must be assigned to one of the following values: ${DISPOSE_OPTIONS.join(', ')}.`);
+        if (!ARG_INFO.dispose.options.includes(this.args.dispose))
+          errors.push(`GIF_ERROR: Dispose is invalid. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${ARG_INFO.dispose.options.join(', ')}.`);
       }
     }
 
@@ -198,17 +197,5 @@ class Gif {
 //---------------------------------
 // EXPORTS
 
-exports.MIN_FILEPATHS = MIN_FILEPATHS;
-exports.DISPOSE_OPTIONS = DISPOSE_OPTIONS;
-exports.DISPOSE_DEFAULT = DISPOSE_DEFAULT;
-exports.LOOP_DEFAULT = LOOP_DEFAULT;
-exports.DELAY_DEFAULT = DELAY_DEFAULT;
-
+exports.ARG_INFO = ARG_INFO;
 exports.Builder = Gif.Builder;
-
-exports.LoaderInfo = {
-  CreateGif: Gif,
-  Func: Builder,
-  Name: 'CreateGif',
-  ComponentType: 'function'
-}
