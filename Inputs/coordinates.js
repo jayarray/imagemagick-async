@@ -1,24 +1,44 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
+let InputsBaseClass = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
+let Validate = require('./validate.js');
 
 //-----------------------------
 
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('x', { type: 'number', default: 0 })
-  .add('y', { type: 'number', default: 0 })
-  .build();
-
-//-----------------------------
-
-class Coordinates extends INPUTS_BASECLASS {
+class Coordinates extends InputsBaseClass {
   constructor(properties) {
     super(properties);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.type = 'Coordinates';
+        this.name = 'Coordinates';
+        this.args = {};
+      }
+
+      /**
+       * @param {number} x 
+       */
+      x(x) {
+        this.args.x = x;
+        return this;
+      }
+
+      /**
+       * @param {number} y 
+       */
+      y(y) {
+        this.args.y = y;
+        return this;
+      }
+
+      build() {
+        return new Coordinates(this);
+      }
+    }
   }
 
   /** 
@@ -29,47 +49,48 @@ class Coordinates extends INPUTS_BASECLASS {
   }
 
   /**
-   * @param {number} x X-coordinate
-   * @param {number} y Y-coordinate
-   * @returns {Coordinates} Returns a Coordinates object.
-   */
-  static Create(x, y) {
-    let properties = {
-      type: 'coordinates',
-      name: 'Coordinates',
-      args: { x: x, y: y }
-    };
-
-    return new Coordinates(properties);
-  }
-
-  /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.x))
+    if (!Validate.IsDefined(this.args.x))
       errors.push('COORDINATES_ERROR: X-coordinate is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.x))
+      if (!Validate.IsNumber(this.args.x))
         errors.push(`COORDINATES_ERROR: X-coordinate is not a number.`);
     }
 
-    if (!CHECKS.IsDefined(this.args.y))
+    if (!Validate.IsDefined(this.args.y))
       errors.push('COORDINATES_ERROR: Y-coordinate is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.y))
+      if (!Validate.IsNumber(this.args.y))
         errors.push(`COORDINATES_ERROR: Y-coordinate is not a number.`);
     }
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      x: {
+        type: 'number',
+        subtype: 'integer',
+        default: 0
+      },
+      y: {
+        type: 'number',
+        subtype: 'integer',
+        default: 0
+      }
+    }
   }
 }
 
 //--------------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Create = Coordinates.Create;
+exports.Coordinates = Coordinates;
