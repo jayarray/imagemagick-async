@@ -39,6 +39,7 @@ class Coordinates extends InputsBaseClass {
         return new Coordinates(this);
       }
     }
+    return Builder;
   }
 
   /** 
