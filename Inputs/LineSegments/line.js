@@ -1,75 +1,95 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-let LINE_SEGMENT_BASECLASS = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).PrimitivesBaseClass;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('x', { type: 'number', subtype: 'integer' })
-  .add('y', { type: 'number', subtype: 'integer' })
-  .build();
+let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------------
 
-class Line extends LINE_SEGMENT_BASECLASS {
+class Line extends LineSegmentBaseClass {
   constructor(properties) {
     super(properties);
   }
 
   /**
-   * @returns {string} A string representation of this line segment.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Line';
+        this.args = {};
+      }
+
+      /**
+       * @param {number} x 
+       */
+      x(x) {
+        this.x = x;
+        return this;
+      }
+
+      /**
+       * @param {number} y 
+       */
+      y(y) {
+        this.y = y;
+        return this;
+      }
+
+      build() {
+        return new Line(this);
+      }
+    }
+    return Builder;
+  }
+
+  /**
+   * @override
    */
   String() {
     return `L ${this.args.x},${this.args.y}`;
   }
 
   /**
-   * Create a Line object.
-   * @param {number} x 
-   * @param {number} y 
-   * @returns {Line} Returns a Line object.
-   */
-  static Create(x, y) {
-    let properties = {
-      name: 'Line',
-      args: { x: x, y: y }
-    }
-
-    return new Line(properties);
-  }
-
-  /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.x))
+    if (!Validate.IsDefined(this.args.x))
       errors.push('LINE_LINE_SEGMENT_ERROR: X coordinate is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.x))
+      if (!Validate.IsNumber(this.args.x))
         errors.push('LINE_LINE_SEGMENT_ERROR: X coordinate is not a number.');
     }
 
-    if (!CHECKS.IsDefined(this.args.y))
+    if (!Validate.IsDefined(this.args.y))
       errors.push('LINE_LINE_SEGMENT_ERROR: Y coordinate is undefined.');
     else {
-      if (!CHECKS.IsNumber(this.args.y))
+      if (!Validate.IsNumber(this.args.y))
         errors.push('LINE_LINE_SEGMENT_ERROR: Y coordinate is not a number.');
     }
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      x: {
+        type: 'number',
+        subtype: 'integer'
+      },
+      y: {
+        type: 'number',
+        subtype: 'integer'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Create = Line.Create;
+exports.Line = Line;

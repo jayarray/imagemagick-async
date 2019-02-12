@@ -1,56 +1,61 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-let LINE_SEGMENT_BASECLASS = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).PrimitivesBaseClass;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('control', { type: 'coordinates' })
-  .add('endPoint', { type: 'coordinates' })
-  .build();
+let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------------
 
-class QuadraticBezier extends LINE_SEGMENT_BASECLASS {
+class QuadraticBezier extends LineSegmentBaseClass {
   constructor(properties) {
     super(properties)
   }
 
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'QuadraticBezier';
+        this.args = {};
+      }
+
+      /**
+       * @param {Coordinates} control 
+       */
+      control(control) {
+        this.control = control;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} endPoint 
+       */
+      endPoint(endPoint) {
+        this.endPoint = endPoint;
+        return this;
+      }
+
+      build() {
+        return new QuadraticBezier(this);
+      }
+    }
+    return Builder;
+  }
+
+  /**
+   * @override
+   */
   String() {
     return `Q ${this.args.control.args.x},${this.args.control.args.y} ${this.args.endPoint.args.x},${this.args.endPoint.args.y}`;
   }
 
   /**
-   * Create a Smooth object.
-   * @param {Coordinates} control
-   * @param {Coordinates} endPoint
-   * @returns {QuadraticBezier} Returns a QuadraticBezier object.
-   */
-  static Create(control, endPoint) {
-    let properties = {
-      name: 'QuadraticBezier',
-      args: { control: control, endPoint: endPoint }
-    };
-
-    return new QuadraticBezier(properties);
-  }
-
-  /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.control))
+    if (!Validate.IsDefined(this.args.control))
       errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: Control point is undefined.');
     else {
-      if (this.args.control.type != 'coordinates')
+      if (this.args.control.type != 'Coordinates')
         errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: Control point is not a Coordinates objcect.');
       else {
         let errs = this.args.control.Errors();
@@ -59,10 +64,10 @@ class QuadraticBezier extends LINE_SEGMENT_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.endPoint))
+    if (!Validate.IsDefined(this.args.endPoint))
       errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: End point is undefined.');
     else {
-      if (this.args.endPoint.type != 'coordinates')
+      if (this.args.endPoint.type != 'Coordinates')
         errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: End point is not a Coordinates objcect.');
       else {
         let errs = this.args.endPoint.Errors();
@@ -73,10 +78,23 @@ class QuadraticBezier extends LINE_SEGMENT_BASECLASS {
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      control: {
+        type: 'Coordinates'
+      },
+      endPoint: {
+        type: 'Coordinates'
+      }
+    };
+  }
 }
 
 //----------------------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Create = QuadraticBezier.Create;
+exports.QuadraticBezier = QuadraticBezier;

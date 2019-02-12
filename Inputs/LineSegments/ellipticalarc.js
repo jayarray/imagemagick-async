@@ -1,29 +1,17 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-let LINE_SEGMENT_BASECLASS = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).PrimitivesBaseClass;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('radius', { type: 'coordinates' })
-  .add('angle', { type: 'number', default: 0 })
-  .add('largeFlag', { type: 'boolean', default: false })
-  .add('sweepFlag', { type: 'boolean', default: false })
-  .add('edge', { type: 'coordinates' })
-  .build();
+let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------------
 
-class EllipticalArc extends LINE_SEGMENT_BASECLASS {
+class EllipticalArc extends LineSegmentBaseClass {
   constructor(properties) {
     super(properties);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -79,7 +67,7 @@ class EllipticalArc extends LINE_SEGMENT_BASECLASS {
   }
 
   /**
-   * @returns {string} Returns a string representation of the elliptical arc line segment.
+   * @override
    */
   String() {
     return `A ${this.args.radius.args.x},${this.args.radius.args.y} ${this.args.angle ? this.args.angle : ARG_INFO.angle.default} ${this.args.largeFlag ? 1 : 0},${this.args.sweepFlag_ ? 1 : 0} ${this.args.edge.args.x},${this.args.edge.args.y}`;
@@ -87,14 +75,13 @@ class EllipticalArc extends LINE_SEGMENT_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.args.radius))
+    if (!Validate.IsDefined(this.args.radius))
       errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Radius coordinates are undefined.');
     else {
       if (this.args.radius.type == 'coordinates')
@@ -106,7 +93,7 @@ class EllipticalArc extends LINE_SEGMENT_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.edge))
+    if (!Validate.IsDefined(this.args.edge))
       errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Edge coordinates are undefined.');
     else {
       if (this.args.edge.type == 'coordinates')
@@ -121,38 +108,63 @@ class EllipticalArc extends LINE_SEGMENT_BASECLASS {
     // Checks optional args
 
     if (this.args.angle) {
-      if (!CHECKS.IsDefined(this.args.angle))
+      if (!Validate.IsDefined(this.args.angle))
         errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Angle is undefined.');
       else {
-        if (!CHECKS.IsNumber(this.args.angle))
+        if (!Validate.IsNumber(this.args.angle))
           errors.push(`ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Angle is not a number.`);
       }
     }
 
     if (this.args.largeFlag) {
-      if (!CHECKS.IsDefined(this.args.largeFlag))
+      if (!Validate.IsDefined(this.args.largeFlag))
         errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Large flag is undefined');
       else {
-        if (!CHECKS.IsBoolean(this.args.largeFlag))
+        if (!Validate.IsBoolean(this.args.largeFlag))
           errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Large flag is not a boolean.');
       }
     }
 
     if (this.args.sweepFlag) {
-      if (!CHECKS.IsDefined(this.args.sweepFlag))
+      if (!Validate.IsDefined(this.args.sweepFlag))
         errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Sweep flag is undefined');
       else {
-        if (!CHECKS.IsBoolean(this.args.sweepFlag))
+        if (!Validate.IsBoolean(this.args.sweepFlag))
           errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Sweep flag is not a boolean.');
       }
     }
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      radius: {
+        type: 'Coordinates'
+      },
+      angle: {
+        type: 'number',
+        default: 0
+      },
+      largeFlag: {
+        type: 'boolean',
+        default: false
+      },
+      sweepFlag: {
+        type: 'boolean',
+        default: false
+      },
+      edge: {
+        type: 'Coordinates'
+      }
+    };
+  }
 }
 
 //------------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = EllipticalArc.Builder;
+exports.EllipticalArc = EllipticalArc;

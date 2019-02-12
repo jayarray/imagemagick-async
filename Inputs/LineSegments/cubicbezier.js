@@ -1,27 +1,17 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-let LINE_SEGMENT_BASECLASS = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).PrimitivesBaseClass;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('control1', { type: 'Coordinates' })
-  .add('control2', { type: 'Coordinates' })
-  .add('endPoint', { type: 'Coordinates' })
-  .build();
+let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------------
 
-class CubicBezier extends LINE_SEGMENT_BASECLASS {
+class CubicBezier extends LineSegmentBaseClass {
   constructor(builder) {
     super(builder);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -61,7 +51,7 @@ class CubicBezier extends LINE_SEGMENT_BASECLASS {
   }
 
   /**
-   * @returns {string} Returns a string representation of the cubic bezier line segment.
+   * @override
    */
   String() {
     return `C ${this.args.control1.args.x},${this.args.control1.args.y} ${this.args.control2.args.x},${this.args.control2.args.y} ${this.args.endPoint.args.x},${this.args.endPoint.args.y_}`;
@@ -69,15 +59,14 @@ class CubicBezier extends LINE_SEGMENT_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.control1))
+    if (!Validate.IsDefined(this.args.control1))
       errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: First control point is undefined.');
     else {
-      if (this.args.control1.type != 'coordinates')
+      if (this.args.control1.type != 'Coordinates')
         errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: First control point is not a Coordinates object.');
       else {
         let errs = this.args.control1.Errors();
@@ -86,10 +75,10 @@ class CubicBezier extends LINE_SEGMENT_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.control2))
+    if (!Validate.IsDefined(this.args.control2))
       errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: Second control point is undefined.');
     else {
-      if (this.args.control2.type != 'coordinates')
+      if (this.args.control2.type != 'Coordinates')
         errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: Second control point is not a Coordinates object.');
       else {
         let errs = this.args.control2.Errors();
@@ -98,10 +87,10 @@ class CubicBezier extends LINE_SEGMENT_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.endPoint))
+    if (!Validate.IsDefined(this.args.endPoint))
       errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: End point is undefined.');
     else {
-      if (this.args.endPoint.type != 'coordinates')
+      if (this.args.endPoint.type != 'Coordinates')
         errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: End point is not a Coordinates object.');
       else {
         let errs = this.args.endPoint.Errors();
@@ -112,10 +101,26 @@ class CubicBezier extends LINE_SEGMENT_BASECLASS {
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      control1: {
+        type: 'Coordinates'
+      },
+      control2: {
+        type: 'Coordinates'
+      },
+      endPoint: {
+        type: 'Coordinates'
+      }
+    };
+  }
 }
 
 //------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = CubicBezier.Builder;
+exports.CubicBezier = CubicBezier

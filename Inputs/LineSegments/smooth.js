@@ -1,28 +1,16 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-let LINE_SEGMENT_BASECLASS = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).PrimitivesBaseClass;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('control', { type: 'coordinates' })
-  .add('endPoint', { type: 'coordinates' })
-  .add('isQuadraticBezier', { type: 'boolean', default: false })
-  .build();
+let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------------
 
-class Smooth extends LINE_SEGMENT_BASECLASS {
+class Smooth extends LineSegmentBaseClass {
   constructor(properties) {
     super(properties);
   }
 
   /**
+   * @override
    * Create a Smooth object. (Used with CubizBezier or QuadraticBezier)
    */
   static get Builder() {
@@ -65,6 +53,7 @@ class Smooth extends LINE_SEGMENT_BASECLASS {
         return new Smooth(properties);
       }
     }
+    return Builder;
   }
 
   constructor(control, endPoint, isQuadraticBezier) {
@@ -73,6 +62,9 @@ class Smooth extends LINE_SEGMENT_BASECLASS {
     this.isQuadraticBezier_ = isQuadraticBezier;
   }
 
+  /**
+   * @override
+   */
   String() {
     let char = 'S';
     if (this.args.isQuadraticBezier)
@@ -83,17 +75,16 @@ class Smooth extends LINE_SEGMENT_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.args.control))
+    if (!Validate.IsDefined(this.args.control))
       errors.push('SMOOTH_LINE_SEGMENT_ERROR: Control point is undefined.');
     else {
-      if (this.args.control.type != 'coordinates')
+      if (this.args.control.type != 'Coordinates')
         errors.push('SMOOTH_LINE_SEGMENT_ERROR: Control point is not a Coordinates objcect.');
       else {
         let errs = this.args.control.Errors();
@@ -102,10 +93,10 @@ class Smooth extends LINE_SEGMENT_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.endPoint))
+    if (!Validate.IsDefined(this.args.endPoint))
       errors.push('SMOOTH_LINE_SEGMENT_ERROR: End point is undefined.');
     else {
-      if (this.args.endPoint.type != 'coordinates')
+      if (this.args.endPoint.type != 'Coordinates')
         errors.push('SMOOTH_LINE_SEGMENT_ERROR: End point is not a Coordinates objcect.');
       else {
         let errs = this.args.endPoint.Errors();
@@ -117,16 +108,33 @@ class Smooth extends LINE_SEGMENT_BASECLASS {
     // Check optional args
 
     if (this.args.isQuadraticBezier) {
-      if (!CHECKS.IsBoolean(this.args.isQuadraticBezier))
+      if (!Validate.IsBoolean(this.args.isQuadraticBezier))
         errors.push('SMOOTH_LINE_SEGMENT_ERROR: Quadratic bezier flag is not a boolean.');
     }
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      control: {
+        type: 'Coordinates'
+      },
+      endPoint: {
+        type: 'Coordinates'
+      },
+      isQuadraticBezier: {
+        type: 'boolean',
+        default: false
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTs
 
-exports.ARG_INFO = ARG_INFO;
-exports.Create = Smooth.Create;
+exports.Smooth = Smooth;
