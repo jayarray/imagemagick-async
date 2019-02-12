@@ -1,32 +1,16 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let GRADIENT_BASECLASS = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('startColor', { type: 'string' })
-  .add('endColor', { type: 'string' })
-  .add('center', { type: 'Coordinates' })
-  .add('radialWidth', { type: 'number', subtype: 'integer', min: 1 })
-  .add('radialHeight', { type: 'number', subtype: 'integer', min: 1 })
-  .add('angle', { type: 'number' })
-  .add('boundinBox', { type: 'BoundingBox' })
-  .add('extent', { type: 'string', options: ['Circle', 'Diagonal', 'Ellipse', 'Maximum', 'Minimum'] })
-  .build();
+let GradientBaseClass = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
 
-class RadialGradient extends GRADIENT_BASECLASS {
+class RadialGradient extends GradientBaseClass {
   constructor(builder) {
     super(builder);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -101,7 +85,7 @@ class RadialGradient extends GRADIENT_BASECLASS {
       }
 
       build() {
-        return new LinearGradient(this);
+        return new RadialGradient(this);
       }
     }
     return Builder;
@@ -109,7 +93,6 @@ class RadialGradient extends GRADIENT_BASECLASS {
 
   /** 
    * @override
-   * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
     let args = [];
@@ -144,9 +127,9 @@ class RadialGradient extends GRADIENT_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
+    let params = RadialGradient.Parameters();
     let errors = [];
 
     // Check required args
@@ -203,8 +186,8 @@ class RadialGradient extends GRADIENT_BASECLASS {
           if (!CHECKS.IsInteger(this.args.radialWidth))
             errors.push(`RADIAL_GRADIENT_ERROR: Radial width is not an integer.`);
           else {
-            if (this.args.radialWidth < ARG_INFO.radialWidth.min)
-              errors.push(`RADIAL_GRADIENT_ERROR: Radial width is out of bounds. Assigned value is : ${this.args.radialWidth}. Value must be greater than or equal to ${ARG_INFO.radialWidth.min}.`);
+            if (this.args.radialWidth < params.radialWidth.min)
+              errors.push(`RADIAL_GRADIENT_ERROR: Radial width is out of bounds. Assigned value is : ${this.args.radialWidth}. Value must be greater than or equal to ${params.radialWidth.min}.`);
           }
         }
       }
@@ -220,55 +203,100 @@ class RadialGradient extends GRADIENT_BASECLASS {
           if (!CHECKS.IsInteger(this.args.radialHeight))
             errors.push(`RADIAL_GRADIENT_ERROR: Radial height is not an integer.`);
           else {
-            if (this.args.radialHeight < ARG_INFO.radialHeight.min)
-              errors.push(`RADIAL_GRADIENT_ERROR: Radial height is out of bounds. Assigned value is : ${this.args.radialHeight}. Value must be greater than or equal to ${ARG_INFO.radialHeight.min}.`);
+            if (this.args.radialHeight < params.radialHeight.min)
+              errors.push(`RADIAL_GRADIENT_ERROR: Radial height is out of bounds. Assigned value is : ${this.args.radialHeight}. Value must be greater than or equal to ${params.radialHeight.min}.`);
           }
         }
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.angle))
-      errors.push(`RADIAL_GRADIENT_ERROR: Angle is undefined.`);
-    else {
-      if (!CHECKS.IsNumber(this.args.angle))
-        errors.push(`RADIAL_GRADIENT_ERROR: Angle is not a number.`);
-    }
-
-    if (!CHECKS.IsDefined(this.args.boundingBox))
-      errors.push(`RADIAL_GRADIENT_ERROR: Bounding box is undefined.`);
-    else {
-      if (this.args.boundingBox.name != 'BoundinBox')
-        erorrs.push(`RADIAL_GRADIENT_ERROR: Bounding box is not a BoundingBox object.`);
+    if (this.args.angle) {
+      if (!CHECKS.IsDefined(this.args.angle))
+        errors.push(`RADIAL_GRADIENT_ERROR: Angle is undefined.`);
       else {
-        let errs = this.args.boundingBox.Errors();
-        if (errs.length > 0)
-          errors.push(`RADIAL_GRADIENT_ERROR: Bounding box has errors: ${errs.join(' ')}`);
+        if (!CHECKS.IsNumber(this.args.angle))
+          errors.push(`RADIAL_GRADIENT_ERROR: Angle is not a number.`);
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.extent))
-      errors.push(`RADIAL_GRADIENT_ERROR: Extent is undefind.`);
-    else {
-      if (!CHECKS.IsString(this.args.extent))
-        errors.push(`RADIAL_GRADIENT_ERROR: Extent is not a string.`);
+    if (this.args.boundinBox) {
+      if (!CHECKS.IsDefined(this.args.boundingBox))
+        errors.push(`RADIAL_GRADIENT_ERROR: Bounding box is undefined.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.extent))
-          errors.push(`RADIAL_GRADIENT_ERROR: Extent is empty string.`);
-        else if (CHECKS, IsWhitespace(this.args.extent))
-          erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is whitespace.`);
+        if (this.args.boundingBox.name != 'BoundinBox')
+          erorrs.push(`RADIAL_GRADIENT_ERROR: Bounding box is not a BoundingBox object.`);
         else {
-          if (!ARG_INFO.extent.options.includes(this.args.extent))
-            erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${ARG_INFO.extent.options.join(', ')}`);
+          let errs = this.args.boundingBox.Errors();
+          if (errs.length > 0)
+            errors.push(`RADIAL_GRADIENT_ERROR: Bounding box has errors: ${errs.join(' ')}`);
+        }
+      }
+    }
+
+    if (this.args.extent) {
+      if (!CHECKS.IsDefined(this.args.extent))
+        errors.push(`RADIAL_GRADIENT_ERROR: Extent is undefind.`);
+      else {
+        if (!CHECKS.IsString(this.args.extent))
+          errors.push(`RADIAL_GRADIENT_ERROR: Extent is not a string.`);
+        else {
+          if (CHECKS.IsEmptyString(this.args.extent))
+            errors.push(`RADIAL_GRADIENT_ERROR: Extent is empty string.`);
+          else if (CHECKS, IsWhitespace(this.args.extent))
+            erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is whitespace.`);
+          else {
+            if (!params.extent.options.includes(this.args.extent))
+              erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${params.extent.options.join(', ')}`);
+          }
         }
       }
     }
 
     return errors;
   }
+
+  static Parameters() {
+    return {
+      startColor: {
+        type: 'Color'
+      },
+      endColor: {
+        type: 'Color'
+      },
+      center: {
+        type: 'Coordinates'
+      },
+      radialWidth: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      radialHeight: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      angle: {
+        type: 'number'
+      },
+      boundinBox: {
+        type: 'BoundingBox'
+      },
+      extent: {
+        type: 'string',
+        options: [
+          'Circle',
+          'Diagonal',
+          'Ellipse',
+          'Maximum',
+          'Minimum'
+        ]
+      }
+    };
+  }
 }
 
 //-----------------------------
-// EXPORTs
+// EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = RadialGradient.Builder;
+exports.RadialGradient = RadialGradient;

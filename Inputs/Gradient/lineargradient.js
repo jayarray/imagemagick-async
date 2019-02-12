@@ -1,30 +1,16 @@
 let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let GRADIENT_BASECLASS = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-
-//----------------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('startColor', { type: 'string' })
-  .add('endColor', { type: 'string' })
-  .add('vector', { type: 'Vector' })
-  .add('boundinBox', { type: 'BoundingBox' })
-  .add('direction', { type: 'string', options: ['NorthWest', 'North', 'Northeast', 'West', 'East', 'SouthWest', 'South', 'SouthEast'] })
-  .add('extent', { type: 'string', options: ['Circle', 'Diagonal', 'Ellipse', 'Maximum', 'Minimum'] })
-  .build();
+let GradientBaseClass = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
 
-class LinearGradient extends GRADIENT_BASECLASS {
+class LinearGradient extends GradientBaseClass {
   constructor(builder) {
     super(builder);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -96,7 +82,7 @@ class LinearGradient extends GRADIENT_BASECLASS {
   }
 
   /** 
-   * @returns {Array} Returns a list of arguments needed for rendering.
+   * @override
    */
   Args() {
     let args = [];
@@ -123,9 +109,9 @@ class LinearGradient extends GRADIENT_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
+    let params = LinearGradient.Parameters();
     let errors = [];
 
     // Check required args
@@ -207,8 +193,8 @@ class LinearGradient extends GRADIENT_BASECLASS {
           else if (CHECKS, IsWhitespace(this.args.direction))
             erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is whitespace.`);
           else {
-            if (!ARG_INFO.direction.options.includes(this.args.direction))
-              erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is invalid. Assigned value is: ${this.args.direction}. Must be assigned one of the following values: ${ARG_INFO.direction.options.join(', ')}`);
+            if (!params.direction.options.includes(this.args.direction))
+              erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is invalid. Assigned value is: ${this.args.direction}. Must be assigned one of the following values: ${params.direction.options.join(', ')}`);
           }
         }
       }
@@ -226,8 +212,8 @@ class LinearGradient extends GRADIENT_BASECLASS {
           else if (CHECKS, IsWhitespace(this.args.extent))
             erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is whitespace.`);
           else {
-            if (!ARG_INFO.extent.options.includes(this.args.extent))
-              erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${ARG_INFO.extent.options.join(', ')}`);
+            if (!params.extent.options.includes(this.args.extent))
+              erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${params.extent.options.join(', ')}`);
           }
         }
       }
@@ -235,10 +221,52 @@ class LinearGradient extends GRADIENT_BASECLASS {
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      startColor: {
+        type: 'Color'
+      },
+      endColor: {
+        type: 'Color'
+      },
+      vector: {
+        type: 'Vector'
+      },
+      boundingBox: {
+        type: 'BoundingBox'
+      },
+      direction: {
+        type: 'string',
+        options: [
+          'NorthWest',
+          'North',
+          'Northeast',
+          'West',
+          'East',
+          'SouthWest',
+          'South',
+          'SouthEast'
+        ]
+      },
+      extent: {
+        type: 'string',
+        options: [
+          'Circle',
+          'Diagonal',
+          'Ellipse',
+          'Maximum',
+          'Minimum'
+        ]
+      }
+    };
+  }
 }
 
 //-------------------------------
 // EXPORTs
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = LinearGradient.Builder;
+exports.LinearGradient = LinearGradient;
