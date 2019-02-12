@@ -471,7 +471,6 @@ class Color extends InputsBaseClass {
                   errors.push(`COLOR_ERROR: Hex string is invalid. Must start with a '#' symbol.`);
 
                 let hex = this.args.hexString.substring(1);
-                let supposeToContainAlpha = this.args.hexString.length == RGBA2_LENGTH || this.args.hexString == RGBA4_LENGTH;
                 let lengthIsInvalid = hex.length != RGB1_LENGTH
                   || hex.length != RGB2_LENGTH
                   || hex.length != RGBA2_LENGTH
