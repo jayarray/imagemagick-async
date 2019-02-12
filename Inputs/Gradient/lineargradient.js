@@ -1,5 +1,6 @@
 let PATH = require('path');
 let GradientBaseClass = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
+let Validate = require('./validate.js');
 
 //-----------------------------
 
@@ -116,28 +117,28 @@ class LinearGradient extends GradientBaseClass {
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.args.startColor))
+    if (!Validate.IsDefined(this.args.startColor))
       errors.push(`LINEAR_GRADIENT_ERROR: Start color is undefined.`);
     else {
-      if (!CHECKS.IsString(this.args.startColor))
+      if (!Validate.IsString(this.args.startColor))
         errors.push(`LINEAR_GRADIENT_ERROR: Start color is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.startColor))
+        if (Validate.IsEmptyString(this.args.startColor))
           errors.push(`LINEAR_GRADIENT_ERROR: Start color is empty string.`);
-        else if (CHECKS.IsWhitespace(this.args.startColor))
+        else if (Validate.IsWhitespace(this.args.startColor))
           errors.push(`LINEAR_GRADIENT_ERROR: Start color is whitespace.`);
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.endColor))
+    if (!Validate.IsDefined(this.args.endColor))
       errors.push(`LINEAR_GRADIENT_ERROR: End color is undefined.`);
     else {
-      if (!CHECKS.IsString(this.args.endColor))
+      if (!Validate.IsString(this.args.endColor))
         errors.push(`LINEAR_GRADIENT_ERROR: End color is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.endColor))
+        if (Validate.IsEmptyString(this.args.endColor))
           errors.push(`LINEAR_GRADIENT_ERROR: End color is empty string.`);
-        else if (CHECKS.IsWhitespace(this.args.endColor))
+        else if (Validate.IsWhitespace(this.args.endColor))
           errors.push(`LINEAR_GRADIENT_ERROR: End color is whitespace.`);
       }
     }
@@ -145,7 +146,7 @@ class LinearGradient extends GradientBaseClass {
     // Check optional args
 
     if (this.args.vector) {
-      if (!CHECKS.IsDefined(this.args.vector))
+      if (!Validate.IsDefined(this.args.vector))
         errors.push(`LINEAR_GRADIENT_ERROR: Vector is undefined.`);
       else {
         if (this.args.vector.name != 'vector')
@@ -159,16 +160,16 @@ class LinearGradient extends GradientBaseClass {
     }
 
     if (this.args.angle) {
-      if (!CHECKS.IsDefined(this.args.angle))
+      if (!Validate.IsDefined(this.args.angle))
         errors.push(`LINEAR_GRADIENT_ERROR: Angle is undefined.`);
       else {
-        if (!CHECKS.IsNumber(this.args.angle))
+        if (!Validate.IsNumber(this.args.angle))
           errors.push(`LINEAR_GRADIENT_ERROR: Angle is not a number.`);
       }
     }
 
     if (this.args.boundingBox) {
-      if (!CHECKS.IsDefined(this.args.boundingBox))
+      if (!Validate.IsDefined(this.args.boundingBox))
         errors.push(`LINEAR_GRADIENT_ERROR: Bounding box is undefined.`);
       else {
         if (this.args.boundingBox.name != 'BoundinBox')
@@ -182,15 +183,15 @@ class LinearGradient extends GradientBaseClass {
     }
 
     if (this.args.direction) {
-      if (!CHECKS.IsDefined(this.args.direction))
+      if (!Validate.IsDefined(this.args.direction))
         errors.push(`LINEAR_GRADIENT_ERROR: Direction is undefind.`);
       else {
-        if (!CHECKS.IsString(this.args.direction))
+        if (!Validate.IsString(this.args.direction))
           errors.push(`LINEAR_GRADIENT_ERROR: Direction is not a string.`);
         else {
-          if (CHECKS.IsEmptyString(this.args.direction))
+          if (Validate.IsEmptyString(this.args.direction))
             errors.push(`LINEAR_GRADIENT_ERROR: Direction is empty string.`);
-          else if (CHECKS, IsWhitespace(this.args.direction))
+          else if (Validate, IsWhitespace(this.args.direction))
             erorrs.push(`LINEAR_GRADIENT_ERROR: Direction is whitespace.`);
           else {
             if (!params.direction.options.includes(this.args.direction))
@@ -201,15 +202,15 @@ class LinearGradient extends GradientBaseClass {
     }
 
     if (this.args.extent) {
-      if (!CHECKS.IsDefined(this.args.extent))
+      if (!Validate.IsDefined(this.args.extent))
         errors.push(`LINEAR_GRADIENT_ERROR: Extent is undefind.`);
       else {
-        if (!CHECKS.IsString(this.args.extent))
+        if (!Validate.IsString(this.args.extent))
           errors.push(`LINEAR_GRADIENT_ERROR: Extent is not a string.`);
         else {
-          if (CHECKS.IsEmptyString(this.args.extent))
+          if (Validate.IsEmptyString(this.args.extent))
             errors.push(`LINEAR_GRADIENT_ERROR: Extent is empty string.`);
-          else if (CHECKS, IsWhitespace(this.args.extent))
+          else if (Validate, IsWhitespace(this.args.extent))
             erorrs.push(`LINEAR_GRADIENT_ERROR: Extent is whitespace.`);
           else {
             if (!params.extent.options.includes(this.args.extent))

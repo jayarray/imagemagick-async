@@ -1,5 +1,6 @@
 let PATH = require('path');
 let GradientBaseClass = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
+let Validate = require('./validate.js');
 
 //-----------------------------
 
@@ -134,28 +135,28 @@ class RadialGradient extends GradientBaseClass {
 
     // Check required args
 
-    if (!CHECKS.IsDefined(this.args.startColor))
+    if (!Validate.IsDefined(this.args.startColor))
       errors.push(`RADIAL_GRADIENT_ERROR: Start color is undefined.`);
     else {
-      if (!CHECKS.IsString(this.args.startColor))
+      if (!Validate.IsString(this.args.startColor))
         errors.push(`RADIAL_GRADIENT_ERROR: Start color is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.startColor))
+        if (Validate.IsEmptyString(this.args.startColor))
           errors.push(`RADIAL_GRADIENT_ERROR: Start color is empty string.`);
-        else if (CHECKS.IsWhitespace(this.args.startColor))
+        else if (Validate.IsWhitespace(this.args.startColor))
           errors.push(`RADIAL_GRADIENT_ERROR: Start color is whitespace.`);
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.endColor))
+    if (!Validate.IsDefined(this.args.endColor))
       errors.push(`RADIAL_GRADIENT_ERROR: End color is undefined.`);
     else {
-      if (!CHECKS.IsString(this.args.endColor))
+      if (!Validate.IsString(this.args.endColor))
         errors.push(`RADIAL_GRADIENT_ERROR: End color is not a string.`);
       else {
-        if (CHECKS.IsEmptyString(this.args.endColor))
+        if (Validate.IsEmptyString(this.args.endColor))
           errors.push(`RADIAL_GRADIENT_ERROR: End color is empty string.`);
-        else if (CHECKS.IsWhitespace(this.args.endColor))
+        else if (Validate.IsWhitespace(this.args.endColor))
           errors.push(`RADIAL_GRADIENT_ERROR: End color is whitespace.`);
       }
     }
@@ -163,7 +164,7 @@ class RadialGradient extends GradientBaseClass {
     // Check optional args
 
     if (this.args.center) {
-      if (!CHECKS.IsDefined(this.args.center))
+      if (!Validate.IsDefined(this.args.center))
         errors.push(`RADIAL_GRADIENT_ERROR: Center is undefined.`);
       else {
         if (this.args.center.name != 'Coordinates')
@@ -177,13 +178,13 @@ class RadialGradient extends GradientBaseClass {
     }
 
     if (this.args.radialWidth) {
-      if (!CHECKS.IsDefined(this.args.radialWidth))
+      if (!Validate.IsDefined(this.args.radialWidth))
         errors.push(`RADIAL_GRADIENT_ERROR: Radial width is undefined.`);
       else {
-        if (!CHECKS.IsNumber(this.args.radialWidth))
+        if (!Validate.IsNumber(this.args.radialWidth))
           errors.push(`RADIAL_GRADIENT_ERROR: Radial width is not a number.`);
         else {
-          if (!CHECKS.IsInteger(this.args.radialWidth))
+          if (!Validate.IsInteger(this.args.radialWidth))
             errors.push(`RADIAL_GRADIENT_ERROR: Radial width is not an integer.`);
           else {
             if (this.args.radialWidth < params.radialWidth.min)
@@ -194,13 +195,13 @@ class RadialGradient extends GradientBaseClass {
     }
 
     if (this.args.radialHeight) {
-      if (!CHECKS.IsDefined(this.args.radialHeight))
+      if (!Validate.IsDefined(this.args.radialHeight))
         errors.push(`RADIAL_GRADIENT_ERROR: Radial height is undefined.`);
       else {
-        if (!CHECKS.IsNumber(this.args.radialHeight))
+        if (!Validate.IsNumber(this.args.radialHeight))
           errors.push(`RADIAL_GRADIENT_ERROR: Radial height is not a number.`);
         else {
-          if (!CHECKS.IsInteger(this.args.radialHeight))
+          if (!Validate.IsInteger(this.args.radialHeight))
             errors.push(`RADIAL_GRADIENT_ERROR: Radial height is not an integer.`);
           else {
             if (this.args.radialHeight < params.radialHeight.min)
@@ -211,16 +212,16 @@ class RadialGradient extends GradientBaseClass {
     }
 
     if (this.args.angle) {
-      if (!CHECKS.IsDefined(this.args.angle))
+      if (!Validate.IsDefined(this.args.angle))
         errors.push(`RADIAL_GRADIENT_ERROR: Angle is undefined.`);
       else {
-        if (!CHECKS.IsNumber(this.args.angle))
+        if (!Validate.IsNumber(this.args.angle))
           errors.push(`RADIAL_GRADIENT_ERROR: Angle is not a number.`);
       }
     }
 
     if (this.args.boundinBox) {
-      if (!CHECKS.IsDefined(this.args.boundingBox))
+      if (!Validate.IsDefined(this.args.boundingBox))
         errors.push(`RADIAL_GRADIENT_ERROR: Bounding box is undefined.`);
       else {
         if (this.args.boundingBox.name != 'BoundinBox')
@@ -234,15 +235,15 @@ class RadialGradient extends GradientBaseClass {
     }
 
     if (this.args.extent) {
-      if (!CHECKS.IsDefined(this.args.extent))
+      if (!Validate.IsDefined(this.args.extent))
         errors.push(`RADIAL_GRADIENT_ERROR: Extent is undefind.`);
       else {
-        if (!CHECKS.IsString(this.args.extent))
+        if (!Validate.IsString(this.args.extent))
           errors.push(`RADIAL_GRADIENT_ERROR: Extent is not a string.`);
         else {
-          if (CHECKS.IsEmptyString(this.args.extent))
+          if (Validate.IsEmptyString(this.args.extent))
             errors.push(`RADIAL_GRADIENT_ERROR: Extent is empty string.`);
-          else if (CHECKS, IsWhitespace(this.args.extent))
+          else if (Validate, IsWhitespace(this.args.extent))
             erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is whitespace.`);
           else {
             if (!params.extent.options.includes(this.args.extent))
