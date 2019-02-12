@@ -1,19 +1,5 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
-
-//-----------------------------
-
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('center', { type: 'Coordinates' })
-  .add('width', { type: 'number', subtype: 'integer', min: 1 })
-  .add('height', { type: 'number', subtype: 'integer', min: 1 })
-  .build();
+let InputsBaseClass = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
+let Validate = require('./validate.js');
 
 //------------------------------
 
@@ -22,10 +8,13 @@ class BoundingBox extends INPUTS_BASECLASS {
     super(builder);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
-        this.type = 'boundingbox';
+        this.type = 'BoundingBox';
         this.name = 'BoundingBox'
         this.args = {};
       }
@@ -70,12 +59,12 @@ class BoundingBox extends INPUTS_BASECLASS {
 
   /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
+    let params = BoundingBox.Parameters();
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.center))
+    if (!Validate.IsDefined(this.args.center))
       errors.push('BOUNDING_BOX_ERROR: Center is undefined.');
     else {
       if (this.args.center.name != 'Coordinates')
@@ -87,42 +76,59 @@ class BoundingBox extends INPUTS_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.width))
+    if (!Validate.IsDefined(this.args.width))
       errors.push(`BOUNDING_BOX_ERROR: Width is undefined.`);
     else {
-      if (!CHECKS.IsNumber(this.args.width))
+      if (!Validate.IsNumber(this.args.width))
         errors.push(`BOUNDING_BOX_ERROR: Width is not a number.`);
       else {
-        if (!CHECKS.IsInteger(this.args.width))
+        if (!Validate.IsInteger(this.args.width))
           errors.push(`BOUNDING_BOX_ERROR: Width is not an integer.`);
         else {
-          if (this.args.width < ARG_INFO.width.min)
-            errors.push(`BOUNDING_BOX_ERROR: Width is out of bounds. Assigned value is ${this.args.width}. Must be greater than or equal to ${ARG_INFO.width.min}.`);
+          if (this.args.width < params.width.min)
+            errors.push(`BOUNDING_BOX_ERROR: Width is out of bounds. Assigned value is ${this.args.width}. Must be greater than or equal to ${params.width.min}.`);
         }
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.height))
+    if (!Validate.IsDefined(this.args.height))
       errors.push(`BOUNDING_BOX_ERROR: Height is undefined.`);
     else {
-      if (!CHECKS.IsNumber(this.args.height))
+      if (!Validate.IsNumber(this.args.height))
         errors.push(`BOUNDING_BOX_ERROR: Height is not a number.`);
       else {
-        if (!CHECKS.IsInteger(this.args.height))
+        if (!Validate.IsInteger(this.args.height))
           errors.push(`BOUNDING_BOX_ERROR: Height is not an integer.`);
         else {
-          if (this.args.width < ARG_INFO.height.min)
-            errors.push(`BOUNDING_BOX_ERROR: Height is out of bounds. Assigned value is ${this.args.height}. Must be greater than or equal to ${ARG_INFO.height.min}.`);
+          if (this.args.width < params.height.min)
+            errors.push(`BOUNDING_BOX_ERROR: Height is out of bounds. Assigned value is ${this.args.height}. Must be greater than or equal to ${params.height.min}.`);
         }
       }
     }
 
     return errors;
   }
+
+  static Parameters() {
+    return {
+      center: {
+        type: 'Coordinates'
+      },
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
+  }
 }
 
 //--------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Builder = BoundingBox.Builder;
+exports.BoundingBox = BoundingBox;
