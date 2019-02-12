@@ -1,24 +1,45 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'builder_stuff');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let INPUTS_BASECLASS = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
-let CHECKS = require(PATH.join(IM_MODULES_DIR, 'Checks', 'check.js'));
-let ARG_DICT_BUILDER = require(PATH.join(IM_MODULES_DIR, 'Arguments', 'argdictionary.js')).Builder;
+let InputsBaseClass = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
+let Validate = require('./validate.js');
 
 //-----------------------------
 
-const ARG_INFO = ARG_DICT_BUILDER()
-  .add('start', { type: 'Coordinates' })
-  .add('end', { type: 'Coordinates' })
-  .build();
-
-//-----------------------------
-
-class Vector extends INPUTS_BASECLASS {
+class Vector extends InputsBaseClass {
   constructor(properties) {
     super(properties);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.type = 'Vector';
+        this.name = 'Vector';
+        this.args = {};
+      }
+
+      /**
+       * @param {Coordinates} start 
+       */
+      start(start) {
+        this.args.start = start;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} end 
+       */
+      end(end) {
+        this.args.end = end;
+        return this;
+      }
+
+      build() {
+        return new Vector(this);
+      }
+    }
+    return Builder;
   }
 
   /**
@@ -29,31 +50,15 @@ class Vector extends INPUTS_BASECLASS {
   }
 
   /**
-   * @param {Coordinates} start Start coordinates 
-   * @param {Coordinates} end End coordinates
-   * @returns {Vector} Returns a Vector object.
-   */
-  static Create(start, end) {
-    let properties = {
-      type: 'vector',
-      name: 'Vector',
-      args: { start: start, end: end }
-    };
-
-    return new Vector(properties);
-  }
-
-  /**
    * @override
-   * @returns {Array<string>} Returns an array of error messages. If array is empty, there were no errors.
    */
   Errors() {
     let errors = [];
 
-    if (!CHECKS.IsDefined(this.args.start))
+    if (!Validate.IsDefined(this.args.start))
       errors.push('VECTOR_ERROR: Start coordinates are undefined.');
     else {
-      if (this.args.start.name != 'Coordinates')
+      if (this.args.start.type != 'Coordinates')
         errors.push(`VECTOR_ERROR: Start is not a Coordinates object.`);
       else {
         let errs = this.args.start.Errors();
@@ -63,17 +68,16 @@ class Vector extends INPUTS_BASECLASS {
       }
     }
 
-    if (!CHECKS.IsDefined(this.args.end))
+    if (!Validate.IsDefined(this.args.end))
       errors.push('VECTOR_ERROR: End coordinates are undefined.');
     else {
-      if (this.args.end.name != 'Coordinates')
+      if (this.args.end.type != 'Coordinates')
         errors.push(`VECTOR_ERROR: End is not a Coordinates object.`);
       else {
         let errs = this.args.end.Errors();
         if (errs.length > 0) {
           errors.push(`VECTOR_ERROR: End coordinates has errors: ${errs.join(' ')}`);
         }
-
       }
     }
 
@@ -84,5 +88,4 @@ class Vector extends INPUTS_BASECLASS {
 //---------------------------
 // EXPORTS
 
-exports.ARG_INFO = ARG_INFO;
-exports.Create = Vector.Create;
+exports.Vector = Vector;
