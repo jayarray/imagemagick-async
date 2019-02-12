@@ -106,6 +106,14 @@ function IsBoolean(o) {
   return typeof o == 'boolean' || o instanceof Boolean;
 }
 
+/**
+ * @param {object} o 
+ * @returns {boolean} Returns true if object is an object with iterable properties. False otherwise.
+ */
+function IsObject(o) {
+  return typeof o == 'object' && o.constructor === Object;
+}
+
 //-------------------------------
 // EXPORTS
 
@@ -121,3 +129,4 @@ exports.IsInteger = IsInteger;
 exports.IsFloat = IsFloat;
 exports.IsArray = IsArray;
 exports.IsBoolean = IsBoolean;
+exports.IsObject = IsObject;
