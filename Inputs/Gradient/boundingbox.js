@@ -3,7 +3,7 @@ let Validate = require('./validate.js');
 
 //------------------------------
 
-class BoundingBox extends INPUTS_BASECLASS {
+class BoundingBox extends InputsBaseClass {
   constructor(builder) {
     super(builder);
   }
