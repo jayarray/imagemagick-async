@@ -83,6 +83,20 @@ class Vector extends InputsBaseClass {
 
     return errors;
   }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      start: {
+        type: 'Coordinates'
+      },
+      end: {
+        type: 'Coordinates'
+      }
+    };
+  }
 }
 
 //---------------------------
