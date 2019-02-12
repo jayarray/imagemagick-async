@@ -1,6 +1,7 @@
-let PATH = require('path');
-let GradientBaseClass = require(PATH.join(__dirname, 'gradientbaseclass.js')).GradientBaseClass;
+let Path = require('path');
 let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let GradientBaseClass = require(Path.join(Filepath.GradientDir(), 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
 

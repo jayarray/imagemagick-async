@@ -1,9 +1,7 @@
-let PATH = require('path');
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'inputs');
-let INPUTS_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let InputsBaseClass = require(PATH.join(INPUTS_DIR, 'inputsbaseclass.js')).InputsBaseClass;
+let Path = require('path');
 let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
 //------------------------------
 

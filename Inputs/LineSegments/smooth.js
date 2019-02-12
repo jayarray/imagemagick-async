@@ -1,6 +1,7 @@
-let PATH = require('path');
-let LineSegmentBaseClass = require(PATH.join(__dirname, 'linesegmentbaseclass.js')).LineSegmentBaseClass;
+let Path = require('path');
 let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
 //------------------------------------
 

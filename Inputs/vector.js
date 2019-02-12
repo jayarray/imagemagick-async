@@ -1,5 +1,7 @@
-let InputsBaseClass = require(PATH.join(__dirname, 'inputsbaseclass.js')).InputsBaseClass;
+let Path = require('path');
 let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
 //-----------------------------
 
