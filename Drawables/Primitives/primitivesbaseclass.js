@@ -1,11 +1,25 @@
-class PrimitiveBaseClass {
-  constructor() {
-    this.xOffset_ = 0;
-    this.yOffset_ = 0;
+let Path = require('path');
+let Filepath = require('./filepath.js').Filepath;
+let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
+
+//----------------------------------
+
+class PrimitivesBaseClass extends DrawableBaseClass {
+  constructor(properties) {
+    super({
+      type: 'Primitive',
+      name: properties.name,
+      args: properties.args
+    });
+
+    this.offset = { x: 0, y: 0 };
+
+    if (properties.offset)
+      this.offset = properties.offset;
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the primitive.
+   * @returns {Array} Returns a list of arguments needed for rendering.
    */
   Args() {
     // Override
@@ -13,23 +27,20 @@ class PrimitiveBaseClass {
 
   /**
    * @override
-   * @returns {string} Returns a string of the type name.
    */
-  Type() {
-    return 'primitive';
+  static IsLayer() {
+    return false;
   }
 
   /**
    * @override
-   * @returns {string} Returns a string of the command used to render the primitive.
    */
-  Command() {
-    return null;
+  static IsConsolidatable() {
+    return true;
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.PrimitiveBaseClass = PrimitiveBaseClass;
-exports.ComponentType = 'private';
+exports.PrimitivesBaseClass = PrimitivesBaseClass;
