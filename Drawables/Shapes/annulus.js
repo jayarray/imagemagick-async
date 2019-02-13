@@ -1,74 +1,291 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let COORDINATES = require(PATH.join(IM_MODULES_DIR, 'Inputs', 'coordinates.js')).Create;
-let ELLIPSE = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'ellipse.js')).Create;
-let CIRCLE = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'circle.js')).Create;
-let PRIMITIVE_BASECLASS = require(PATH.join(IM_MODULES_DIR, 'Primitives', 'primitivesbaseclass.js')).PrimitiveBaseClass;
+let Path = require('path');
+let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let Coordinates = require(Path_.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
+let Circle = require(Path.join(Filepath.PrimitivesDir(), 'circle.js')).Circle;
+let Ellipse = require(Path.join(Filepath.PrimitivesDir(), 'ellipse.js')).Ellipse;
+let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //---------------------------------
 
-class Annulus extends PRIMITIVE_BASECLASS {
-  constructor(center, minorRadius, majorRadius, strokeColor, strokeWidth, fillColor) {
-    super();
-    this.center_ = center;
-    this.minorRadius_ = minorRadius;
-    this.majorRadius_ = majorRadius;
-    this.strokeColor_ = strokeColor;
-    this.strokeWidth_ = strokeWidth;
-    this.circleStrokeWidth = strokeWidth;
-    this.fillColor_ = fillColor; // used for ellipse
+class Annulus extends PrimitivesBaseClass {
+  constructor(properties) {
+    super(properties);
+  }
 
-    // Minor outline
-    let minorEdge = COORDINATES(center.x_ + minorRadius, center.y_);
-    this.minorOutline_ = CIRCLE(center, minorEdge, strokeColor, this.circleStrokeWidth, "none");
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Annulus';
+        this.args = {};
+      }
 
-    // Major outline
-    let majorEdge = COORDINATES(center.x_ + majorRadius, center.y_);
-    this.majorOutline_ = CIRCLE(center, majorEdge, strokeColor, this.circleStrokeWidth, "none");
+      /**
+       * @param {Coordinates} center 
+       */
+      center(center) {
+        this.args.center = center;
+        return this;
+      }
 
-    // Donut
-    let ellipseWidth = majorRadius + minorRadius; //Math.abs(center.x_ - majorEdge.x_);
-    let ellipseHeight = ellipseWidth;
-    let ellipseStrokeColor = fillColor;
-    let ellipseStrokeWidth = majorRadius - minorRadius;
-    this.ellipse_ = ELLIPSE(center, ellipseWidth, ellipseHeight, ellipseStrokeColor, ellipseStrokeWidth, "none", 0, 360);
+      /**
+       * @param {number} minorRadius Length of the inner radius.
+       */
+      minorRadius(minorRadius) {
+        this.args.minorRadius = minorRadius;
+        return this;
+      }
+
+      /**
+       * @param {number} majorRadius Length of the outer radius.
+       */
+      majorRadius(majorRadius) {
+        this.args.majorRadius = majorRadius;
+        return this;
+      }
+
+      /**
+       * @param {Color} color The color of the annulus.
+       */
+      color(color) {
+        this.color = color;
+        return this
+      }
+
+      /**
+       * @param {Color} strokeColor The color of the outlines making up the major and minor radii. (Optional)
+       */
+      strokeColor(strokeColor) {
+        this.args.strokeColor = strokeColor;
+        return this;
+      }
+
+      /**
+       * @param {number} strokeWidth Width of the outlines making up the major and minor radii. Larger values produce thicker lines. (Optional)
+       */
+      strokeWidth(strokeWidth) {
+        this.args.strokeWidth = strokeWidth;
+        return this;
+      }
+
+      /**
+       * @param {Color} fillColor The color used to fill in the empty space inside the annulus. (Optional)
+       */
+      fillColor(fillColor) {
+        this.args.fillColor = fillColor;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Annulus(this);
+      }
+    }
+    return Builder;
   }
 
   /** 
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the polygon.
    */
   Args() {
-    return this.ellipse_.Args().concat(this.majorOutline_.Args()).concat(this.minorOutline_.Args());
+    let args = [];
+
+    // Minor outline
+
+    let minorEdge = Coordinates.Builder()
+      .x(this.args.center.args.x + this.args.minorRadius)
+      .y(this.center.args.y)
+      .build();
+
+    let minorCircle = Circle.Builder()
+      .center(this.args.center)
+      .edge(minorEdge)
+      .strokeColor(this.args.strokeColor)
+      .strokeWidth(this.args.strokeWidth)
+      .build();
+
+    // Major outline
+
+    let majorEdge = Coordinates.Builder()
+      .x(this.args.center.args.x + this.args.majorRadius)
+      .y(this, args.center.args.y)
+      .build();
+
+    let majorCircle = Circle.Builder()
+      .center(this.args.center)
+      .edge(majorEdge)
+      .strokeColor(this.args.strokeColor)
+      .strokeWidth(this.args.strokeWidth)
+      .build();
+
+    // Fill color (background) (Same as major circle but solid colored)
+
+    if (this.args.fillColor) {
+      let fillColorCircle = Circle.Builder()
+        .center(this.args.center)
+        .edge(majorEdge)
+        .strokeColor(this.args.strokeColor)
+        .strokeWidth(this.args.strokeWidth)
+        .fillColor(this.args.fillColor)
+        .build();
+
+      args = args.concat(fillColorCircle.Args());
+    }
+
+    // Donut
+
+    let ellipse = Ellipse.Builder()
+      .center(this.args.center)
+      .width(this.args.majorRadius + this.args.minorRadius)
+      .height(this.args.majorRadius + this.args.minorRadius)
+      .strokeColor(this.args.color)
+      .strokeWidth(this.args.majorRadius - this.args.minorRadius)
+      .angleStart(0)
+      .angleEnd(360)
+      .build();
+
+    args = args.concat(ellipse.Args()).concat(majorCircle.Args()).concat(minorCircle.Args());
+
+    return args;
   }
 
-  /** 
-   * Create an Annulus object with the specified properties.
-   * @param {Coordinates} center (Required)
-   * @param {number} minorRadius Length of the inner radius. (Required)
-   * @param {number} majorRadius Length of the outer radius. (Required)
-   * @param {string} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
-   * @param {string} fillColor The color to fill the path with. (Valid color format string used in Image Magick) (Optional)
-   * @returns {Annulus} Returns an Annulus object. If inputs are invalid, it returns null.
+  /**
+   * @override
    */
-  static Create(center, minorRadius, majorRadius, strokeColor, strokeWidth, fillColor) {
-    if (!center || isNaN(minorRadius) || isNaN(majorRadius))
-      return null;
+  Errors() {
+    let params = Annulus.Parameters();
+    let errors = [];
 
-    return new Annulus(center, minorRadius, majorRadius, strokeColor, strokeWidth, fillColor);
+    // Check required args
+
+    if (!Validate.IsDefined(this.args.center))
+      errors.push('ANNULUS_SHAPE_ERROR: Center is undefined.');
+    else {
+      if (this.args.center.type != 'Coordinates')
+        errors.push('ANNULUS_SHAPE_ERROR: Center is not a Coordinates object.');
+      else {
+        let errs = this.args.center.Errors();
+        if (errs.length > 0)
+          errors.push(`ANNULUS_SHAPE_ERROR: Center has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    if (!Validate.IsDefined(this.args.minorRadius))
+      errors.push('ANNULUS_SHAPE_ERROR: Minor radius is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.minorRadius))
+        errors.push('ANNULUS_SHAPE_ERROR: Minor radius is not an integer.');
+      else {
+        if (this.args.minorRadius < params.minorRadius.min)
+          errors.push(`ANNULUS_SHAPE_ERROR: Minor radius is out of bounds. Assigned value is: ${this.args.minorRadius}. Value must be greater than or equal to ${params.minorRadius.min}.`);
+      }
+    }
+
+    if (!Validate.IsDefined(this.args.majorRadius))
+      errors.push('ANNULUS_SHAPE_ERROR: Major radius is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.majorRadius))
+        errors.push('ANNULUS_SHAPE_ERROR: Major radius is not an integer.');
+      else {
+        if (this.args.majorRadius < params.majorRadius.min)
+          errors.push(`ANNULUS_SHAPE_ERROR: Major radius is out of bounds. Assigned value is: ${this.args.majorRadius}. Value must be greater than or equal to ${params.majorRadius.min}.`);
+      }
+    }
+
+    if (!Validate.IsDefined(this.args.color))
+      errors.push('ANNULUS_SHAPE_ERROR: Color is not defined.');
+    else {
+      if (this.args.color.type != 'Color')
+        errors.push('ANNULUS_SHAPE_ERROR: Color is not a Color object.');
+      else {
+        let errs = this.args.color.Errors();
+        if (errs.length > 0)
+          errors.push(`ANNULUS_SHAPE_ERROR: Color has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    // Check optional args
+
+    if (this.args.strokeColor) {
+      if (this.args.strokeColor.type != 'Color')
+        errors.push('ANNULUS_SHAPE_ERROR: Stroke color is not a Color object.');
+      else {
+        let errs = this.args.strokeColor.Errors();
+        if (errs.length > 0)
+          errors.push(`ANNULUS_SHAPE_ERROR: Stroke color has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    if (this.args.strokeWidth) {
+      if (!Validate.IsInteger(this.args.strokeWidth))
+        errors.push('ANNULUS_SHAPE_ERROR: Stroke width is not an integer.');
+      else {
+        if (this.args.strokeWidth < params.strokeWidth.min)
+          errors.push(`ANNULUS_SHAPE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
+      }
+    }
+
+    if (this.args.fillColor) {
+      if (this.args.fillColor.type != 'Color')
+        errors.push('ANNULUS_SHAPE_ERROR: Fill color is not a Color object.');
+      else {
+        let errs = this.args.fillColor.Errors();
+        if (errs.length > 0)
+          errors.push(`ANNULUS_SHAPE_ERROR: Fill color has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      center: {
+        type: 'Coordinates'
+      },
+      minorRadius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      majorRadius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      color: {
+        type: 'Color'
+      },
+      strokeColor: {
+        type: 'Color'
+      },
+      strokeWidth: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      fillColor: {
+        type: 'Color'
+      }
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = Annulus.Create;
-exports.Name = 'Annulus';
-exports.Layer = false;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Annulus = Annulus;
