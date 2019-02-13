@@ -46,7 +46,7 @@ class Ellipse extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {Color} strokeColor The color of the line making up the circle. (Valid color format string used in Image Magick) (Optional)
+       * @param {Color} strokeColor The color of the line making up the ellipse. (Valid color format string used in Image Magick) (Optional)
        */
       strokeColor(strokeColor) {
         this.args.strokeColor = strokeColor;
@@ -54,7 +54,7 @@ class Ellipse extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} strokeWidth Width of the line making up the circle. (Larger values produce thicker lines.) (Optional)
+       * @param {number} strokeWidth Width of the line making up the ellipse. (Larger values produce thicker lines.) (Optional)
        */
       strokeWidth(strokeWidth) {
         this.args.strokeWidth = strokeWidth;
@@ -62,7 +62,7 @@ class Ellipse extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {Color} fillColor The color to fill the circle. (Valid color format string used in Image Magick) (Optional)
+       * @param {Color} fillColor The color to fill the ellipse. (Valid color format string used in Image Magick) (Optional)
        */
       fillColor(fillColor) {
         this.args.fillColor = fillColor;
