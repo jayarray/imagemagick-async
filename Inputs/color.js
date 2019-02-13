@@ -393,7 +393,7 @@ class Color extends InputsBaseClass {
        * @param {string} format The input format that determines how the color is constructed. The formats are: 'string' (for using a hex string), 'integers' (for using rgb values), or 'percents' (for using percent values). 
        */
       format(format) {
-        this.format = format;
+        this.args.format = format;
         return this;
       }
 
@@ -426,7 +426,7 @@ class Color extends InputsBaseClass {
   }
 
   /**
-   * @returns {string} Returns the string representation of this color.
+   * @returns {string} Returns the string representation of this color according to its format.
    */
   String() {
     let info = this.Info();
@@ -440,6 +440,13 @@ class Color extends InputsBaseClass {
       str = info.percents.string;
 
     return str;
+  }
+
+  /**
+   * @returns {string} Returns the hex string representation of this color in the form of '#rrggbb'.
+   */
+  HexString() {
+    return this.Info().hex.string;
   }
 
   /**
