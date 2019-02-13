@@ -19,13 +19,6 @@ class PrimitivesBaseClass extends DrawableBaseClass {
   }
 
   /**
-   * @returns {Array} Returns a list of arguments needed for rendering.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
    * @override
    */
   static IsLayer() {
