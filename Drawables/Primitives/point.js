@@ -1,51 +1,136 @@
-let PATH = require('path');
-let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')).PrimitiveBaseClass;
+let Path_ = require('path');
+let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //-----------------------------------
 
-class Point extends PRIMITIVE_BASECLASS {
-  constructor(x, y, color) {
-    super();
-    this.x_ = x;
-    this.y_ = y;
-    this.color_ = color;
+class Point extends PrimitivesBaseClass {
+  constructor(properties) {
+    super(properties);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Point';
+        this.args = {};
+      }
+
+      /**
+       * @param {number} x X-coordinate
+       */
+      x(x) {
+        this.args.x = x;
+        return this;
+      }
+
+      /**
+       * @param {number} y Y-coordinate
+       */
+      y(y) {
+        this.args.y = y;
+        return this;
+      }
+
+      /**
+       * @param {Color} color Valid color format string used in Image Magick. (Optional)
+       */
+      color(color) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Point(this);
+      }
+    }
+    return Builder;
   }
 
   /** 
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the point.
    */
   Args() {
     let args = [];
 
-    if (this.color_)
-      args.push('-fill', this.color_); // Default color is black
+    if (this.args.color)
+      args.push('-fill', this.args.color.Info().hex.string); // Default color is black
 
-    args.push('-draw', `point ${this.x_ + this.xOffset_},${this.y_ + this.yOffset_}`);
+    args.push('-draw', `point ${this.args.x + this.offset.x},${this.args.y + this.offset.y}`);
     return args;
   }
 
   /**
-   * Creates a Point object given the specified x and y coordinates.
-   * @param {number} x X-coordinate (Required)
-   * @param {number} y Y-coordinate (Required)
-   * @param {string} color Valid color format string used in Image Magick. (Optional)
-   * @returns {Point} Returns a Path object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(x, y, color) {
-    if (!x || !y)
-      return null;
+  Errors() {
+    let errors = [];
 
-    return new Point(x, y, color);
+    // Check required args
+
+    if (!Validate.IsDefined(this.args.x))
+      errors.push('POINT_PRIMITIVE_ERROR: X is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.x))
+        errors.push('POINT_PRIMITIVE_ERROR: X is not an integer.');
+    }
+
+    if (!Validate.IsDefined(this.args.y))
+      errors.push('POINT_PRIMITIVE_ERROR: Y is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.y))
+        errors.push('POINT_PRIMITIVE_ERROR: Y is not an integer.');
+    }
+
+    // Check optional args
+
+    if (this.args.color) {
+      if (this.args.color.type != 'Color')
+        errors.push('POINT_PRIMITIVE_ERROR: Color is not a Color object.');
+      else {
+        let errs = this.args.color.Errors();
+        if (errs.length > 0)
+          errors.push(`POINT_PRIMITIVE_ERROR: Color has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      x: {
+        type: 'number',
+        subtype: 'integer'
+      },
+      y: {
+        type: 'number',
+        subtype: 'integer'
+      },
+      color: {
+        type: 'Color'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTs
 
-exports.Create = Point.Create;
-exports.Name = 'Point';
-exports.Layer = false;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Point = Point;
