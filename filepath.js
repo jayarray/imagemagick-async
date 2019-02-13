@@ -148,6 +148,7 @@ class Filepath {
   static EffectsDir() {
     return Filepath.Builder()
       .partialPath(Filepath.RootDir)
+      .dir('Drawables')
       .dir('Effects')
       .build()
       .String();
@@ -159,6 +160,7 @@ class Filepath {
   static FxDir() {
     return Filepath.Builder()
       .partialPath(Filepath.RootDir)
+      .dir('Drawables')
       .dir('Effects')
       .dir('Fx')
       .build()
@@ -171,6 +173,7 @@ class Filepath {
   static ModDir() {
     return Filepath.Builder()
       .partialPath(Filepath.RootDir)
+      .dir('Drawables')
       .dir('Effects')
       .dir('Mod')
       .build()
@@ -183,6 +186,7 @@ class Filepath {
   static TransformDir() {
     return Filepath.Builder()
       .partialPath(Filepath.RootDir)
+      .dir('Drawables')
       .dir('Effects')
       .dir('Transform')
       .build()
