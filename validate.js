@@ -99,6 +99,40 @@ function IsArray(o) {
 }
 
 /**
+ * Use this function with classes inheriting from ObjectInterface class.
+ * @param {Array} array 
+ * @param {string} type The only type that should be in the array.
+ * @returns {boolean} Returns true if an item in the array does not match specified type. False otherwise.
+ */
+function ArrayHasInvalidTypes(arr, type) {
+  for (let i = 0; i < arr.length; ++i) {
+    let currItem = arr[i];
+
+    if (currItem.type != type)
+      return true;
+  }
+
+  return false;
+}
+
+/**
+ * Use this function with classes inheriting from ObjectInterface class.
+ * @param {Array} arr
+ * @returns {boolean} Returns true if any item in the array produces errors. False otherwise. 
+ */
+function ArrayHasErrors(arr) {
+  for (let i = 0; i < arr.length; ++i) {
+    let currItem = arr[i];
+    let errors = currItem.Errors();
+
+    if (errors.length > 0)
+      return true;
+  }
+
+  return false;
+}
+
+/**
  * @param {object} o 
  * @returns {boolean} Returns true if object is a boolean. False otherwise.
  */
@@ -128,5 +162,7 @@ exports.IsNumber = IsNumber;
 exports.IsInteger = IsInteger;
 exports.IsFloat = IsFloat;
 exports.IsArray = IsArray;
+exports.ArrayHasInvalidTypes = ArrayHasInvalidTypes;
+exports.ArrayHasErrors = ArrayHasErrors;
 exports.IsBoolean = IsBoolean;
 exports.IsObject = IsObject;
