@@ -1,71 +1,208 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let COORDINATES = require(PATH.join(IM_MODULES_DIR, 'Inputs', 'coordinates.js')).Create;
-let PRIMITIVE_BASECLASS = require(PATH.join(__dirname, 'primitivesbaseclass.js')).PrimitiveBaseClass;
+let Path = require('path');
+let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
+let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //------------------------------------
 
-class Circle extends PRIMITIVE_BASECLASS {
-  constructor(center, edge, strokeColor, strokeWidth, fillColor) {
-    super();
-    this.center_ = center;
-    this.edge_ = edge;
-    this.strokeColor_ = strokeColor;
-    this.strokeWidth_ = strokeWidth;
-    this.fillColor_ = fillColor;
+class Circle extends PrimitivesBaseClass {
+  constructor(properties) {
+    super(properties);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class builder {
+      constructor() {
+        this.name = 'Circle';
+        this.args = {};
+      }
+
+      /**
+       * @param {Coordinates} center 
+       */
+      center(center) {
+        this.args.center = center;
+        return this.args;
+      }
+
+      /**
+       * @param {Coordinates} edge 
+       */
+      edge(edge) {
+        this.args.edge = edge;
+        return this;
+      }
+
+      /**
+       * @param {Color} strokeColor The color of the line making up the circle. (Valid color format string used in Image Magick) (Optional)
+       */
+      strokeColor(strokeColor) {
+        this.args.strokeColor = strokeColor;
+        return this;
+      }
+
+      /**
+       * @param {number} strokeWidth Width of the line making up the circle. (Larger values produce thicker lines.) (Optional)
+       */
+      strokeWidth(strokeWidth) {
+        this.args.strokeWidth = strokeWidth;
+        return this;
+      }
+
+      /**
+       * @param {Color} fillColor The color to fill the circle. (Valid color format string used in Image Magick) (Optional)
+       */
+      fillColor(fillColor) {
+        this.args.fillColor = fillColor;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Circle(this);
+      }
+    }
+    return Builder;
   }
 
   /** 
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments needed for drawing the circle.
   */
   Args() {
     let args = [];
 
-    if (this.fillColor_)
-      args.push('-fill', this.fillColor_);
+    if (this.args.fillColor)
+      args.push('-fill', this.args.fillColor.Info().hex.string);
     else
       args.push('-fill', 'none'); // Prevents default black fill color
 
-    if (this.strokeColor_)
-      args.push('-stroke', this.strokeColor_);
+    if (this.args.strokeColor)
+      args.push('-stroke', this.args.strokeColor.Info().hex.string);
 
-    if (this.strokeWidth_)
-      args.push('-strokewidth', this.strokeWidth_);
+    if (this.args.strokeWidth)
+      args.push('-strokewidth', this.args.strokeWidth);
 
-    let center = COORDINATES(this.center_.x_ + this.xOffset_, this.center_.y_ + this.yOffset_);
-    let edge = COORDINATES(this.edge_.x_ + this.xOffset_, this.edge_.y_ + this.yOffset_);
+    let center = Coordinates.Builder()
+      .x(this.args.center.args.x + this.offset.x)
+      .y(this.args.center.args.y + this.offset.y)
+      .build();
+
+    let edge = Coordinates.Builder()
+      .x(this.args.edge.args.x + this.offset.x)
+      .y(this.args.edge.args.y + this.offset.y)
+      .build();
+
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);
 
     return args;
   }
 
   /**
-   * Create a Circle object using the specified properties.
-   * @param {Coordinates} center Coordinates for center of circle. (Required)
-   * @param {Coordinates} edge  Coordinates for point on edge of circle. (Used for computing the radius.) (Required)
-   * @param {string} strokeColor The color of the line that makes up the circle. (Valid color format string used in Image Magick) (Optional)
-   * @param {number} strokeWidth The width of the line that makes up the circle. (Larger value produces a thicker line.) (Optional)
-   * @param {string} fillColor The color to fill the circle with. (Valid color format string used in Image Magick) (Optional)
-   * @returns {Circle} Returns a Circle object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(center, edge, strokeColor, strokeWidth, fillColor) {
-    if (!center || !edge)
-      return null;
+  Errors() {
+    let errors = [];
 
-    return new Circle(center, edge, strokeColor, strokeWidth, fillColor);
+    // Check required args
+
+    if (!Validate.IsDefined(this.args.center))
+      errors.push('CIRCLE_PRIMITIVE_ERROR: Center is undefined.');
+    else {
+      if (this.args.center.type != 'Coordinates')
+        errors.push('CIRCLE_PRIMITIVE_ERROR: Center is not a Coordinates object.');
+      else {
+        let errs = this.args.center.Errors();
+        if (errs.length > 0)
+          errors.push(`CIRCLE_PRIMITIVE_ERROR: Center has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    if (!Validate.IsDefined(this.args.edge))
+      errors.push('CIRCLE_PRIMITIVE_ERROR: Edge is undefined.');
+    else {
+      if (this.args.edge.type != 'Coordinates')
+        errors.push('CIRCLE_PRIMITIVE_ERROR: Edge is not a Coordinates object.');
+      else {
+        let errs = this.args.edge.Errors();
+        if (errs.length > 0)
+          errors.push(`CIRCLE_PRIMITIVE_ERROR: Center has errors: ${errs.join(' ')}`);
+      }
+    }
+
+    // Checks optional args
+
+    if (this.args.strokeColor) {
+      if (this.args.strokeColor.type != 'Color')
+        errors.push('CIRCLE_PRIMITIVE_ERROR: Stroke color is not a Color object.');
+      else {
+        let errs = this.args.strokeColor.Errors();
+        if (errs.length > 0)
+          errors.push(`CIRCLE_PRIMITIVE_ERROR: Stroke color has some errors: ${errs.join(' ')}`);
+      }
+    }
+
+    if (this.args.strokeWidth) {
+      if (!Validate.IsNumber(this.args.strokeWidth))
+        errors.push('CIRCLE_PRIMITIVE_ERROR: Stroke width is not a number.');
+      else {
+        if (this.args.strokeWidth < params.strokeWidth.min)
+          errors.push(`CIRCLE_PRIMITIVE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
+      }
+    }
+
+    if (this.args.fillColor) {
+      if (this.args.fillColor.type != 'Color')
+        errors.push('CIRCLE_PRIMITIVE_ERROR: Fill color is not a Color object.');
+      else {
+        let errs = this.args.fillColor.Errors();
+        if (errs.length > 0)
+          errors.push(`CIRCLE_PRIMITIVE_ERROR: Fill color has some errors: ${errs.join(' ')}`);
+      }
+    }
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      center: {
+        type: 'Coordinates'
+      },
+      edge: {
+        type: 'Coordinates'
+      },
+      strokeColor: {
+        type: 'Color'
+      },
+      strokeWidth: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1,
+        default: 1
+      },
+      fillColor: {
+        type: 'Color'
+      }
+    };
   }
 }
 
 //------------------------------
 // EXPORTS
 
-exports.Create = Circle.Create;
-exports.Name = 'Circle';
-exports.Layer = false;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Circle = Circle;
