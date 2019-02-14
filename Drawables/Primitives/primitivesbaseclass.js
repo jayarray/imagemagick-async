@@ -9,13 +9,9 @@ class PrimitivesBaseClass extends DrawableBaseClass {
     super({
       type: 'Primitive',
       name: properties.name,
-      args: properties.args
+      args: properties.args,
+      properties: properties.offset
     });
-
-    this.offset = { x: 0, y: 0 };
-
-    if (properties.offset)
-      this.offset = properties.offset;
   }
 
   /**
