@@ -23,8 +23,8 @@ class Image extends PrimitivesBaseClass {
       /**
        * @param {string} src Source path
        */
-      src(src) {
-        this.args.src = src;
+      source(source) {
+        this.args.source = source;
         return this;
       }
 
@@ -84,7 +84,7 @@ class Image extends PrimitivesBaseClass {
       height = this.args.height;
     }
 
-    return ['-draw', `image over ${this.corner.String()} ${width},${height} ${this.args.src}`];
+    return ['-draw', `image over ${this.corner.String()} ${width},${height} ${this.args.source}`];
   }
 
   /**
@@ -96,15 +96,15 @@ class Image extends PrimitivesBaseClass {
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.src))
+    if (!Validate.IsDefined(this.args.source))
       errors.push('IMAGE_PRIMITIVE_ERROR: Source is undefined.');
     else {
-      if (!Validate.IsString(this.args.src))
+      if (!Validate.IsString(this.args.source))
         errors.push('IMAGE_PRIMITIVE_ERROR: Source is not a string.');
       else {
-        if (Validate.IsEmptyString(this.args.src))
+        if (Validate.IsEmptyString(this.args.source))
           errors.push('IMAGE_PRIMITIVE_ERROR: Source is empty string.');
-        else if (Validate.IsWhitespace(this.args.src))
+        else if (Validate.IsWhitespace(this.args.source))
           errors.push('IMAGE_PRIMITIVE_ERROR: Source is whitespace.');
       }
     }
