@@ -1,75 +1,49 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let LAYER_BASECLASS = require(PATH.join(IM_MODULES_DIR, 'Layer', 'layerbaseclass.js')).LayerBaseClass;
+let Path = require('path');
+let Filepath = require('./filepath.js').Filepath;
+let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
 
 //---------------------------------
 
-class CanvasBaseClass extends LAYER_BASECLASS {
-  constructor(width, height) {
-    super();
-    this.width_ = width;
-    this.height_ = height;
-    this.primitives_ = [];
+class CanvasBaseClass extends DrawableBaseClass {
+  constructor(properties) {
+    super({
+      type: 'Canvas',
+      name: properties.name,
+      args: properties.args,
+      offset: properties.offset
+    });
+
+    this.command = 'convert';
+    this.primitives = properties.primitives ? properties.primitives : [];
   }
 
   /**
-   * Add a Primitive object to this canvas.
+   * Add a Primitive to this canvas.
    * @param {Primitive} p 
    * @param {number} xOffset 
    * @param {number} yOffset 
    */
-  AddPrimitive(p, xOffset, yOffset) {
-    p.xOffset_ = xOffset;
-    p.yOffset_ = yOffset;
-    this.primitives_.push(p);
-  }
+  AddPrimitive(p, offset) {
+    if (offset) {
+      p.offset.x = offset.x;
+      p.offset.y = offset.y;
+    }
 
-  /**
-   * @returns {Array<Primitive>} Returns an array of Primitive objects.
-   */
-  Primitives() {
-    return this.primitives_;
-  }
-
-  /**
-   * Get list of arguments required to draw the canvas.
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    return []; // Override
+    this.primitives.push(p);
   }
 
   /**
    * @override
-   * @returns {string} Returns a string of the type name.
    */
-  Type() {
-    return 'canvas';
+  static IsLayer() {
+    return true;
   }
 
   /**
    * @override
-   * @returns {string} Returns a string of the command used to render the canvas.
    */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @returns {number} Returns the width of the canvas.
-   */
-  Width() {
-    return this.width_;
-  }
-
-  /**
-   * @returns {number} Returns the height of the canvas.
-   */
-  Height() {
-    return this.height_;
+  static IsConsolidatable() {
+    return false;
   }
 }
 
@@ -77,4 +51,3 @@ class CanvasBaseClass extends LAYER_BASECLASS {
 // EXPORTS
 
 exports.CanvasBaseClass = CanvasBaseClass;
-exports.ComponentType = 'private';
