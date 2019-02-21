@@ -581,9 +581,10 @@ class ErrorMessage {
     }
 
     if (Validate.IsDefined(strCond.length_)) {
-      if (strCond.length_) {
+      if (strCond.length_ >= 0) {
         if (strCond.value_.length != strCond.length_) {
           s2 += ` is invalid length. Current length is: ${strCond.value_.length}. Length must be equal to ${strCond.length_}.`;
+          return s1 + s2;
         }
       }
     }
