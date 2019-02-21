@@ -377,7 +377,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'lt',
           value: value,
-          ok: this.value < value
+          ok: this.value_ < value
         });
 
         return this;
@@ -387,7 +387,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'lte',
           value: value,
-          ok: this.value <= value
+          ok: this.value_ <= value
         });
 
         return this;
@@ -397,7 +397,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'gt',
           value: value,
-          ok: this.value > value
+          ok: this.value_ > value
         });
 
         return this;
@@ -407,7 +407,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'gte',
           value: value,
-          ok: this.value >= value
+          ok: this.value_ >= value
         });
 
         return this;
@@ -417,7 +417,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'eq',
           value: value,
-          ok: this.value == value
+          ok: this.value_ == value
         });
 
         return this;
@@ -427,7 +427,7 @@ class NumberCondition {
         this.operations_.push({
           name: 'notEq',
           value: value,
-          ok: this.value != value
+          ok: this.value_ != value
         });
 
         return this;
