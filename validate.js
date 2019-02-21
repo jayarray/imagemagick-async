@@ -39,7 +39,7 @@ function IsAlphaString(s) {
     return false;
 
   let regExp = /^[A-Za-z]+$/;
-  return s.value.match(regExp) != null;
+  return s.match(regExp) != null;
 }
 
 /**
@@ -51,7 +51,7 @@ function IsNumericString(s) {
     return false;
 
   let regExp = /^[0-9]+$/;
-  return s.value.match(regExp) != null;
+  return s.match(regExp) != null;
 }
 
 /**
@@ -63,7 +63,7 @@ function IsAlphaNumeric(s) {
     return false;
 
   let regExp = /^[0-9a-zA-Z]+$/;
-  return !IsAlphaString(s) && !IsNumericString(s) && s.value.match(regExp) != null;
+  return !IsAlphaString(s) && !IsNumericString(s) && s.match(regExp) != null;
 }
 
 /**
