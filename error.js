@@ -620,13 +620,13 @@ class ErrorMessage {
           }
         }
         else if (strCond.startsWith_) {
-          if (strCond.value_.startsWith(strcond.startsWith_)) {
+          if (!strCond.value_.startsWith(strCond.startsWith_)) {
             s2 += ` is invalid. String must start with: ${strCond.startsWith_}.`;
             return s1 + s2;
           }
         }
         else if (strCond.endsWith_) {
-          if (strCond.value_.endsWith(strcond.endsWith_)) {
+          if (!strCond.value_.endsWith(strCond.endsWith_)) {
             s2 += ` is invalid. String must end with: ${strCond.endsWith_}.`;
             return s1 + s2;
           }
