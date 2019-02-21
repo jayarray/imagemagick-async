@@ -1,26 +1,66 @@
-let PATH = require('path');
-let CANVAS_BASECLASS = require(PATH.join(__dirname, 'canvasbaseclass.js')).CanvasBaseClass;
-
-let MIN_WIDTH = 1;
-let MIN_HEIGHT = 1;
+let Path = require('path');
+let Validate = require('./validate.js');
+let Filepath = require('./filepath.js').Filepath;
+let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //----------------------------------------
 // COLOR CANVAS
 
-class NoiseCanvas extends CANVAS_BASECLASS {
-  constructor(width, height) {
-    super(width, height);
+class NoiseCanvas extends CanvasBaseClass {
+  constructor(properties) {
+    super(properties);
   }
 
   /**
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'NoiseCanvas';
+        this.args = {};
+        this.primitives = [];
+      }
+
+      /**
+       * @param {number} width Width in pixels. 
+       */
+      width(width) {
+        this.width = width;
+        return this;
+      }
+
+      /**
+       * @param {number} height Height in pixels.
+       */
+      height(height) {
+        this.height = height;
+        return this;
+      }
+
+      /**
+       * @param {Array<Primitive>} primitives A list of Primitive types to draw onto the canvas (Optional)
+       */
+      primitives(primitives) {
+        this.primitives = primitives;
+        return this;
+      }
+
+      build() {
+        return new NoiseCanvas(this);
+      }
+    }
+    return Builder;
+  }
+
+  /**
+   * @override
    */
   Args() {
-    let args = ['-size', `${this.width_}x${this.height_}`, 'canvas:', '+noise', 'Random'];
+    let args = ['-size', `${this.args.width}x${this.args.height}`, 'canvas:', '+noise', 'Random'];
 
-    if (this.Primitives().length > 0)
-      this.Primitives().forEach(p => args = args.concat(p.Args()));
+    if (this.primitives.length > 0)
+      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -28,30 +68,55 @@ class NoiseCanvas extends CANVAS_BASECLASS {
   /**
    * @override
    */
-  Name() {
-    return 'NoiseCanvas';
+  Errors() {
+    let params = NoiseCanvas.Parameters();
+    let errors = [];
+
+    if (!Validate.IsDefined(this.args.width))
+      errors.push('NOISE_CANVAS_ERROR: Width is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.width))
+        errors.push('NOISE_CANVAS_ERROR: Width is not an integer.');
+      else {
+        if (this.args.width < params.width.min)
+          errors.push(`NOISE_CANVAS_ERROR: Width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to ${params.width.min}.`);
+      }
+    }
+
+    if (!Validate.IsDefined(this.args.height))
+      errors.push('NOISE_CANVAS_ERROR: Height is undefined.');
+    else {
+      if (!Validate.IsInteger(this.args.height))
+        errors.push('NOISE_CANVAS_ERROR: Height is not an integer.');
+      else {
+        if (this.args.height < params.height.min)
+          errors.push(`NOISE_CANVAS_ERROR: Height is out of bounds. Assigned value is: ${this.args.height}. Value must be greater than or equal to ${params.height.min}.`);
+      }
+    }
+
+    return errors;
   }
 
   /**
-   * Create a NoiseCanvas object with the specified properties.
-   * @param {number} width Width (in pixels)
-   * @param {number} height Height (in pixels)
-   * @returns {NoiseCanvas} Returns a NoiseCanvas object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(width, height) {
-    if (width < MIN_WIDTH || height < MIN_HEIGHT)
-      return null;
-
-    return new NoiseCanvas(width, height);
+  static Parameters() {
+    return {
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = NoiseCanvas.Create;
-exports.Name = 'NoiseCanvas';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.NoiseCanvas = NoiseCanvas;
