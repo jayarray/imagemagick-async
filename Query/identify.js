@@ -1,13 +1,11 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let VALIDATE = require(PATH.join(IM_MODULES_DIR, 'Validation', 'validate.js'));
+let Path = require('path');
+let Err = require('./error.js');
+let Filepath = require('./filepath.js').Filepath;
+let Validate = require('./validate.js');
 let GUID = require(PATH.join(IM_MODULES_DIR, 'Layer', 'guid.js'));
 
-let LINUX_COMMANDS = require('linux-commands-async');
-let LOCAL_COMMAND = require('linux-commands-async').Command.LOCAL;
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = require('linux-commands-async').Command.LOCAL;  // TO DO: Update this!!!
 
 //-------------------------------------
 // IMAGE
@@ -235,12 +233,12 @@ function ParseImageInfo(infoStr) {
  * @returns {Promise<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
 function GetImageInfo(src) {
-  let error = VALIDATE.IsStringInput(src);
+  let error = Validate.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to get image info: source is ${error}`);
 
   return new Promise((resolve, reject) => {
-    LOCAL_COMMAND.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
+    LocalCommand.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
       if (output.stderr) {
         reject(`Failed to get image info: ${output.stderr}`);
         return;
@@ -259,7 +257,7 @@ function GetImageInfo(src) {
 
 function GifFrameCount(src) { // displays info for all images making up the GIF.
   return new Promise((resolve, reject) => {
-    LOCAL_COMMAND.Execute('identify', [src]).then(output => {
+    LocalCommand.Execute('identify', [src]).then(output => {
       if (output.stderr) {
         reject(`Failed to get image info: ${output.stderr}`);
         return;
@@ -299,13 +297,13 @@ function ParseGifInfo(infoStr) {
  * @returns {Promise<{frameCount: number, path: string, images: Array<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
 function GetGifInfo(src) {
-  let error = VALIDATE.IsStringInput(src);
+  let error = Validate.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to get GIF info: source is ${error}`);
 
   return new Promise((resolve, reject) => {
     GifFrameCount(src).then(frameCount => {
-      LOCAL_COMMAND.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
+      LocalCommand.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
         if (output.stderr) {
           reject(`Failed to get GIF info: ${output.stderr}`);
           return;
@@ -329,12 +327,12 @@ function GetGifInfo(src) {
  * @returns {Promise<string>} Returns a promise. If it resolves, it returns a lowercase string representing the format type. Otherwise, it returns an error.
  */
 function Format(src) {
-  let error = VALIDATE.IsStringInput(src);
+  let error = Validate.IsStringInput(src);
   if (error)
     return Promise.reject(`Failed to identify format: source is ${error}`);
 
   return new Promise((resolve, reject) => {
-    LOCAL_COMMAND.Execute('identify', [src]).then(output => {
+    LocalCommand.Execute('identify', [src]).then(output => {
       if (output.stderr) {
         reject(`Failed to identify format: ${output.stderr}`);
         return;
@@ -417,17 +415,17 @@ class ImageInfo {
    * @returns {Promise<{x: number, y: number, color: string}>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   PixelInfo(x, y) {
-    let error = VALIDATE.IsInteger(x);
+    let error = Validate.IsInteger(x);
     if (error)
       return Promise.reject(`Failed to get pixel info: x is ${error}`);
 
-    error = VALIDATE.IsInteger(y);
+    error = Validate.IsInteger(y);
     if (error)
       return Promise.reject(`Failed to get pixel info: y is ${error}`);
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `1x1+${x}+${y}`, 'text:-'];
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
+      LocalCommand.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel info: ${output.stderr}`);
           return;
@@ -446,13 +444,13 @@ class ImageInfo {
    * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   PixelRowInfo(row) {
-    let error = VALIDATE.IsInteger(row);
+    let error = Validate.IsInteger(row);
     if (error)
       return Promise.reject(`Failed to get pixel row info: row is ${error}`);
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `${this.info_.width}x1+0+${row}`, 'text:-'];
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
+      LocalCommand.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel row info: ${output.stderr}`);
           return;
@@ -473,13 +471,13 @@ class ImageInfo {
    * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   PixelColumnInfo(column) {
-    let error = VALIDATE.IsInteger(column);
+    let error = Validate.IsInteger(column);
     if (error)
       return Promise.reject(`Failed to get pixel column info: row is ${error}`);
 
     return new Promise((resolve, reject) => {
       let args = [this.info_.path, '-crop', `1x${this.info_.height}+${column}+0`, 'text:-'];
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
+      LocalCommand.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel column info: ${output.stderr}`);
           return;
@@ -503,19 +501,19 @@ class ImageInfo {
    * @returns {Promise<Array<{x: number, y: number, color: string}>>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   PixelRangeInfo(startRow, endRow, startColumn, endColumn) {
-    let error = VALIDATE.IsInteger(startRow);
+    let error = Validate.IsInteger(startRow);
     if (error)
       return Promise.reject(`Failed to get pixel range info: start row is ${error}`);
 
-    error = VALIDATE.IsInteger(endRow);
+    error = Validate.IsInteger(endRow);
     if (error)
       return Promise.reject(`Failed to get pixel range info: end row is ${error}`);
 
-    error = VALIDATE.IsInteger(startColumn);
+    error = Validate.IsInteger(startColumn);
     if (error)
       return Promise.reject(`Failed to get pixel range info: start column is ${error}`);
 
-    error = VALIDATE.IsInteger(endColumn);
+    error = Validate.IsInteger(endColumn);
     if (error)
       return Promise.reject(`Failed to get pixel range info: end column is ${error}`);
 
@@ -523,18 +521,18 @@ class ImageInfo {
       let width = (endColumn - startColumn) + 1;
       let height = (endRow - startRow) + 1;
 
-      let parentDir = LINUX_COMMANDS.Path.ParentDir(this.src_);
+      let parentDir = LinuxCommands.Path.ParentDir(this.src_);
       let tempFilepath = PATH.join(parentDir, GUID.Filename(GUID.DEFAULT_LENGTH, 'txt'));
       let args = [this.info_.path, '-crop', `${width}x${height}+${startColumn}+${startRow}`, `text:${tempFilepath}`];
 
-      LOCAL_COMMAND.Execute('convert', args).then(output => {
+      LocalCommand.Execute('convert', args).then(output => {
         if (output.stderr) {
           reject(`Failed to get pixel range info: ${output.stderr}`);
           return;
         }
 
         // Read from file
-        LINUX_COMMANDS.File.Read(tempFilepath, LOCAL_COMMAND).then(text => {
+        LinuxCommands.File.Read(tempFilepath, LocalCommand).then(text => {
           let infos = ParsePixelInfo(text.trim())
           let pixels = [];
 
@@ -546,7 +544,7 @@ class ImageInfo {
           });
 
           // Clean up temp file
-          LINUX_COMMANDS.File.Remove(tempFilepath, LOCAL_COMMAND).then(success => {
+          LinuxCommands.File.Remove(tempFilepath, LocalCommand).then(success => {
             resolve(pixels);
           }).catch(error => reject(error));
         }).catch(error => reject(error));
@@ -564,7 +562,7 @@ class ImageInfo {
    * @returns {Promise<ImageInfo>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
    */
   static Create(src) {
-    let error = VALIDATE.IsStringInput(src);
+    let error = Validate.IsStringInput(src);
     if (error)
       return Promise.reject(`Failed to get image info: source is ${error}`);
 

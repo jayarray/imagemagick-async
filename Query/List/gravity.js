@@ -1,16 +1,17 @@
-let LINUX_COMMANDS = require('linux-commands-async');
-let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
 
 //---------------------------------
 // GRAVITY
 
 /** 
- * @returns {Promise<Array<{string}>>} Returns a promise. If it resolves, it returns a list of gravity names. Otherwise, it returns an error.
+ * @returns {Promise<Array<string>>} Returns a promise. If it resolves, it returns a list of gravity names. Otherwise, it returns an error.
  */
 function Gravity() {
   return new Promise((resolve, reject) => {
     let args = ['-list', 'gravity'];
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
+
+    LocalCommand.Execute('convert', args).then(output => {
       if (output.stderr) {
         reject(`Failed to get gravity values: ${output.stderr}`);
         return;
@@ -27,7 +28,3 @@ function Gravity() {
 // EXPORTS
 
 exports.Gravity = Gravity;
-
-exports.Name = 'Gravity';
-exports.ComponentType = 'function';
-exports.Func = Gravity;

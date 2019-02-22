@@ -1,5 +1,5 @@
-let LINUX_COMMANDS = require('linux-commands-async');
-let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
 
 //---------------------------------
 // FONTS
@@ -10,7 +10,8 @@ let LOCAL_COMMAND = LINUX_COMMANDS.Command.LOCAL;
 function Fonts() {
   return new Promise((resolve, reject) => {
     let args = ['-list', 'font'];
-    LOCAL_COMMAND.Execute('convert', args).then(output => {
+
+    LocalCommand.Execute('convert', args).then(output => {
       if (output.stderr) {
         reject(`Failed to get fonts: ${output.stderr}`);
         return;
@@ -49,7 +50,3 @@ function Fonts() {
 // EXPORTS
 
 exports.Fonts = Fonts;
-
-exports.Name = 'Fonts';
-exports.ComponentType = 'function';
-exports.Func = Fonts;
