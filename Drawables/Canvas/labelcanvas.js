@@ -10,6 +10,9 @@ class LabelCanvas extends CanvasBaseClass {
     super(properties);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -123,7 +126,7 @@ class LabelCanvas extends CanvasBaseClass {
       }
 
       build() {
-        return new ImageCanvas(this);
+        return new LabelCanvas(this);
       }
     }
     return Builder;
