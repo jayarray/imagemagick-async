@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
@@ -22,18 +22,18 @@ class Vector extends InputsBaseClass {
       }
 
       /**
-       * @param {Coordinates} start 
+       * @param {Coordinates} coordinates 
        */
-      start(start) {
-        this.args.start = start;
+      start(coordinates) {
+        this.args.start = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} end 
+       * @param {Coordinates} coordinates 
        */
-      end(end) {
-        this.args.end = end;
+      end(coordinates) {
+        this.args.end = coordinates;
         return this;
       }
 
@@ -56,32 +56,41 @@ class Vector extends InputsBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'VECTOR_ERROR';
 
-    if (!Validate.IsDefined(this.args.start))
-      errors.push('VECTOR_ERROR: Start coordinates are undefined.');
-    else {
-      if (this.args.start.type != 'Coordinates')
-        errors.push(`VECTOR_ERROR: Start is not a Coordinates object.`);
-      else {
-        let errs = this.args.start.Errors();
-        if (errs.length > 0) {
-          errors.push(`VECTOR_ERROR: Start coordinates has errors: ${errs.join(' ')}`);
-        }
-      }
-    }
+    // Check start
 
-    if (!Validate.IsDefined(this.args.end))
-      errors.push('VECTOR_ERROR: End coordinates are undefined.');
-    else {
-      if (this.args.end.type != 'Coordinates')
-        errors.push(`VECTOR_ERROR: End is not a Coordinates object.`);
-      else {
-        let errs = this.args.end.Errors();
-        if (errs.length > 0) {
-          errors.push(`VECTOR_ERROR: End coordinates has errors: ${errs.join(' ')}`);
-        }
-      }
-    }
+    let startErr = new Err.Error.Builder()
+      .prefix(prefix)
+      .varName('Start coordinates')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.start)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (startErr)
+      errors.push(startErr);
+
+    // Check end
+
+    let endErr = new Err.Error.Builder()
+      .prefix(prefix)
+      .varName('End coordinates')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.end)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endErr)
+      errors.push(endErr);
 
     return errors;
   }
