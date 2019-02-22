@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
@@ -22,10 +22,10 @@ class PointAndColor extends InputsBaseClass {
       }
 
       /**
-       * @param {Coordinates} point 
+       * @param {Coordinates} coordinates 
        */
-      point(point) {
-        this.args.point = point;
+      point(coordinates) {
+        this.args.point = coordinates;
         return this;
       }
 
@@ -57,31 +57,37 @@ class PointAndColor extends InputsBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'POINT_AND_COLOR';
 
-    if (!Validate.IsDefined(this.args.point))
-      errors.push('POINT_AND_COLOR_ERROR: Point is undefined.');
-    else {
-      if (this.args.point.name != 'Coordinates')
-        errors.push(`POINT_AND_COLOR_ERROR: Point is not a Coordinates object.`);
-      else {
-        let errs = this.args.point.Errors();
-        if (errs.length > 0)
-          errors.push(`POINT_AND_COLOR_ERROR: Point has errors: ${errs.join(' ')}`);
-      }
-    }
+    let pointErr = new Err.Error.Builder() 
+      .prefix(prefix)
+      .varName('Point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.point)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.color))
-      errors.push('POINT_AND_COLOR_ERROR: Color is undefined.');
-    else {
-      if (!Validate.IsString(this.args.color))
-        errors.push(`POINT_AND_COLOR_ERROR: Color is not a string.`);
-      else {
-        if (Validate.IsEmptyString(this.args.color))
-          errors.push(`POINT_AND_COLOR_ERROR: Color is empty string.`);
-        else if (Validate.IsWhitespace(this.args.color))
-          errors.push(`POINT_AND_COLOR_ERROR: Color is whitespace.`);
-      }
-    }
+    if (pointErr)
+        errors.push(pointErr);
+
+    let colorErr = new Err.Error.Builder()
+      .prefix(prefix)
+      .varName('Color')
+      .condition(
+        new Err.ObjectCondition.Builder()
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (colorErr)
+      errors.push(colorErr);
 
     return errors;
   }
