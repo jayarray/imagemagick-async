@@ -63,7 +63,10 @@ class Coordinates extends InputsBaseClass {
     let xErr = new Err.Error.Builder()
       .prefix(prefix)
       .varName('X')
-      .condition(new Err.NumberCondition.Builder(this.args.x))
+      .condition(
+        new Err.NumberCondition.Builder(this.args.x)
+          .build()
+      )
       .build()
       .String();
 
@@ -75,7 +78,10 @@ class Coordinates extends InputsBaseClass {
     let yErr = new Err.Error.Builder()
       .prefix(prefix)
       .varName('Y')
-      .condition(new Err.NumberCondition.Builder(this.args.y))
+      .condition(
+        new Err.NumberCondition.Builder(this.args.y)
+          .build()
+      )
       .build()
       .String();
 
