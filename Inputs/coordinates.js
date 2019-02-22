@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
@@ -22,18 +22,18 @@ class Coordinates extends InputsBaseClass {
       }
 
       /**
-       * @param {number} x 
+       * @param {number} n 
        */
-      x(x) {
-        this.args.x = x;
+      x(n) {
+        this.args.x = n;
         return this;
       }
 
       /**
-       * @param {number} y 
+       * @param {number} n 
        */
-      y(y) {
-        this.args.y = y;
+      y(n) {
+        this.args.y = n;
         return this;
       }
 
@@ -56,20 +56,31 @@ class Coordinates extends InputsBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'COORDINATES_ERROR';
 
-    if (!Validate.IsDefined(this.args.x))
-      errors.push('COORDINATES_ERROR: X-coordinate is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.x))
-        errors.push(`COORDINATES_ERROR: X-coordinate is not a number.`);
-    }
+    // Check x-value
 
-    if (!Validate.IsDefined(this.args.y))
-      errors.push('COORDINATES_ERROR: Y-coordinate is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.y))
-        errors.push(`COORDINATES_ERROR: Y-coordinate is not a number.`);
-    }
+    let xErr = new Err.Error.Builder()
+      .prefix(prefix)
+      .varName('X')
+      .condition(new Err.NumberCondition.Builder(this.args.x))
+      .build()
+      .String();
+
+    if (xErr)
+      errors.push(xErr);
+
+    // Check y-value
+
+    let yErr = new Err.Error.Builder()
+      .prefix(prefix)
+      .varName('Y')
+      .condition(new Err.NumberCondition.Builder(this.args.y))
+      .build()
+      .String();
+
+    if (yErr)
+      errors.push(yErr);
 
     return errors;
   }
