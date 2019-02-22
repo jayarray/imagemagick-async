@@ -268,6 +268,7 @@ class ObjectCondition {
     this.include_ = builder.include_;
     this.exclude_ = builder.exclude_;
     this.typeName_ = builder.typeName_;
+    this.checkForErrors_ = builder.checkForErrors_;
   }
 
   static get Builder() {
@@ -292,6 +293,15 @@ class ObjectCondition {
        */
       exclude(arr) {
         this.exclude_ = arr;
+        return this;
+      }
+
+      /**
+       * Specify whether you want to check the object for erorrs using it's built-in Errors() function.
+       * @param {boolean} bool 
+       */
+      checkForErrors(bool) {
+        this.checkForErrors_ = bool;
         return this;
       }
 
@@ -950,23 +960,38 @@ class ErrorMessage {
     let propertyNames = objCond.value_ ? Object.keys(objCond.value_) : [];
     s2 = this.varName_ ? this.varName_ : 'Object';
 
-    if (objCond.include_) {
-      let include = objCond.include_ ? objCond.include_ : [];
-      let notIncluded = propertyNames.filter(x => !include.includes(x));
+    if (Validate.IsDefined(objCond.include_)) {
+      if (objCond.include_) {
+        let include = objCond.include_ ? objCond.include_ : [];
+        let notIncluded = propertyNames.filter(x => !include.includes(x));
 
-      if (notIncluded.length > 0) {
-        s2 += ` should not include the following properties: ${notIncluded.join(', ')}.`;
-        return s1 + s2;
+        if (notIncluded.length > 0) {
+          s2 += ` should not include the following properties: ${notIncluded.join(', ')}.`;
+          return s1 + s2;
+        }
       }
     }
 
-    if (objCond.exclude_) {
-      let exclude = objCond.exclude_ ? objCond.exclude_ : [];
-      let notExcluded = propertyNames.filter(x => exclude.includes(x));
+    if (Validate.IsDefined(objCond.exclude_)) {
+      if (objCond.exclude_) {
+        let exclude = objCond.exclude_ ? objCond.exclude_ : [];
+        let notExcluded = propertyNames.filter(x => exclude.includes(x));
 
-      if (notExcluded.length > 0) {
-        s2 += ` should not have the following properties: ${notExcluded.join(', ')}.`;
-        return s1 + s2;
+        if (notExcluded.length > 0) {
+          s2 += ` should not have the following properties: ${notExcluded.join(', ')}.`;
+          return s1 + s2;
+        }
+      }
+    }
+
+    if (Validate.IsDefined(objCond.checkForErrors_)) {
+      if (objCond.checkForErrors_) {
+        let errs = objCond.value_.Errors();
+
+        if (errs.length > 0) {
+          s2 += ` has errors: ${errs.join(' ')}`;
+          return s1 + s2;
+        }
       }
     }
 
