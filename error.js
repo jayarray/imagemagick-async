@@ -174,7 +174,7 @@ class BooleanCondition {
 class ArrayCondition {
   constructor(builder) {
     this.conditionType_ = builder.conditionType_;
-    this.value_ = builder.conditionType_;
+    this.value_ = builder.value_;
     this.include_ = builder.include_;
     this.exclude_ = builder.exclude_;
     this.contains_ = builder.contains_;
@@ -197,7 +197,7 @@ class ArrayCondition {
       }
 
       /**
-       * Specify which objects can be included as valid inputs.
+       * Specify items that should be found in the array. (Does not limit the array to this one).
        * @param {Array} arr 
        */
       include(arr) {
@@ -206,7 +206,7 @@ class ArrayCondition {
       }
 
       /**
-       * Specify which objects to exclude as valid inputs.
+       * Specify items that should not be found in the array.
        * @param {Array} arr 
        */
       exclude(arr) {
@@ -214,11 +214,19 @@ class ArrayCondition {
         return this;
       }
 
+      /**
+       * Specify an item that should be found in the array.
+       * @param {object} item 
+       */
       contains(item) {
         this.contains_.push(item);
         return this;
       }
 
+      /**
+       * Specify an item that should not be found in the array.
+       * @param {object} item 
+       */
       doesNotContain(item) {
         this.doesNotContain_.push(item);
         return this;
@@ -265,7 +273,7 @@ class ObjectCondition {
   static get Builder() {
     class Builder {
       constructor(obj) {
-        this.type_ = 'object';
+        this.conditionType_ = 'object';
         this.value_ = obj;
       }
 
@@ -292,7 +300,7 @@ class ObjectCondition {
        * @param {string} name 
        */
       typeName(name) {
-        this.type_ = name;
+        this.typeName_ = name;
         return this;
       }
 
@@ -786,7 +794,7 @@ class ErrorMessage {
     let s1 = this.prefix_ ? `${this.prefix_}: ` : '';
     let s2 = this.varName_ ? this.varName_ : 'Value';
 
-    if (Validate.IsDefined(boolCond.value_)) {
+    if (!Validate.IsDefined(boolCond.value_)) {
       s2 += ' is undefined.';
       return s1 + s2;
     }
@@ -794,6 +802,36 @@ class ErrorMessage {
     if (!Validate.IsBoolean(boolCond.value_)) {
       s2 += ' is not a boolean.';
       return s1 + s2;
+    }
+
+    if (Validate.IsDefined(boolCond.isTrue_)) {
+      if (boolCond.isTrue_) {
+        if (!boolCond.value_) {
+          s2 += ` is invalid. Expected value is: ${!boolCond.value_}.`;
+          return s1 + s2;
+        }
+      }
+      else {
+        if (boolCond.value_) {
+          s2 += ` is invalid. Expected value is: ${!boolCond.value_}.`;
+          return s1 + s2;
+        }
+      }
+    }
+
+    if (Validate.IsDefined(boolCond.isFalse_)) {
+      if (boolCond.isFalse_) {
+        if (!boolCond.value_) {
+          s2 += ` is invalid. Expected value is: ${!boolCond.value_}.`;
+          return s1 + s2;
+        }
+      }
+      else {
+        if (boolCond.value_) {
+          s2 += ` is invalid. Expected value is: ${!boolCond.value_}.`;
+          return s1 + s2;
+        }
+      }
     }
 
     return null;
@@ -808,7 +846,7 @@ class ErrorMessage {
       return s1 + s2;
     }
 
-    if (Validate.IsArray(arrCond.value_)) {
+    if (!Validate.IsArray(arrCond.value_)) {
       s2 += ' is not an array.';
       return s1 + s2;
     }
@@ -848,33 +886,37 @@ class ErrorMessage {
         }
       }
     }
-    else {
-      if (objCond.include_ || objCond.contains_) {
-        let include = arrCond.include_ ? arrCond.include_ : [];
-        let contains = arrCond.contains_ ? arrCond.contains_ : [];
-        let allIncludedItems = include.concat(contains);
 
-        if (allIncludedItems.length > 0) {
-          let notIncluded = arrCond.value_.filter(x => !allIncludedItems.includes(x));
+    if (Validate.IsDefined(arrCond.include_) || Validate.IsDefined(arrCond.contains_)) {
+      let include = arrCond.include_ ? arrCond.include_ : [];
+      let contains = arrCond.contains_ ? arrCond.contains_ : [];
+      let allIncludedItems = include.concat(contains);
 
-          if (notIncluded.length > 0) {
-            s2 += ` contains ${notIncluded.length} item(s) that should not be included.`;
+      if (allIncludedItems.length > 0) {
+        for (let i = 0; i < allIncludedItems.length; ++i) {
+          let currItem = allIncludedItems[i];
+
+          if (!arrCond.value_.includes(currItem)) {
+            s2 = this.varName_ ? this.varName_ : 'Array';
+            s2 += ` is missing an item that should be included.`;
             return s1 + s2;
           }
         }
       }
+    }
 
-      if (objCond.exclude_ || objCond.doesNotContain_) {
-        let exclude = arrCond.exclude_ ? arrCond.exclude_ : [];
-        let doesNotContain = arrCond.doesNotContain_ ? arrCond.doesNotContain_ : [];
-        let allExcludedItems = exclude.concat(doesNotContain);
+    if (Validate.IsDefined(arrCond.exclude_) || Validate.IsDefined(arrCond.doesNotContain_)) {
+      let exclude = arrCond.exclude_ ? arrCond.exclude_ : [];
+      let doesNotContain = arrCond.doesNotContain_ ? arrCond.doesNotContain_ : [];
+      let allExcludedItems = exclude.concat(doesNotContain);
 
-        if (allExcludedItems.length > 0) {
-          let notExcluded = arrCond.value_.filter(x => allExcludedItems.includes(x));
+      if (allExcludedItems.length > 0) {
+        for (let i = 0; i < allExcludedItems.length; ++i) {
+          let currItem = allExcludedItems[i];
 
-          if (notExcluded.length > 0) {
+          if (arrCond.value_.includes(currItem)) {
             s2 = this.varName_ ? this.varName_ : 'Array';
-            s2 += ` contains ${notExcluded.length} item(s) that should be excluded.`;
+            s2 += ` contains item(s) that should be excluded.`;
             return s1 + s2;
           }
         }
@@ -913,7 +955,7 @@ class ErrorMessage {
       let notIncluded = propertyNames.filter(x => !include.includes(x));
 
       if (notIncluded.length > 0) {
-        s2 += ` is missing the following properties: ${notIncluded.join(', ')}.`;
+        s2 += ` should not include the following properties: ${notIncluded.join(', ')}.`;
         return s1 + s2;
       }
     }
