@@ -59,7 +59,7 @@ class PointAndColor extends InputsBaseClass {
     let errors = [];
     let prefix = 'POINT_AND_COLOR';
 
-    let pointErr = new Err.Error.Builder() 
+    let pointErr = new Err.ErrorMessage.Builder() 
       .prefix(prefix)
       .varName('Point')
       .condition(
@@ -74,11 +74,11 @@ class PointAndColor extends InputsBaseClass {
     if (pointErr)
         errors.push(pointErr);
 
-    let colorErr = new Err.Error.Builder()
+    let colorErr = new Err.ErrorMessage.Builder()
       .prefix(prefix)
       .varName('Color')
       .condition(
-        new Err.ObjectCondition.Builder()
+        new Err.ObjectCondition.Builder(this.args.color)
           .typeName('Color')
           .checkForErrors(true)
           .build()

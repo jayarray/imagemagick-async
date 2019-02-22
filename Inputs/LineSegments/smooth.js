@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
@@ -12,7 +12,7 @@ class Smooth extends LineSegmentBaseClass {
 
   /**
    * @override
-   * Create a Smooth object. (Used with CubizBezier or QuadraticBezier)
+   * (Used with CubizBezier or QuadraticBezier)
    */
   static get Builder() {
     class Builder {
@@ -22,45 +22,34 @@ class Smooth extends LineSegmentBaseClass {
       }
 
       /**
-       * @param {Coordinates} control 
+       * @param {Coordinates} coordinates 
        */
-      control(control) {
-        this.args.control = control;
+      control(coordinates) {
+        this.args.control = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} endPoint 
+       * @param {Coordinates} coordinates 
        */
-      endPoint(endPoint) {
-        this.args.endPoint = endPoint;
+      endPoint(coordinates) {
+        this.args.endPoint = coordinates;
         return this;
       }
 
       /**
-       * @param {boolean} isQuadraticBezier (Optional)
+       * @param {boolean} bool (Optional)
        */
-      isQuadraticBezier(isQuadraticBezier) {
-        this.args.isQuadraticBezier = isQuadraticBezier;
+      isQuadraticBezier(bool) {
+        this.args.isQuadraticBezier = bool;
         return this;
       }
 
       build() {
-        let properties = {
-          name: this.name,
-          args: this.args
-        };
-
         return new Smooth(properties);
       }
     }
     return Builder;
-  }
-
-  constructor(control, endPoint, isQuadraticBezier) {
-    this.control_ = control;
-    this.endPoint_ = endPoint;
-    this.isQuadraticBezier_ = isQuadraticBezier;
   }
 
   /**
@@ -79,38 +68,56 @@ class Smooth extends LineSegmentBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'SMOOTH_LINE_SEGMENT_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.control))
-      errors.push('SMOOTH_LINE_SEGMENT_ERROR: Control point is undefined.');
-    else {
-      if (this.args.control.type != 'Coordinates')
-        errors.push('SMOOTH_LINE_SEGMENT_ERROR: Control point is not a Coordinates objcect.');
-      else {
-        let errs = this.args.control.Errors();
-        if (errs.length > 0)
-          errors.push(`SMOOTH_LINE_SEGMENT_ERROR: Control point has errors: ${errs.join(' ')}`);
-      }
-    }
+    let controlErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Control')
+      .condition(
+        new Err.ObjectCondition.Build(this.args.control)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.endPoint))
-      errors.push('SMOOTH_LINE_SEGMENT_ERROR: End point is undefined.');
-    else {
-      if (this.args.endPoint.type != 'Coordinates')
-        errors.push('SMOOTH_LINE_SEGMENT_ERROR: End point is not a Coordinates objcect.');
-      else {
-        let errs = this.args.endPoint.Errors();
-        if (errs.length > 0)
-          errors.push(`SMOOTH_LINE_SEGMENT_ERROR: End point has errors: ${errs.join(' ')}`);
-      }
-    }
+    if (controlErr)
+      errors.push(controlErr);
+
+    let endPointErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('End point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.endPoint)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endPointErr)
+      errors.push(endPointErr);
 
     // Check optional args
 
+
     if (this.args.isQuadraticBezier) {
-      if (!Validate.IsBoolean(this.args.isQuadraticBezier))
-        errors.push('SMOOTH_LINE_SEGMENT_ERROR: Quadratic bezier flag is not a boolean.');
+      let isQuadraticBezierErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Quadratic bezier flag')
+        .condition(
+          new Err.BooleanCondition(this.args.isQuadraticBezier)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (isQuadraticBezierErr)
+        errors.push(isQuadraticBezierErr);
     }
 
     return errors;

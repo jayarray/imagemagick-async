@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
@@ -21,42 +21,42 @@ class EllipticalArc extends LineSegmentBaseClass {
       }
 
       /**
-       * @param {Coordinates} radius Location of radius
+       * @param {Coordinates} coordinates Location of radius
        */
-      radius(radius) {
-        this.args.radius = radius;
+      radius(coordinates) {
+        this.args.radius = coordinates;
         return this;
       }
 
       /**
-       * @param {number} angle (Optional)
+       * @param {number} n (Optional)
        */
-      angle(angle) {
-        this.args.angle = angle;
+      angle(n) {
+        this.args.angle = n;
         return this;
       }
 
       /**
-       * @param {boolean} largeFlag Set to true if longer path going around the center of the ellipse is desired. False results in a smaller arc not containing the center of the ellipse. (Optional)
+       * @param {boolean} bool Set to true if longer path going around the center of the ellipse is desired. False results in a smaller arc not containing the center of the ellipse. (Optional)
        */
-      largeFlag(largeFlag) {
-        this.args.largeFlag = largeFlag;
+      largeFlag(bool) {
+        this.args.largeFlag = bool;
         return this;
       }
 
       /**
-       * @param {boolean} sweepFlag Set to true if path should go below the center of the ellipse. False results in the path going above the center of the ellipse. (Optional)
+       * @param {boolean} bool Set to true if path should go below the center of the ellipse. False results in the path going above the center of the ellipse. (Optional)
        */
-      sweepFlag(sweepFlag) {
-        this.args.sweepFlag = sweepFlag;
+      sweepFlag(bool) {
+        this.args.sweepFlag = bool;
         return this;
       }
 
       /**
-       * @param {Coordinates} edge Location of edge
+       * @param {Coordinates} coordinates Location of edge
        */
       edge(edge) {
-        this.args.edge = edge;
+        this.args.edge = coordinates;
         return this;
       }
 
@@ -79,60 +79,85 @@ class EllipticalArc extends LineSegmentBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'ELLIPTICAL_ARC_LINE_SEGMENT_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.radius))
-      errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Radius coordinates are undefined.');
-    else {
-      if (this.args.radius.type == 'coordinates')
-        errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Radius coordinates are not a Coordinates object.');
-      else {
-        let errs = this.args.radius.Errors();
-        if (errs.length > 0)
-          errors.push(`ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Radius coordinates has errors: ${err.join(' ')}`);
-      }
-    }
+    let radiusErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Radius')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.radius)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.edge))
-      errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Edge coordinates are undefined.');
-    else {
-      if (this.args.edge.type == 'coordinates')
-        errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Edge coordinates are not a Coordinates object.');
-      else {
-        let errs = this.args.edge.Errors();
-        if (errs.length > 0)
-          errors.push(`ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Edge coordinates has errors: ${err.join(' ')}`);
-      }
-    }
+    if (radiusErr)
+      errors.push(radiusErr);
+
+    let edgeErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Edge')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.edge)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (edgeErr)
+      errors.push(edgeErr);
 
     // Checks optional args
 
     if (this.args.angle) {
-      if (!Validate.IsDefined(this.args.angle))
-        errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Angle is undefined.');
-      else {
-        if (!Validate.IsNumber(this.args.angle))
-          errors.push(`ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Angle is not a number.`);
-      }
+      let angleErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Angle')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.angle)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (angleErr)
+        errors.push(angleErr);
     }
 
     if (this.args.largeFlag) {
-      if (!Validate.IsDefined(this.args.largeFlag))
-        errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Large flag is undefined');
-      else {
-        if (!Validate.IsBoolean(this.args.largeFlag))
-          errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Large flag is not a boolean.');
-      }
+      let largeFlagErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Large flag')
+        .condition(
+          new Err.BooleanCondition.Builder(this.args.largeFlag)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (largeFlagErr)
+        errors.push(largeFlagErr);
     }
 
     if (this.args.sweepFlag) {
-      if (!Validate.IsDefined(this.args.sweepFlag))
-        errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Sweep flag is undefined');
-      else {
-        if (!Validate.IsBoolean(this.args.sweepFlag))
-          errors.push('ELLIPTICAL_ARC_LINE_SEGMENT_ERROR: Sweep flag is not a boolean.');
-      }
+      let sweepFlagErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Sweep flag')
+        .condition(
+          new Err.BooleanCondition.Builder(this.args.sweepFlag)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (sweepFlagErr)
+        errors.push(sweepFlagErr);
     }
 
     return errors;

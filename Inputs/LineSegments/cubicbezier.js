@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
@@ -21,26 +21,26 @@ class CubicBezier extends LineSegmentBaseClass {
       }
 
       /**
-       * @param {Coordinates} control1 
+       * @param {Coordinates} coordinates 
        */
-      control11(control1) {
-        this.args.control11 = control1;
+      control1(coordinates) {
+        this.args.control1 = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} control2 
+       * @param {Coordinates} coordinates 
        */
-      constrol2(control2) {
-        this.args.constrol2 = control2;
+      control2(coordinates) {
+        this.args.control2 = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} endPoint 
+       * @param {Coordinates} coordinates 
        */
-      endPoint(endPoint) {
-        this.args.endPoint = endPoint;
+      endPoint(coordinates) {
+        this.args.endPoint = coordinates;
         return this;
       }
 
@@ -63,42 +63,52 @@ class CubicBezier extends LineSegmentBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'CUBIC_BEZIER_LINE_SEGMENT_ERROR';
 
-    if (!Validate.IsDefined(this.args.control1))
-      errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: First control point is undefined.');
-    else {
-      if (this.args.control1.type != 'Coordinates')
-        errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: First control point is not a Coordinates object.');
-      else {
-        let errs = this.args.control1.Errors();
-        if (errs.length > 0)
-          errors.push(`CUBIC_BEZIER_LINE_SEGMENT_ERROR: First control point has some errors: ${errs.join(' ')}`);
-      }
-    }
+    let control1Err = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('First control point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.control1)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.control2))
-      errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: Second control point is undefined.');
-    else {
-      if (this.args.control2.type != 'Coordinates')
-        errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: Second control point is not a Coordinates object.');
-      else {
-        let errs = this.args.control2.Errors();
-        if (errs.length > 0)
-          errors.push(`CUBIC_BEZIER_LINE_SEGMENT_ERROR: Second control point has some errors: ${errs.join(' ')}`);
-      }
-    }
+    if (control1Err)
+      errors.push(control1Err);
 
-    if (!Validate.IsDefined(this.args.endPoint))
-      errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: End point is undefined.');
-    else {
-      if (this.args.endPoint.type != 'Coordinates')
-        errors.push('CUBIC_BEZIER_LINE_SEGMENT_ERROR: End point is not a Coordinates object.');
-      else {
-        let errs = this.args.endPoint.Errors();
-        if (errs.length > 0)
-          errors.push(`CUBIC_BEZIER_LINE_SEGMENT_ERROR: End point has some errors: ${errs.join(' ')}`);
-      }
-    }
+    let control2Err = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Second control point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.control2)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (control2Err)
+      errors.push(control2Err);
+
+    let endPointErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('End point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.endPoint)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endPointErr)
+      errors.push(endPointErr);
 
     return errors;
   }

@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let GradientBaseClass = require(Path.join(Filepath.GradientDir(), 'gradientbaseclass.js')).GradientBaseClass;
 
@@ -21,52 +21,52 @@ class RadialGradient extends GradientBaseClass {
       }
 
       /**
-       * @param {string} startColor Start color for radial gradient.
+       * @param {Color} color Start color for radial gradient.
        */
-      startColor(startColor) {
-        this.args.startColor = startColor;
+      startColor(color) {
+        this.args.startColor = color;
         return this;
       }
 
       /**
-       * @param {string} endColor End color for radial gradient.
+       * @param {Color} color End color for radial gradient.
        */
-      endColor(endColor) {
-        this.args.endColor = endColor;
+      endColor(color) {
+        this.args.endColor = color;
         return this;
       }
 
       /**
-       * @param {Coordinates} center Coordinates for the center of the radial gradient. (Optional)
+       * @param {Coordinates} coordinates Coordinates for the center of the radial gradient. (Optional)
        */
-      center(center) {
-        this.args.center = center;
-        return this;
-      }
-
-      /**
-       * 
-       * @param {number} radialWidth Width of the radial gradient. (Optional)
-       */
-      radialWidth(radialWidth) {
-        this.args.radialWidth = radialWidth;
+      center(coordinates) {
+        this.args.center = coordinates;
         return this;
       }
 
       /**
        * 
-       * @param {number} radialHeight Height of the radial gradient. (Optional)
+       * @param {number} n Width of the radial gradient. (Optional)
        */
-      radialHeight(radialHeight) {
-        this.args.radialHeight = radialHeight;
+      radialWidth(n) {
+        this.args.radialWidth = n;
         return this;
       }
 
       /**
-       * @param {number} angle Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
+       * 
+       * @param {number} n Height of the radial gradient. (Optional)
        */
-      angle(angle) {
-        this.args.angle = angle;
+      radialHeight(n) {
+        this.args.radialHeight = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n Specifies the direction of the gradient going from startColor to endColor in a clockwise positive manner relative to north (up). (Optional)
+       */
+      angle(n) {
+        this.args.angle = n;
         return this;
       }
 
@@ -79,10 +79,10 @@ class RadialGradient extends GradientBaseClass {
       }
 
       /**
-       * @param {string} extent Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
+       * @param {string} str Specifies the shape of an image centered radial gradient. Valid values are: Circle, Diagonal, Ellipse, Maximum, Minimum. (Optional)
        */
-      extent(extent) {
-        this.args.extent = extent;
+      extent(str) {
+        this.args.extent = str;
         return this;
       }
 
@@ -133,130 +133,149 @@ class RadialGradient extends GradientBaseClass {
   Errors() {
     let params = RadialGradient.Parameters();
     let errors = [];
+    let prefix = 'RADIAL_GRADIENT_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.startColor))
-      errors.push(`RADIAL_GRADIENT_ERROR: Start color is undefined.`);
-    else {
-      if (!Validate.IsString(this.args.startColor))
-        errors.push(`RADIAL_GRADIENT_ERROR: Start color is not a string.`);
-      else {
-        if (Validate.IsEmptyString(this.args.startColor))
-          errors.push(`RADIAL_GRADIENT_ERROR: Start color is empty string.`);
-        else if (Validate.IsWhitespace(this.args.startColor))
-          errors.push(`RADIAL_GRADIENT_ERROR: Start color is whitespace.`);
-      }
-    }
+    let startColorErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Start color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.startColor)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.endColor))
-      errors.push(`RADIAL_GRADIENT_ERROR: End color is undefined.`);
-    else {
-      if (!Validate.IsString(this.args.endColor))
-        errors.push(`RADIAL_GRADIENT_ERROR: End color is not a string.`);
-      else {
-        if (Validate.IsEmptyString(this.args.endColor))
-          errors.push(`RADIAL_GRADIENT_ERROR: End color is empty string.`);
-        else if (Validate.IsWhitespace(this.args.endColor))
-          errors.push(`RADIAL_GRADIENT_ERROR: End color is whitespace.`);
-      }
-    }
+    if (startColorErr)
+      errors.push(startColorErr);
+
+      let endColorErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('End color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.endColor)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endColorErr)
+      errors.push(endColorErr);
 
     // Check optional args
 
     if (this.args.center) {
-      if (!Validate.IsDefined(this.args.center))
-        errors.push(`RADIAL_GRADIENT_ERROR: Center is undefined.`);
-      else {
-        if (this.args.center.name != 'Coordinates')
-          errors.push(`RADIAL_GRADIENT_ERROR: Center is not a Coordinates object.`);
-        else {
-          let errs = this.args.center.Errors();
-          if (errs.length > 0)
-            errors.push(`RADIAL_GRADIENT_ERROR: Center has errors: ${errs.join(' ')}`);
-        }
-      }
+      let centerErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Center')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.center)
+            .typeName('Coordinates')
+              .checkForErrors(true)
+          .build()
+        )
+        .build()
+        .String();
+    
+      if (centerErr)
+        errors.push(centerErr);
     }
 
     if (this.args.radialWidth) {
-      if (!Validate.IsDefined(this.args.radialWidth))
-        errors.push(`RADIAL_GRADIENT_ERROR: Radial width is undefined.`);
-      else {
-        if (!Validate.IsNumber(this.args.radialWidth))
-          errors.push(`RADIAL_GRADIENT_ERROR: Radial width is not a number.`);
-        else {
-          if (!Validate.IsInteger(this.args.radialWidth))
-            errors.push(`RADIAL_GRADIENT_ERROR: Radial width is not an integer.`);
-          else {
-            if (this.args.radialWidth < params.radialWidth.min)
-              errors.push(`RADIAL_GRADIENT_ERROR: Radial width is out of bounds. Assigned value is : ${this.args.radialWidth}. Value must be greater than or equal to ${params.radialWidth.min}.`);
-          }
-        }
-      }
+      let radialWidthErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Radial width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.radialWidth)
+            .isInteger(true)
+            .min(params.radialWidth.min)
+            .build()
+        )
+        .build()
+        .String();
+    
+      if (radialWidthErr)
+        errors.push(radialWidthErr);
     }
 
     if (this.args.radialHeight) {
-      if (!Validate.IsDefined(this.args.radialHeight))
-        errors.push(`RADIAL_GRADIENT_ERROR: Radial height is undefined.`);
-      else {
-        if (!Validate.IsNumber(this.args.radialHeight))
-          errors.push(`RADIAL_GRADIENT_ERROR: Radial height is not a number.`);
-        else {
-          if (!Validate.IsInteger(this.args.radialHeight))
-            errors.push(`RADIAL_GRADIENT_ERROR: Radial height is not an integer.`);
-          else {
-            if (this.args.radialHeight < params.radialHeight.min)
-              errors.push(`RADIAL_GRADIENT_ERROR: Radial height is out of bounds. Assigned value is : ${this.args.radialHeight}. Value must be greater than or equal to ${params.radialHeight.min}.`);
-          }
-        }
-      }
+      let radialHeightErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Radial height')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.radialHeight)
+            .isInteger(true)
+            .min(params.radialHeight.min)
+            .build()
+        )
+        .build()
+        .String();
+    
+      if (radialHeightErr)
+        errors.push(radialHeightErr);
     }
 
     if (this.args.angle) {
-      if (!Validate.IsDefined(this.args.angle))
-        errors.push(`RADIAL_GRADIENT_ERROR: Angle is undefined.`);
-      else {
-        if (!Validate.IsNumber(this.args.angle))
-          errors.push(`RADIAL_GRADIENT_ERROR: Angle is not a number.`);
-      }
+      let angleErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Angle')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.angle)
+            .build()
+        )
+        .build()
+        .String();
+    
+      if (angleErr)
+        errors.push(angleErr);
     }
-
+    
     if (this.args.boundinBox) {
-      if (!Validate.IsDefined(this.args.boundingBox))
-        errors.push(`RADIAL_GRADIENT_ERROR: Bounding box is undefined.`);
-      else {
-        if (this.args.boundingBox.name != 'BoundinBox')
-          erorrs.push(`RADIAL_GRADIENT_ERROR: Bounding box is not a BoundingBox object.`);
-        else {
-          let errs = this.args.boundingBox.Errors();
-          if (errs.length > 0)
-            errors.push(`RADIAL_GRADIENT_ERROR: Bounding box has errors: ${errs.join(' ')}`);
-        }
-      }
+      let boundingBoxErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Bounding box')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.boundinBox)
+            .typeName('BoundingBox')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (boundingBoxErr)
+        errors.push(boundingBoxErr);
     }
 
     if (this.args.extent) {
-      if (!Validate.IsDefined(this.args.extent))
-        errors.push(`RADIAL_GRADIENT_ERROR: Extent is undefind.`);
-      else {
-        if (!Validate.IsString(this.args.extent))
-          errors.push(`RADIAL_GRADIENT_ERROR: Extent is not a string.`);
-        else {
-          if (Validate.IsEmptyString(this.args.extent))
-            errors.push(`RADIAL_GRADIENT_ERROR: Extent is empty string.`);
-          else if (Validate, IsWhitespace(this.args.extent))
-            erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is whitespace.`);
-          else {
-            if (!params.extent.options.includes(this.args.extent))
-              erorrs.push(`RADIAL_GRADIENT_ERROR: Extent is invalid. Assigned value is: ${this.args.extent}. Must be assigned one of the following values: ${params.extent.options.join(', ')}`);
-          }
-        }
-      }
+      let extentErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Extent')
+        .condition(
+          new Err.StringCondition.Builder(this.args.extent)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .include(params.extent.options)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (extentErr)
+        errors.push(extentErr);
     }
 
     return errors;
   }
 
+  /**
+   * @override
+   */
   static Parameters() {
     return {
       startColor: {

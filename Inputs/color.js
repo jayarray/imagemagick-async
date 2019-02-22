@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
@@ -350,50 +350,50 @@ class Color extends InputsBaseClass {
       }
 
       /**
-       * @param {string} hexString Hex string representation of the desired color.
+       * @param {string} str Hex string representation of the desired color.
        */
-      hexString(hexString) {
-        this.args.hexString = hexString;
+      hexString(str) {
+        this.args.hexString = str;
         return this;
       }
 
       /**
-       * @param {number} red Integer value of red
+       * @param {number} n Integer value of red
        */
-      red(red) {
-        this.args.red = red;
+      red(n) {
+        this.args.red = n;
         return this;
       }
 
       /**
-       * @param {number} green Integer value of green
+       * @param {number} n Integer value of green
        */
-      green(green) {
-        this.args.green = green;
+      green(n) {
+        this.args.green = n;
         return this;
       }
 
       /**
-       * @param {number} blue Integer value of blue
+       * @param {number} n Integer value of blue
        */
-      blue(blue) {
-        this.args.blue = blue;
+      blue(n) {
+        this.args.blue = n;
         return this;
       }
 
       /**
-       * @param {number} alpha Integer value of alpha
+       * @param {number} n Integer value of alpha
        */
-      alpha(alpha) {
-        this.args.alpha = alpha;
+      alpha(n) {
+        this.args.alpha = n;
         return this;
       }
 
       /**
-       * @param {string} format The input format that determines how the color is constructed. The formats are: 'string' (for using a hex string), 'integers' (for using rgb values), or 'percents' (for using percent values). 
+       * @param {string} str The input format that determines how the color is constructed. The formats are: 'string' (for using a hex string), 'integers' (for using rgb values), or 'percents' (for using percent values). 
        */
-      format(format) {
-        this.args.format = format;
+      format(str) {
+        this.args.format = str;
         return this;
       }
 
@@ -455,94 +455,201 @@ class Color extends InputsBaseClass {
   Errors() {
     let params = Color.Parameters();
     let errors = [];
+    let prefix = 'COLOR_ERROR';
 
-    if (!Validate.IsDefined(this.format))
-      errors.push('COLOR_ERROR: Format is undefined.');
-    else {
-      if (FORMATS.includes(this.format))
-        errors.push(`COLOR_ERROR: Format is invalid. Assigned value is: ${this.format}. Must be assigned one of the following values: ${FORMATS.join(' ')}.`);
-      else {
-        if (this.format == 'string') {
-          // Check formatting as well
-          if (!Validate.IsDefined(this.args.hexString))
-            errors.push(`COLOR_ERROR: Hex string is undefined.`);
-          else {
-            if (!Validate.IsString(this.args.hexString))
-              errors.push(`COLOR_ERROR: Hex string is not a string.`);
-            else {
-              if (Validate.IsEmptyString(this.args.hexString))
-                errors.push(`COLOR_ERROR: Hex string is empty string.`);
-              else if (Validate.IsWhitespace(this.args.hexString))
-                errors.push(`COLOR_ERROR: Hex string is whitespace.`);
-              else {
-                // Check if hex string format is correct
+    let formatErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Format')
+      .condition(
+        new Err.StringCondition.Builder(this.args.format)
+          .isEmpty(false)
+          .IsWhitespace(false)
+          .include(params.format.options)
+          .build()
+      )
+      .build()
+      .String();
 
-                if (!this.args.hexString.startsWith('#'))
-                  errors.push(`COLOR_ERROR: Hex string is invalid. Must start with a '#' symbol.`);
+    if (formatErr)
+      errors.push(formatErr);
 
-                let hex = this.args.hexString.substring(1);
-                let lengthIsInvalid = hex.length != RGB1_LENGTH
-                  || hex.length != RGB2_LENGTH
-                  || hex.length != RGBA2_LENGTH
-                  || hex.length != RGB4_LENGTH
-                  || hex.length != RGBA4_LENGTH;
+    if (this.args.format == 'string') {
+      // Check if hex string is non-empty and starts with '#'.
 
-                if (!lengthIsInvalid)
-                  errors.push(`COLOR_ERROR: Hex string length is invalid. Must have the following number of alphanumeric characters: ${RGB1_LENGTH}, ${RGB2_LENGTH}, ${RGBA2_LENGTH}, ${RGB4_LENGTH}, or ${RGBA4_LENGTH}.`);
-                else {
-                  let invalidChars = Array.from(hex).filter(x => !HEX_CHARS.includes(x));
-                  invalidChars = Array.from(new Set(invalidChars));
+      let hexErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Hex string')
+        .condition(
+          new Err.StringCondition.Builder(this.args.hexString)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .startsWith('#')
+            .build()
+        )
+        .build()
+        .String();
 
-                  if (invalidChars.length > 0)
-                    errors.push(`COLOR_ERROR: Hex string is invalid. Contains the following invalid characters: ${invalidChars.join(', ')}.`);
-                }
-              }
-            }
-          }
-        }
-        else if (this.format == 'integers') {
-          // Check if all inputs are integers
-          if (!Validate.IsDefined(this.args.red))
-            errors.push('COLOR_ERROR: Red value is undefined.');
-          else {
-            if (!Validate.IsNumber(this.args.red))
-              errors.push('COLOR_ERROR: Red value is not a number.');
-            else {
-              if (!Validate.IsInteger(this.args.red))
-                errors.push('COLOR_ERROR: Red value is not an integer.');
-              else {
-                if (this.args.red < params.red.min)
-                  errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${params.red.min}.`);
-                else if (this.args.green < params.green.min)
-                  errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${params.green.min}.`);
-                else if (this.args.blue < params.blue.min)
-                  errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${params.blue.min}.`);
-                else if (this.args.alpha && this.args.alpha < params.alpha.min)
-                  errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${params.alpha.min}.`);
-              }
-            }
-          }
-        }
-        else if (this.format == 'percents') {
-          // Check if all inputs are numbers
-          if (!Validate.IsDefined(this.args.red))
-            errors.push('COLOR_ERROR: Red value is undefined.');
-          else {
-            if (!Validate.IsNumber(this.args.red))
-              errors.push('COLOR_ERROR: Red value is not a number.');
-            else {
-              if (this.args.red < params.red.min)
-                errors.push(`COLOR_ERROR: Red value is out of bounds. Assigned value is: ${this.args.red}. Value must be greater than or equal to ${params.red.min}.`);
-              else if (this.args.green < params.green.min)
-                errors.push(`COLOR_ERROR: Green value is out of bounds. Assigned value is: ${this.args.green}. Value must be greater than or equal to ${params.green.min}.`);
-              else if (this.args.blue < params.blue.min)
-                errors.push(`COLOR_ERROR: Blue value is out of bounds. Assigned value is: ${this.args.blue}. Value must be greater than or equal to ${params.blue.min}.`);
-              else if (this.args.alpha && this.args.alpha < params.alpha.min)
-                errors.push(`COLOR_ERROR: Alpha value is out of bounds. Assigned value is: ${this.args.alpha}. Value must be greater than or equal to ${params.alpha.min}.`);
-            }
-          }
-        }
-      }
+      if (hexErr)
+        errors.push(hexErr);
+
+      // Check if hex string length is valid.
+
+      hexErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Hex length')
+        .condition(
+          new Err.StringCondition.Builder(this.args.hexString.substring(1))
+            .minLength(RGB1_LENGTH)
+            .maxLength(RGBA4_LENGTH)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (hexErr)
+        errors.push(hexErr);
+
+      // Check if hex string contains invalid chars
+
+      let invalidChars = Array.from(this.args.hex.substring(1)).filter(x => !HEX_CHARS.includes(x));
+
+      if (invalidChars.length > 0)
+        errors.push('COLOR_ERROR: Hex string is invalid. Contains invalid characters.');
+      
+    }
+    else if (this.args.format == 'integers') {
+      // Check red value
+
+      let redErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Red value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.red)
+            .isInteger(true)
+            .min(params.red.min)
+            .build()
+        )
+        .build()
+        .String();
+      
+      if (redErr)
+        errors.push(redErr);
+
+      // Check green value
+
+      let greenErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Green value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.green)
+            .isInteger(true)
+            .min(params.green.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (greenErr)
+        errors.push(greenErr);
+
+      // Check blue value
+
+      let blueErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Blue value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.blue)
+            .isInteger(true)
+            .min(params.blue.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (blueErr)
+        errors.push(blueErr);
+
+      // Check alpha value
+
+      let alphaErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Alpha value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.alpha)
+            .isInteger(true)
+            .min(params.alpha.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (alphaErr)
+        errors.push(alphaErr);
+    }
+    else if (this.args.format == 'percents') {
+      // Check red value
+
+      let redErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Red value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.red)
+            .min(params.red.min)
+            .build()
+        )
+        .build()
+        .String();
+      
+      if (redErr)
+        errors.push(redErr);
+
+      // Check green value
+
+      let greenErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Green value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.green)
+            .min(params.green.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (greenErr)
+        errors.push(greenErr);
+
+      // Check blue value
+
+      let blueErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Blue value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.blue)
+            .min(params.blue.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (blueErr)
+        errors.push(blueErr);
+
+      // Check alpha value
+
+      let alphaErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Alpha value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.alpha)
+            .min(params.alpha.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (alphaErr)
+        errors.push(alphaErr);
     }
 
     return errors;
@@ -553,6 +660,10 @@ class Color extends InputsBaseClass {
    */
   static Parameters() {
     return {
+      format: {
+        type: 'string',
+        options: ['string', 'integers', 'percents']
+      },
       red: {
         type: 'number',
         min: RGB_MIN,

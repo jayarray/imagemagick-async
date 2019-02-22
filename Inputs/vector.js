@@ -60,7 +60,7 @@ class Vector extends InputsBaseClass {
 
     // Check start
 
-    let startErr = new Err.Error.Builder()
+    let startErr = new Err.ErrorMessage.Builder()
       .prefix(prefix)
       .varName('Start coordinates')
       .condition(
@@ -77,7 +77,7 @@ class Vector extends InputsBaseClass {
 
     // Check end
 
-    let endErr = new Err.Error.Builder()
+    let endErr = new Err.ErrorMessage.Builder()
       .prefix(prefix)
       .varName('End coordinates')
       .condition(

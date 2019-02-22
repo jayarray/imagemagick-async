@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
@@ -22,26 +22,26 @@ class BoundingBox extends InputsBaseClass {
       }
 
       /**
-       * @param {Coordinates} center Coordinates for the center of the bounding box.
+       * @param {Coordinates} coordinates Coordinates for the center of the bounding box.
        */
-      center(center) {
-        this.args.center = center;
+      center(coordinates) {
+        this.args.center = coordinates;
         return this;
       }
 
       /**
-       * @param {number} width Width (in pixels)
+       * @param {number} n Width (in pixels)
        */
-      width(width) {
-        this.args.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
       /**
-       * @param {number} height Height (in pixels)
+       * @param {number} n Height (in pixels)
        */
-      height(height) {
-        this.args.height = height;
+      height(n) {
+        this.args.height = n;
         return this;
       }
 
@@ -65,52 +65,59 @@ class BoundingBox extends InputsBaseClass {
   Errors() {
     let params = BoundingBox.Parameters();
     let errors = [];
+    let prefix = 'BOUNDING_BOX_ERROR';
 
-    if (!Validate.IsDefined(this.args.center))
-      errors.push('BOUNDING_BOX_ERROR: Center is undefined.');
-    else {
-      if (this.args.center.name != 'Coordinates')
-        errors.push('BOUNDING_BOX_ERROR: Center is not a Coordinates object.');
-      else {
-        let errs = this.args.center.Errors();
-        if (errs.length > 0)
-          errors.push(`BOUNDING_BOX_ERROR: Center has erorrs: ${errs.join(' ')}`);
-      }
-    }
+    let centerErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Center')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.center)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+    
+    if (centerErr)
+      errors.push(centerErr);
 
-    if (!Validate.IsDefined(this.args.width))
-      errors.push(`BOUNDING_BOX_ERROR: Width is undefined.`);
-    else {
-      if (!Validate.IsNumber(this.args.width))
-        errors.push(`BOUNDING_BOX_ERROR: Width is not a number.`);
-      else {
-        if (!Validate.IsInteger(this.args.width))
-          errors.push(`BOUNDING_BOX_ERROR: Width is not an integer.`);
-        else {
-          if (this.args.width < params.width.min)
-            errors.push(`BOUNDING_BOX_ERROR: Width is out of bounds. Assigned value is ${this.args.width}. Must be greater than or equal to ${params.width.min}.`);
-        }
-      }
-    }
+    let widthErr = new Err.ErrorMessage.Builder()
+			.prefix(prefix)
+			.varName('Width')
+			.condition(
+				new Err.NumberCondition.Builder(this.args.width)
+					.isInteger(true)
+					.min(params.width.min)
+					.build()
+			)
+			.build()
+			.String();
 
-    if (!Validate.IsDefined(this.args.height))
-      errors.push(`BOUNDING_BOX_ERROR: Height is undefined.`);
-    else {
-      if (!Validate.IsNumber(this.args.height))
-        errors.push(`BOUNDING_BOX_ERROR: Height is not a number.`);
-      else {
-        if (!Validate.IsInteger(this.args.height))
-          errors.push(`BOUNDING_BOX_ERROR: Height is not an integer.`);
-        else {
-          if (this.args.width < params.height.min)
-            errors.push(`BOUNDING_BOX_ERROR: Height is out of bounds. Assigned value is ${this.args.height}. Must be greater than or equal to ${params.height.min}.`);
-        }
-      }
-    }
+		if (widthErr)
+			errors.push(widthErr);
+			
+		let heightErr = new Err.ErrorMessage.Builder()
+			.prefix(prefix)
+			.varName('Height')
+			.condition(
+				new Err.NumberCondition.Builder(this.args.height)
+					.isInteger(true)
+					.min(params.height.min)
+					.build()
+			)
+			.build()
+			.String();
+
+		if (heightErr)
+			errors.push(heightErr);
 
     return errors;
   }
 
+	/**
+	 * @override
+	 */
   static Parameters() {
     return {
       center: {

@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
@@ -7,9 +7,12 @@ let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linese
 
 class QuadraticBezier extends LineSegmentBaseClass {
   constructor(properties) {
-    super(properties)
+    super(properties);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -18,18 +21,18 @@ class QuadraticBezier extends LineSegmentBaseClass {
       }
 
       /**
-       * @param {Coordinates} control 
+       * @param {Coordinates} coordinates 
        */
-      control(control) {
-        this.control = control;
+      control(coordinates) {
+        this.control = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} endPoint 
+       * @param {Coordinates} coordinates 
        */
-      endPoint(endPoint) {
-        this.endPoint = endPoint;
+      endPoint(coordinates) {
+        this.endPoint = coordinates;
         return this;
       }
 
@@ -52,30 +55,37 @@ class QuadraticBezier extends LineSegmentBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'QUADRATIC_BEZIER_LINE_SEGMENT_ERROR';
 
-    if (!Validate.IsDefined(this.args.control))
-      errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: Control point is undefined.');
-    else {
-      if (this.args.control.type != 'Coordinates')
-        errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: Control point is not a Coordinates objcect.');
-      else {
-        let errs = this.args.control.Errors();
-        if (errs.length > 0)
-          errors.push(`QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: Control point has errors: ${errs.join(' ')}`);
-      }
-    }
+    let controlErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Control point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.control)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.endPoint))
-      errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: End point is undefined.');
-    else {
-      if (this.args.endPoint.type != 'Coordinates')
-        errors.push('QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: End point is not a Coordinates objcect.');
-      else {
-        let errs = this.args.endPoint.Errors();
-        if (errs.length > 0)
-          errors.push(`QUADRATIC_BEZIER_LINE_SEGMENT_ERROR: End point has errors: ${errs.join(' ')}`);
-      }
-    }
+    if (controlErr)
+      errors.push(controlErr);
+
+    let endPointErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('End point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.endPoint)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .built()
+      .String();
+
+    if (endPointErr)
+      errors.push(endPointErr);
 
     return errors;
   }

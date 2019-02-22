@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
@@ -21,18 +21,18 @@ class Line extends LineSegmentBaseClass {
       }
 
       /**
-       * @param {number} x 
+       * @param {number} n 
        */
-      x(x) {
-        this.x = x;
+      x(n) {
+        this.x = n;
         return this;
       }
 
       /**
-       * @param {number} y 
+       * @param {number} n 
        */
-      y(y) {
-        this.y = y;
+      y(n) {
+        this.y = n;
         return this;
       }
 
@@ -55,20 +55,33 @@ class Line extends LineSegmentBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'LINE_LINE_SEGMENT_ERROR';
 
-    if (!Validate.IsDefined(this.args.x))
-      errors.push('LINE_LINE_SEGMENT_ERROR: X coordinate is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.x))
-        errors.push('LINE_LINE_SEGMENT_ERROR: X coordinate is not a number.');
-    }
+    let xErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('X coordinate')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.x)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.y))
-      errors.push('LINE_LINE_SEGMENT_ERROR: Y coordinate is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.y))
-        errors.push('LINE_LINE_SEGMENT_ERROR: Y coordinate is not a number.');
-    }
+    if (xErr)
+      errors.push(xErr);
+
+    let yErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Y coordinate')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.y)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (yErr)
+      errors.push(yErr);
 
     return errors;
   }
