@@ -1,5 +1,7 @@
-let AnimationBaseClass = require(PATH.join(__dirname, 'animationbaseclass.js')).AnimationBaseClass;
-let Validate = require('./validate.js');
+let Path = require('path');
+let Err = require('./error.js');
+let Filepath = require('./filepath.js').Filepath;
+let AnimationBaseClass = require(Path.join(Filepath.AnimationDir(), 'animationbaseclass.js')).AnimationBaseClass;
 
 //--------------------------------------
 // GIF
@@ -24,46 +26,46 @@ class Gif extends AnimationBaseClass {
 
       /**
        * List of filepaths.
-       * @param {Array<string>} filepaths
+       * @param {Array<string>} strArr
        */
-      filepaths(filepaths) {
-        this.args.filepaths = filepaths;
+      filepaths(strArr) {
+        this.args.filepaths = strArr;
         return this;
       }
 
       /**
        * Number of times the GIF will cycle through the image sequence before stopping. (Optional)
-       * @param {number} loop
+       * @param {number} n
        */
-      loop(loop) {
-        this.args.loop = loop;
+      loop(n) {
+        this.args.loop = n;
         return this;
       }
 
       /**
        * The time delay to pause after drawing the images that are read in. (Optional)
-       * @param {number} delay
+       * @param {number} n
        */
-      delay(delay) {
-        this.args.delay = delay;
+      delay(n) {
+        this.args.delay = n;
         return this;
       }
 
       /**
        * What the following image should do with the previous result of the GIF animation. (Optional)
-       * @param {string} dispose
+       * @param {string} str
        */
-      dispose(dispose) {
-        this.args.dispose = dispose;
+      dispose(str) {
+        this.args.dispose = str;
         return this;
       }
 
       /**
        * The destination for the newly created GIF.
-       * @param {string} outputPath
+       * @param {string} str
        */
-      outputPath(outputPath) {
-        this.args.outputPath = outputPath;
+      outputPath(str) {
+        this.args.outputPath = str;
         return this;
       }
 
@@ -110,72 +112,75 @@ class Gif extends AnimationBaseClass {
   Errors() {
     let params = Gif.Parameters();
     let errors = [];
+    let prefix = 'GIF_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.filepaths))
-      errors.push('GIF_ERROR: Filepaths is undefined.');
-    else {
-      if (!Validate.IsArray(this.args.filepaths))
-        errors.push(`GIF_ERROR: Filepaths is not an array.`);
-      else {
-        if (this.args.filepaths.length == 0)
-          errors.push('GIF_ERROR: No filepaths provided.');
-        else if (this.args.filepaths.length < params.filepaths.min)
-          errors.push(`GIF_ERROR: Insufficient filepaths. Only ${this.args.filepaths.length} path(s) provided. Must provide at least ${params.filepaths.min} filepaths.`);
-      }
-    }
+    let filepathsErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Filepaths')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.filepaths)
+          .minLength(params.filepaths.min)
+          .build()
+      )
+      .build()
+      .Strong();
 
-    if (!Validate.IsDefined(this.args.outputPath))
-      error.push(`GIF_ERROR: Output path is undefined.`);
-    else {
-      if (!Validate.IsString(this.args.outputPath))
-        errors.push(`GIF_ERROR: Output path is not a string.`);
-      else {
-        if (Validate.IsEmptyString(this.args.outputPath))
-          errors.push('GIF_ERROR: Output path is empty.');
-        else if (Validate.IsWhitespace(this.args.outputPath))
-          errors.push('GIF_ERROR: Output path is whitespace.');
-      }
-    }
+    if (filepathsErr)
+      errors.push(filepathsErr);
 
     // Check optional args
 
-    if (!Validate.IsDefined(this.args.loop))
-      errors.push('GIF_ERROR: Loop is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.loop))
-        errors.push(`GIF_ERROR: Loop is not a number.`);
-      else {
-        if (!Validate.IsInteger(this.args.loop))
-          errors.push('GIF_ERROR: Loop is not an integer.');
-        else {
-          if (this.args.loop < params.loop.min)
-            errors.push(`GIF_ERROR: Loop is out of bounds. Assigned value is: ${this.args.loop}. Value must be greater than or equal to ${params.loop.min}.`);
-        }
-      }
+    if (this.args.loop) {
+      let loopErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Loop')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.loop)
+          .isInteger(true)
+          .min(params.loop.min)
+          .build()
+        )
+        .build()
+        .String();
+
+      if (loopErr)
+        errors.push(loopErr);
     }
 
-    if (!Validate.IsDefined(this.args.delay))
-      errors.push('GIF_ERROR: Delay is undefined.');
-    else {
-      if (!Validate.IsNumber(this.args.delay))
-        errors.push(`GIF_ERROR: Delay is not a number.`);
-      else {
-        if (this.args.delay <= params.delay.min)
-          errors.push(`GIF_ERROR: Delay is out of bounds. Assigned value is: ${this.args.delay}. Value must be greater than ${params.delay.min}.`);
-      }
+    if (this.args.delay) {
+      let delayErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Delay')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.delay)
+            .min(params.delay.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (delayErr)
+        errors.push(delayErr);
     }
 
-    if (!Validate.IsDefined(this.args.dispose))
-      errors.push('GIF_ERROR: Dispose is undefined.');
-    else {
-      if (!Validate.IsString(this.args.dispose))
-        errors.push(`GIF_ERROR: Dispose is not a string.`);
-      else {
-        if (!params.dispose.options.includes(this.args.dispose))
-          errors.push(`GIF_ERROR: Dispose is invalid. Assigned value is: ${this.args.dispose}. Must be assigned to one of the following values: ${params.dispose.options.join(', ')}.`);
-      }
+    if (this.args.dispose) {
+      let disposeErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Dispose')
+        .condition(
+          new Err.StringCondition.Builder()
+            .isEmpty(false)
+            .isWhitespace(false)
+            .include(params.dispose.options)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (disposeErr)
+        errors.push(disposeErr);
     }
 
     return errors;
