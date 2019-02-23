@@ -1,4 +1,5 @@
 let Path = require('path');
+let Err = require('./error.js');
 let Validate = require('./validate.js');
 let Filepath = require('./filepath.js').Filepath;
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
@@ -22,34 +23,34 @@ class Bezier extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {Array<Coordinates>} points A list of points for the bezier curve to travel through.
+       * @param {Array<Coordinates>} coordinatesArr A list of points for the bezier curve to travel through.
        */
-      points(points) {
-        this.args.points = points;
+      points(coordinatesArr) {
+        this.args.points = coordinatesArr;
         return this;
       }
 
       /**
-       * @param {Color} strokeColor The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
+       * @param {Color} color The color of the line connecting all the points. (Valid color format string used in Image Magick) (Optional)
        */
-      strokeColor(strokeColor) {
-        this.args.strokeColor = strokeColor;
+      strokeColor(color) {
+        this.args.strokeColor = color;
         return this;
       }
 
       /**
-       * @param {number} strokeWidth Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
+       * @param {number} n Width of the line connecting all the points. (Larger values produce thicker lines.) (Optional)
        */
-      strokeWidth(strokeWidth) {
-        this.args.strokeWidth = strokeWidth;
+      strokeWidth(n) {
+        this.args.strokeWidth = n;
         return this;
       }
 
       /**
-       * @param {Color} fillColor The color to fill the bezier. (Valid color format string used in Image Magick) (Optional)
+       * @param {Color} color The color to fill the bezier. (Valid color format string used in Image Magick) (Optional)
        */
-      fillColor(fillColor) {
-        this.args.fillColor = fillColor;
+      fillColor(color) {
+        this.args.fillColor = color;
         return this;
       }
 
@@ -116,60 +117,79 @@ class Bezier extends PrimitivesBaseClass {
   Errors() {
     let params = Bezier.Parameters();
     let errors = [];
+    let prefix = 'BEZIER_PRIMITIVE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.points))
-      errors.push('BEZIER_PRIMITIVE_ERROR: Points are undefined.');
-    else {
-      if (!Validate.IsArray(this.args.points))
-        errors.push('BEZIER_PRIMITIVE_ERROR: Points is not an array.');
-      else {
-        let arrayHasInvalidTypes = Validate.ArrayHasInvalidTypes(this.args.points, 'Coordinates');
-        let arrayHasErrors = Validate.ArrayHasErrors(this.args.points);
+    let pointsErr = new Err.ErrorMEssage.Builder()
+      .prefix(prefix)
+      .varName('Points')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.points)
+          .validType('Coordinates')
+          .minLength(params.points.min)
+          .build()
+      )
+      .build()
+      .String();
 
-        if (arrayHasInvalidTypes)
-          error.push('BEZIER_PRIMITIVE_ERROR: Points contains objects that are not Coordinates.');
-        else {
-          if (arrayHasErrors)
-            errors.push('BEZIER_PRIMITIVE_ERROR: Points has Coordinates with errors.');
-          else {
-            if (this.args.points.length < params.points.min)
-              errors.push(`BEZIER_PRIMITIVE_ERROR: Insufficient points provided. Number of points provided: ${this.args.points.length}. Must provide ${params.points.min} or more points.`);
-          }
-        }
-      }
-    }
+    if (pointsErr)
+      errors.push(pointsErr);
+
+    let arrayHasErrors = Validate.ArrayHasErrors(this.args.points);
+    if (arrayHasErrors)
+        errors.push(`${prefix}: Points contains a Coordinates object with errors.`);
 
     // Check optional args
 
     if (this.args.strokeColor) {
-      if (this.args.strokeColor.type != 'Color')
-        errors.push('BEZIER_PRIMITIVE_ERROR: Stroke color is not a Color object.');
-      else {
-        let errs = this.args.strokeColor.Errors();
-        if (errs.length > 0)
-          errors.push(`BEZIER_PRIMITIVE_ERROR: Stroke color has some errors: ${errs.join(' ')}`);
-      }
+      let strokeColorErr = new Err.ErrorMEssage.Builder()
+        .prefix(prefix)
+        .varName('Stroke color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.strokeColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeColorErr)
+        errors.push(strokeColorErr);
     }
 
     if (this.args.strokeWidth) {
-      if (!Validate.IsNumber(this.args.strokeWidth))
-        errors.push('BEZIER_PRIMITIVE_ERROR: Stroke width is not a number.');
-      else {
-        if (this.args.strokeWidth < params.strokeWidth.min)
-          errors.push(`BEZIER_PRIMITIVE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
-      }
+      let strokeWidthErr = new Err.ErrorMEssage.Builder()
+        .prefix(prefix)
+        .varName('Stroke width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.strokeWidth)
+            .isInteger(true)
+            .min(params.strokeWidth.min)
+        )
+        .build()
+        .String();
+
+      if (strokeWidthErr)
+        errors.push(strokeWidthErr);
     }
 
     if (this.args.fillColor) {
-      if (this.args.fillColor.type != 'Color')
-        errors.push('BEZIER_PRIMITIVE_ERROR: Fill color is not a Color object.');
-      else {
-        let errs = this.args.fillColor.Errors();
-        if (errs.length > 0)
-          errors.push(`BEZIER_PRIMITIVE_ERROR: Fill color has some errors: ${errs.join(' ')}`);
-      }
+      let fillColorErr = new Err.ErrorMEssage.Builder()
+        .prefix(prefix)
+        .varName('Fill color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.fillColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fillColorErr)
+        errors.push(fillColorErr);
     }
 
     return errors;
