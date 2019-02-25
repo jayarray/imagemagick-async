@@ -63,7 +63,8 @@ class Filepath {
         return new Filepath(this);
       }
     }
-    return Builder;
+
+    return new Builder();
   }
 
   /**
@@ -74,11 +75,22 @@ class Filepath {
   }
 
   /**
+   * @returns {string} Returns the path to the im_modules folder.
+   */
+  static ImModulesDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.RootDir)
+      .dir('im_modules')
+      .build()
+      .String();
+  }
+
+  /**
    * @returns {string} Returns a path to this directory.
    */
   static AnimationDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Animation')
       .build()
       .String();
@@ -89,7 +101,7 @@ class Filepath {
    */
   static ConstantsDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Constants')
       .build()
       .String();
@@ -100,7 +112,7 @@ class Filepath {
    */
   static DrawablesDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Drawables')
       .build()
       .String();
@@ -111,8 +123,7 @@ class Filepath {
    */
   static CanvasDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
+      .partialPath(Filepath.DrawablesDir)
       .dir('Canvas')
       .build()
       .String();
@@ -123,8 +134,7 @@ class Filepath {
    */
   static PrimitivesDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
+      .partialPath(Filepath.DrawablesDir)
       .dir('Primitives')
       .build()
       .String();
@@ -135,8 +145,7 @@ class Filepath {
    */
   static ShapesDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
+      .partialPath(Filepath.DrawablesDir)
       .dir('Shapes')
       .build()
       .String();
@@ -147,8 +156,7 @@ class Filepath {
    */
   static EffectsDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
+      .partialPath(Filepath.DrawablesDir)
       .dir('Effects')
       .build()
       .String();
@@ -159,9 +167,7 @@ class Filepath {
    */
   static FxDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
-      .dir('Effects')
+      .partialPath(Filepath.EffectsDir)
       .dir('Fx')
       .build()
       .String();
@@ -172,9 +178,7 @@ class Filepath {
    */
   static ModDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
-      .dir('Effects')
+      .partialPath(Filepath.EffectsDir)
       .dir('Mod')
       .build()
       .String();
@@ -185,9 +189,7 @@ class Filepath {
    */
   static TransformDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Drawables')
-      .dir('Effects')
+      .partialPath(Filepath.EffectsDir)
       .dir('Transform')
       .build()
       .String();
@@ -198,7 +200,7 @@ class Filepath {
    */
   static InputsDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Inputs')
       .build()
       .String();
@@ -209,8 +211,7 @@ class Filepath {
    */
   static GradientDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Inputs')
+      .partialPath(Filepath.InputsDir)
       .dir('Gradient')
       .build()
       .String();
@@ -221,8 +222,7 @@ class Filepath {
    */
   static LineSegmentsDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Inputs')
+      .partialPath(Filepath.InputsDir)
       .dir('LineSegments')
       .build()
       .String();
@@ -233,7 +233,7 @@ class Filepath {
    */
   static LayerDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Layer')
       .build()
       .String();
@@ -244,7 +244,7 @@ class Filepath {
    */
   static QueryDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
+      .partialPath(Filepath.ImModulesDir)
       .dir('Query')
       .build()
       .String();
@@ -255,8 +255,7 @@ class Filepath {
    */
   static ListDir() {
     return Filepath.Builder()
-      .partialPath(Filepath.RootDir)
-      .dir('Query')
+      .partialPath(Filepath.QueryDir)
       .dir('List')
       .build()
       .String();

@@ -1,4 +1,5 @@
 let Path_ = require('path');
+let Err = require('./error.js');
 let Validate = require('./validate.js');
 let Filepath = require('./filepath.js').Filepath;
 let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
@@ -78,33 +79,55 @@ class Point extends PrimitivesBaseClass {
    */
   Errors() {
     let errors = [];
+    let prefix = 'POINT_PRIMITIVE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.x))
-      errors.push('POINT_PRIMITIVE_ERROR: X is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.x))
-        errors.push('POINT_PRIMITIVE_ERROR: X is not an integer.');
-    }
+    let xErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('X')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.x)
+          .isInteger(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.y))
-      errors.push('POINT_PRIMITIVE_ERROR: Y is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.y))
-        errors.push('POINT_PRIMITIVE_ERROR: Y is not an integer.');
-    }
+    if (xErr)
+      errors.push(xErr);
+
+    let yErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Y')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.y)
+          .isInteger(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (yErr)
+      errors.push(yErr);
 
     // Check optional args
 
     if (this.args.color) {
-      if (this.args.color.type != 'Color')
-        errors.push('POINT_PRIMITIVE_ERROR: Color is not a Color object.');
-      else {
-        let errs = this.args.color.Errors();
-        if (errs.length > 0)
-          errors.push(`POINT_PRIMITIVE_ERROR: Color has errors: ${errs.join(' ')}`);
-      }
+      let colorErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.color)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (colorErr)
+        errors.push(colorErr);
     }
 
     return errors;

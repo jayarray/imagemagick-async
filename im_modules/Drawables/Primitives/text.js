@@ -1,4 +1,5 @@
 let Path_ = require('path');
+let Err = require('./error.js');
 let Validate = require('./validate.js');
 let Filepath = require('./filepath.js').Filepath;
 let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
@@ -10,6 +11,9 @@ class Text extends PrimitivesBaseClass {
     super(properties);
   }
 
+  /**
+   * @override
+   */
   static get Builder() {
     class Builder {
       constructor() {
@@ -18,58 +22,58 @@ class Text extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {string} string String containing text.
+       * @param {string} str String containing text.
        */
-      string(string) {
-        this.string = string;
+      string(str) {
+        this.args.string = str;
         return this;
       }
 
       /**
-       * @param {string} font Font name (Optional)
+       * @param {string} name Font name (Optional)
        */
-      font(font) {
-        this.font = font;
+      font(name) {
+        this.args.font = name;
         return this;
       }
 
       /**
-       * @param {number} pointSize Point size (Optional)
+       * @param {number} n Point size (Optional)
        */
-      pointSize(pointSize) {
-        this.pointSize = pointSize;
+      pointSize(n) {
+        this.args.pointSize = n;
         return this;
       }
 
       /**
-       * @param {string} gravity Gravity (Optional)
+       * @param {string} str Gravity (Optional)
        */
-      gravity(gravity) {
-        this.gravity = gravity;
+      gravity(str) {
+        this.args.gravity = str;
         return this;
       }
 
       /**
-       * @param {Color} strokeColor The color of the outline of the text. (Optional)
+       * @param {Color} color The color of the outline of the text. (Optional)
        */
-      strokeColor(strokeColor) {
-        this.strokeColor = strokeColor;
+      strokeColor(color) {
+        this.args.strokeColor = color;
         return this;
       }
 
       /**
-       * @param {number} strokeWidth The width of the outline of the text. (Optional)
+       * @param {number} n The width of the outline of the text. (Optional)
        */
-      strokeWidth(strokeWidth) {
-        this.strokeWidth = strokeWidth;
+      strokeWidth(n) {
+        this.args.strokeWidth = n;
         return this;
       }
 
       /**
-       * @param {Color} fillColor The color to fill the text with.  (Valid color format string used in Image Magick) (Optional)
+       * @param {Color} color The color to fill the text with.  (Valid color format string used in Image Magick) (Optional)
        */
-      fillColor(fillColor) {
-        this.fillColor = fillColor;
+      fillColor(color) {
+        this.args.fillColor = color;
         return this;
       }
 
@@ -123,33 +127,45 @@ class Text extends PrimitivesBaseClass {
   Errors() {
     let params = Text.Parameters();
     let errors = [];
+    let prefix = 'TEXT_PRIMITIVE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.string))
-      errors.push('TEXT_PRIMITIVE_ERROR: String is undefined.');
-    else {
-      if (!Validate.IsString(this.args.string))
-        errors.push('TEXT_PRIMITIVE_ERROR: String is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.string))
-          errors.push('TEXT_PRIMITIVE_ERROR: String is empty string.');
-      }
-    }
+    let stringErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('String')
+      .condition(
+        new Err.StringCondition.Builder(this.args.string)
+          .isEmpty(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (stringErr)
+      errors.push(stringErr);
 
     // Check optional args
 
     if (this.args.font) {
-      if (!Validate.IsString(this.args.font))
-        errors.push('TEXT_PRIMITIVE_ERROR: Font is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.font))
-          errors.push('TEXT_PRIMITIVE_ERROR: Font is empty string.');
-        else if (Validate.IsWhitespace(this.args.font))
-          errors.push('TEXT_PRIMITIVE_ERROR: Font is whitespace.');
-      }
+      let fontErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Font')
+        .condition(
+          new Err.StringCondition.Builder(this.args.font)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fontErr)
+        erorrs.push(fontErr);
     }
 
+    // CONT
+    
     if (this.args.pointSize) {
       if (!Validate.IsNumber(this.args.pointSize))
         errors.push('TEXT_PRIMITIVE_ERROR: Point size is not a number.');

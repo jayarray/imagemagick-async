@@ -1,5 +1,5 @@
 let Path = require('path');
-let Validate = require('./validate.js');
+let Err = require('./error.js');
 let Filepath = require('./filepath.js').Filepath;
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
@@ -22,18 +22,18 @@ class Line extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {Coordinates} start 
+       * @param {Coordinates} coordinates 
        */
-      start(start) {
-        this.start = start;
+      start(coordinates) {
+        this.args.start = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} end 
+       * @param {Coordinates} coordinates 
        */
-      end(end) {
-        this.end = end;
+      end(coordinates) {
+        this.args.end = coordinates;
         return this;
       }
 
@@ -41,15 +41,15 @@ class Line extends PrimitivesBaseClass {
        * @param {Color} color Valid color format string used in Image Magick. (Optional)
        */
       color(color) {
-        this.color = color;
+        this.args.color = color;
         return this;
       }
 
       /**
-       * @param {number} width Width of line. Larger values produce thicker lines. (Optional)
+       * @param {number} n Width of line. Larger values produce thicker lines. (Optional)
        */
-      width(width) {
-        this.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
@@ -102,57 +102,82 @@ class Line extends PrimitivesBaseClass {
   Errors() {
     let params = Line.Parameters();
     let errors = [];
+    let prefix = 'LINE_PRIMITIVE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.start))
-      errors.push('LINE_PRIMITIVE_ERROR: Start is undefined.');
-    else {
-      if (this.args.start.type != 'Coordinates')
-        errors.push('LINE_PRIMITIVE_ERROR: Start is not a Coordinates object.');
-      else {
-        let errs = this.args.start.Errors();
-        if (errs.length > 0)
-          errors.push(`LINE_PRIMITIVE_ERROR: Start has errors: ${errs.join(' ')}`);
-      }
-    }
+    let startErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('Start')
+      .condition(
+        new Err.ObjecCondition.Builder(this.args.start)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.end))
-      errors.push('LINE_PRIMITIVE_ERROR: End is undefined.');
-    else {
-      if (this.args.end.type != 'Coordinates')
-        errors.push('LINE_PRIMITIVE_ERROR: End is not a Coordinates object.');
-      else {
-        let errs = this.args.end.Errors();
-        if (errs.length > 0)
-          errors.push(`LINE_PRIMITIVE_ERROR: End has errors: ${errs.join(' ')}`);
-      }
-    }
+    if (startErr)
+      errors.push(startErr);
+
+    let endErr = new Err.ErrorMessage.Builder()
+      .prefix(prefix)
+      .varName('End')
+      .condition(
+        new Err.ObjecCondition.Builder(this.args.end)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endErr)
+      errors.push(endErr);
 
     // Check optional args
 
     if (this.args.color) {
-      if (this.args.color.type != 'Color')
-        errors.push('LINE_PRIMITIVE_ERROR: Color is not a Color object.');
-      else {
-        let errs = this.args.color.Errors();
-        if (errs.length > 0)
-          errors.push(`LINE_PRIMITIVE_ERROR: Color has errors: ${errs.join(' ')}`);
-      }
+      let colorErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Color')
+        .condition(
+          new Err.ObjecCondition.Builder(this.args.color)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (colorErr)
+        errors.push(colorErr);
     }
 
     if (this.args.width) {
-      if (!Validate.IsInteger(this.args.width))
-        errors.push('LINE_PRIMITIVE_ERROR: Width is not an integer.');
-      else {
-        if (this.args.width < params.width.min)
-          errors.push(`LINE_PRIMITIVE_ERROR: width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to ${params.width.min}.`);
-      }
+      let widthErr = new Err.ErrorMessage.Builder()
+        .prefix(prefix)
+        .varName('Width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.width)
+            .isInteger(true)
+            .min(params.width.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (widthErr)
+        errors.push(widthErr);
     }
 
     return errors;
   }
 
+  /**
+   * @override
+   */
   static Parameters() {
     return {
       start: {
