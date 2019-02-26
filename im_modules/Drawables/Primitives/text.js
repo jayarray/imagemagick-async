@@ -1,7 +1,8 @@
-let Path_ = require('path');
-let Err = require('./error.js');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
 let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //-------------------------------------
@@ -165,7 +166,7 @@ class Text extends PrimitivesBaseClass {
     }
 
     // CONT
-    
+
     if (this.args.pointSize) {
       if (!Validate.IsNumber(this.args.pointSize))
         errors.push('TEXT_PRIMITIVE_ERROR: Point size is not a number.');

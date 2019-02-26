@@ -1,7 +1,8 @@
 let Path = require('path');
-let Err = require('./error.js');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
@@ -138,7 +139,7 @@ class Bezier extends PrimitivesBaseClass {
 
     let arrayHasErrors = Validate.ArrayHasErrors(this.args.points);
     if (arrayHasErrors)
-        errors.push(`${prefix}: Points contains a Coordinates object with errors.`);
+      errors.push(`${prefix}: Points contains a Coordinates object with errors.`);
 
     // Check optional args
 

@@ -1,5 +1,6 @@
 let Path = require('path');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
 
 //----------------------------------

@@ -1,7 +1,7 @@
-let Path_ = require('path');
-let Err = require('./error.js');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //-----------------------------------
