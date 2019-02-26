@@ -16,7 +16,7 @@ class Circle extends PrimitivesBaseClass {
    * @override
    */
   static get Builder() {
-    class builder {
+    class Builder {
       constructor() {
         this.name = 'Circle';
         this.args = {};
