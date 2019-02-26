@@ -11,7 +11,7 @@ class PrimitivesBaseClass extends DrawableBaseClass {
       type: 'Primitive',
       name: properties.name,
       args: properties.args,
-      properties: properties.offset
+      offset: properties.offset
     });
   }
 
