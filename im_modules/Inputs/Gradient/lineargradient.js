@@ -2,6 +2,8 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DirectionValues = require(Path.join(Filepath.ConstantsDir(), 'gradient_direction.json')).values;
+let ExtentValues = require(Path.join(Filepath.ConstantsDir(), 'gradient_extent.json')).values;
 let GradientBaseClass = require(Path.join(Filepath.GradientDir(), 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
@@ -131,11 +133,11 @@ class LinearGradient extends GradientBaseClass {
       )
       .build()
       .String();
-    
+
     if (startColorErr)
       errors.push(startColorErr);
 
-      let endColorErr = Err.ErrorMessage.Builder
+    let endColorErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End color')
       .condition(
@@ -146,7 +148,7 @@ class LinearGradient extends GradientBaseClass {
       )
       .build()
       .String();
-    
+
     if (endColorErr)
       errors.push(endColorErr);
 
@@ -168,7 +170,7 @@ class LinearGradient extends GradientBaseClass {
       if (vectorErr)
         errors.push(vectorErr);
     }
-    
+
     if (this.args.angle) {
       let angleErr = Err.ErrorMessage.Builder
         .prefix(prefix)
@@ -199,7 +201,7 @@ class LinearGradient extends GradientBaseClass {
 
       if (boundingBoxErr)
         errors.push(boundingBoxErr);
-    }    
+    }
 
     if (this.args.direction) {
       let directionErr = Err.ErrorMessage.Builder
@@ -217,7 +219,7 @@ class LinearGradient extends GradientBaseClass {
 
       if (directionErr)
         errors.push(directionErr);
-    }    
+    }
 
     if (this.args.extent) {
       let extentErr = Err.ErrorMessage.Builder
@@ -232,10 +234,10 @@ class LinearGradient extends GradientBaseClass {
         )
         .build()
         .String();
-    
+
       if (extentErr)
         errors.push(extentErr);
-    }    
+    }
 
     return errors;
   }
@@ -259,26 +261,11 @@ class LinearGradient extends GradientBaseClass {
       },
       direction: {
         type: 'string',
-        options: [
-          'NorthWest',
-          'North',
-          'Northeast',
-          'West',
-          'East',
-          'SouthWest',
-          'South',
-          'SouthEast'
-        ]
+        options: DirectionValues
       },
       extent: {
         type: 'string',
-        options: [
-          'Circle',
-          'Diagonal',
-          'Ellipse',
-          'Maximum',
-          'Minimum'
-        ]
+        options: ExtentValues
       }
     };
   }

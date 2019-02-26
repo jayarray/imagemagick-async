@@ -2,6 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ExtentValues = require(Path.join(Filepath.ConstantsDir(), 'gradient_extent.json')).values;
 let GradientBaseClass = require(Path.join(Filepath.GradientDir(), 'gradientbaseclass.js')).GradientBaseClass;
 
 //-----------------------------
@@ -306,13 +307,7 @@ class RadialGradient extends GradientBaseClass {
       },
       extent: {
         type: 'string',
-        options: [
-          'Circle',
-          'Diagonal',
-          'Ellipse',
-          'Maximum',
-          'Minimum'
-        ]
+        options: ExtentValues
       }
     };
   }
