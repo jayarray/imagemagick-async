@@ -1,6 +1,7 @@
 let Path = require('path');
-let Err = require('./error.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let AnimationBaseClass = require(Path.join(Filepath.AnimationDir(), 'animationbaseclass.js')).AnimationBaseClass;
 
 //--------------------------------------
@@ -73,7 +74,7 @@ class Gif extends AnimationBaseClass {
         return new Gif(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**
@@ -116,7 +117,7 @@ class Gif extends AnimationBaseClass {
 
     // Check required args
 
-    let filepathsErr = new Err.ErrorMessage.Builder()
+    let filepathsErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Filepaths')
       .condition(
@@ -133,7 +134,7 @@ class Gif extends AnimationBaseClass {
     // Check optional args
 
     if (this.args.loop) {
-      let loopErr = new Err.ErrorMessage.Builder()
+      let loopErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Loop')
         .condition(
@@ -150,7 +151,7 @@ class Gif extends AnimationBaseClass {
     }
 
     if (this.args.delay) {
-      let delayErr = new Err.ErrorMessage.Builder()
+      let delayErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Delay')
         .condition(
@@ -166,7 +167,7 @@ class Gif extends AnimationBaseClass {
     }
 
     if (this.args.dispose) {
-      let disposeErr = new Err.ErrorMessage.Builder()
+      let disposeErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Dispose')
         .condition(
