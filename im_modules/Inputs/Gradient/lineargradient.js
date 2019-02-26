@@ -120,7 +120,7 @@ class LinearGradient extends GradientBaseClass {
 
     // Check required args
 
-    let startColorErr = new Err.ErrorMessage.Builder()
+    let startColorErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Start color')
       .condition(
@@ -135,7 +135,7 @@ class LinearGradient extends GradientBaseClass {
     if (startColorErr)
       errors.push(startColorErr);
 
-      let endColorErr = new Err.ErrorMessage.Builder()
+      let endColorErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End color')
       .condition(
@@ -153,7 +153,7 @@ class LinearGradient extends GradientBaseClass {
     // Check optional args
 
     if (this.args.vector) {
-      let vectorErr = new Err.ErrorMessage.Builder()
+      let vectorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Vector')
         .condition(
@@ -170,7 +170,7 @@ class LinearGradient extends GradientBaseClass {
     }
     
     if (this.args.angle) {
-      let angleErr = new Err.ErrorMessage.Builder()
+      let angleErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Angle')
         .condition(
@@ -185,7 +185,7 @@ class LinearGradient extends GradientBaseClass {
     }
 
     if (this.args.boundingBox) {
-      let boundingBoxErr = new Err.ErrorMessage.Builder()
+      let boundingBoxErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Bounding box')
         .condition(
@@ -202,7 +202,7 @@ class LinearGradient extends GradientBaseClass {
     }    
 
     if (this.args.direction) {
-      let directionErr = new Err.ErrorMessage.Builder()
+      let directionErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Direction')
         .condition(
@@ -220,7 +220,7 @@ class LinearGradient extends GradientBaseClass {
     }    
 
     if (this.args.extent) {
-      let extentErr = new Err.ErrorMessage.Builder()
+      let extentErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Extent')
         .condition(

@@ -68,7 +68,7 @@ class BoundingBox extends InputsBaseClass {
     let errors = [];
     let prefix = 'BOUNDING_BOX_ERROR';
 
-    let centerErr = new Err.ErrorMessage.Builder()
+    let centerErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Center')
       .condition(
@@ -83,7 +83,7 @@ class BoundingBox extends InputsBaseClass {
     if (centerErr)
       errors.push(centerErr);
 
-    let widthErr = new Err.ErrorMessage.Builder()
+    let widthErr = Err.ErrorMessage.Builder
 			.prefix(prefix)
 			.varName('Width')
 			.condition(
@@ -98,7 +98,7 @@ class BoundingBox extends InputsBaseClass {
 		if (widthErr)
 			errors.push(widthErr);
 			
-		let heightErr = new Err.ErrorMessage.Builder()
+		let heightErr = Err.ErrorMessage.Builder
 			.prefix(prefix)
 			.varName('Height')
 			.condition(

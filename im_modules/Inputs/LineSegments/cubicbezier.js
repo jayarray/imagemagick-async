@@ -66,7 +66,7 @@ class CubicBezier extends LineSegmentBaseClass {
     let errors = [];
     let prefix = 'CUBIC_BEZIER_LINE_SEGMENT_ERROR';
 
-    let control1Err = new Err.ErrorMessage.Builder()
+    let control1Err = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('First control point')
       .condition(
@@ -81,7 +81,7 @@ class CubicBezier extends LineSegmentBaseClass {
     if (control1Err)
       errors.push(control1Err);
 
-    let control2Err = new Err.ErrorMessage.Builder()
+    let control2Err = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Second control point')
       .condition(
@@ -96,7 +96,7 @@ class CubicBezier extends LineSegmentBaseClass {
     if (control2Err)
       errors.push(control2Err);
 
-    let endPointErr = new Err.ErrorMessage.Builder()
+    let endPointErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End point')
       .condition(

@@ -73,7 +73,7 @@ class Smooth extends LineSegmentBaseClass {
 
     // Check required args
 
-    let controlErr = new Err.ErrorMessage.Builder()
+    let controlErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Control')
       .condition(
@@ -88,7 +88,7 @@ class Smooth extends LineSegmentBaseClass {
     if (controlErr)
       errors.push(controlErr);
 
-    let endPointErr = new Err.ErrorMessage.Builder()
+    let endPointErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End point')
       .condition(
@@ -107,7 +107,7 @@ class Smooth extends LineSegmentBaseClass {
 
 
     if (this.args.isQuadraticBezier) {
-      let isQuadraticBezierErr = new Err.ErrorMessage.Builder()
+      let isQuadraticBezierErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Quadratic bezier flag')
         .condition(

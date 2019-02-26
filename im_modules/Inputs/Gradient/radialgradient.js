@@ -138,7 +138,7 @@ class RadialGradient extends GradientBaseClass {
 
     // Check required args
 
-    let startColorErr = new Err.ErrorMessage.Builder()
+    let startColorErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Start color')
       .condition(
@@ -153,7 +153,7 @@ class RadialGradient extends GradientBaseClass {
     if (startColorErr)
       errors.push(startColorErr);
 
-      let endColorErr = new Err.ErrorMessage.Builder()
+    let endColorErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End color')
       .condition(
@@ -171,24 +171,24 @@ class RadialGradient extends GradientBaseClass {
     // Check optional args
 
     if (this.args.center) {
-      let centerErr = new Err.ErrorMessage.Builder()
+      let centerErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Center')
         .condition(
           new Err.ObjectCondition.Builder(this.args.center)
             .typeName('Coordinates')
-              .checkForErrors(true)
-          .build()
+            .checkForErrors(true)
+            .build()
         )
         .build()
         .String();
-    
+
       if (centerErr)
         errors.push(centerErr);
     }
 
     if (this.args.radialWidth) {
-      let radialWidthErr = new Err.ErrorMessage.Builder()
+      let radialWidthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Radial width')
         .condition(
@@ -199,13 +199,13 @@ class RadialGradient extends GradientBaseClass {
         )
         .build()
         .String();
-    
+
       if (radialWidthErr)
         errors.push(radialWidthErr);
     }
 
     if (this.args.radialHeight) {
-      let radialHeightErr = new Err.ErrorMessage.Builder()
+      let radialHeightErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Radial height')
         .condition(
@@ -216,13 +216,13 @@ class RadialGradient extends GradientBaseClass {
         )
         .build()
         .String();
-    
+
       if (radialHeightErr)
         errors.push(radialHeightErr);
     }
 
     if (this.args.angle) {
-      let angleErr = new Err.ErrorMessage.Builder()
+      let angleErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Angle')
         .condition(
@@ -231,13 +231,13 @@ class RadialGradient extends GradientBaseClass {
         )
         .build()
         .String();
-    
+
       if (angleErr)
         errors.push(angleErr);
     }
-    
+
     if (this.args.boundinBox) {
-      let boundingBoxErr = new Err.ErrorMessage.Builder()
+      let boundingBoxErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Bounding box')
         .condition(
@@ -254,7 +254,7 @@ class RadialGradient extends GradientBaseClass {
     }
 
     if (this.args.extent) {
-      let extentErr = new Err.ErrorMessage.Builder()
+      let extentErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Extent')
         .condition(

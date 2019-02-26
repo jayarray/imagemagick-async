@@ -58,7 +58,7 @@ class Line extends LineSegmentBaseClass {
     let errors = [];
     let prefix = 'LINE_LINE_SEGMENT_ERROR';
 
-    let xErr = new Err.ErrorMessage.Builder()
+    let xErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('X coordinate')
       .condition(
@@ -71,7 +71,7 @@ class Line extends LineSegmentBaseClass {
     if (xErr)
       errors.push(xErr);
 
-    let yErr = new Err.ErrorMessage.Builder()
+    let yErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Y coordinate')
       .condition(

@@ -61,7 +61,7 @@ class Coordinates extends InputsBaseClass {
 
     // Check x-value
 
-    let xErr = new Err.ErrorMessage.Builder()
+    let xErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('X')
       .condition(
@@ -76,7 +76,7 @@ class Coordinates extends InputsBaseClass {
 
     // Check y-value
 
-    let yErr = new Err.ErrorMessage.Builder()
+    let yErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Y')
       .condition(

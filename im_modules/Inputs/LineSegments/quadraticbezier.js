@@ -58,7 +58,7 @@ class QuadraticBezier extends LineSegmentBaseClass {
     let errors = [];
     let prefix = 'QUADRATIC_BEZIER_LINE_SEGMENT_ERROR';
 
-    let controlErr = new Err.ErrorMessage.Builder()
+    let controlErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Control point')
       .condition(
@@ -73,7 +73,7 @@ class QuadraticBezier extends LineSegmentBaseClass {
     if (controlErr)
       errors.push(controlErr);
 
-    let endPointErr = new Err.ErrorMessage.Builder()
+    let endPointErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End point')
       .condition(

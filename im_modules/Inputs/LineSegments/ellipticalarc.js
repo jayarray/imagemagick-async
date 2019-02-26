@@ -84,7 +84,7 @@ class EllipticalArc extends LineSegmentBaseClass {
 
     // Check required args
 
-    let radiusErr = new Err.ErrorMessage.Builder()
+    let radiusErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Radius')
       .condition(
@@ -99,7 +99,7 @@ class EllipticalArc extends LineSegmentBaseClass {
     if (radiusErr)
       errors.push(radiusErr);
 
-    let edgeErr = new Err.ErrorMessage.Builder()
+    let edgeErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Edge')
       .condition(
@@ -117,7 +117,7 @@ class EllipticalArc extends LineSegmentBaseClass {
     // Checks optional args
 
     if (this.args.angle) {
-      let angleErr = new Err.ErrorMessage.Builder()
+      let angleErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Angle')
         .condition(
@@ -132,7 +132,7 @@ class EllipticalArc extends LineSegmentBaseClass {
     }
 
     if (this.args.largeFlag) {
-      let largeFlagErr = new Err.ErrorMessage.Builder()
+      let largeFlagErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Large flag')
         .condition(
@@ -147,7 +147,7 @@ class EllipticalArc extends LineSegmentBaseClass {
     }
 
     if (this.args.sweepFlag) {
-      let sweepFlagErr = new Err.ErrorMessage.Builder()
+      let sweepFlagErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Sweep flag')
         .condition(

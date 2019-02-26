@@ -458,7 +458,7 @@ class Color extends InputsBaseClass {
     let errors = [];
     let prefix = 'COLOR_ERROR';
 
-    let formatErr = new Err.ErrorMessage.Builder()
+    let formatErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Format')
       .condition(
@@ -477,7 +477,7 @@ class Color extends InputsBaseClass {
     if (this.args.format == 'string') {
       // Check if hex string is non-empty and starts with '#'.
 
-      let hexErr = new Err.ErrorMessage.Builder()
+      let hexErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Hex string')
         .condition(
@@ -495,7 +495,7 @@ class Color extends InputsBaseClass {
 
       // Check if hex string length is valid.
 
-      hexErr = new Err.ErrorMessage.Builder()
+      hexErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Hex length')
         .condition(
@@ -521,7 +521,7 @@ class Color extends InputsBaseClass {
     else if (this.args.format == 'integers') {
       // Check red value
 
-      let redErr = new Err.ErrorMessage.Builder()
+      let redErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Red value')
         .condition(
@@ -538,7 +538,7 @@ class Color extends InputsBaseClass {
 
       // Check green value
 
-      let greenErr = new Err.ErrorMessage.Builder()
+      let greenErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Green value')
         .condition(
@@ -555,7 +555,7 @@ class Color extends InputsBaseClass {
 
       // Check blue value
 
-      let blueErr = new Err.ErrorMessage.Builder()
+      let blueErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Blue value')
         .condition(
@@ -572,7 +572,7 @@ class Color extends InputsBaseClass {
 
       // Check alpha value
 
-      let alphaErr = new Err.ErrorMessage.Builder()
+      let alphaErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Alpha value')
         .condition(
@@ -590,7 +590,7 @@ class Color extends InputsBaseClass {
     else if (this.args.format == 'percents') {
       // Check red value
 
-      let redErr = new Err.ErrorMessage.Builder()
+      let redErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Red value')
         .condition(
@@ -606,7 +606,7 @@ class Color extends InputsBaseClass {
 
       // Check green value
 
-      let greenErr = new Err.ErrorMessage.Builder()
+      let greenErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Green value')
         .condition(
@@ -622,7 +622,7 @@ class Color extends InputsBaseClass {
 
       // Check blue value
 
-      let blueErr = new Err.ErrorMessage.Builder()
+      let blueErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Blue value')
         .condition(
@@ -638,7 +638,7 @@ class Color extends InputsBaseClass {
 
       // Check alpha value
 
-      let alphaErr = new Err.ErrorMessage.Builder()
+      let alphaErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Alpha value')
         .condition(
