@@ -1,5 +1,6 @@
 let Path = require('path');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js'));
 
 //---------------------------------
@@ -22,14 +23,14 @@ function GetRotatedPoint(center, point, degrees) {
     let newY = (point.args.y * Math.cos(theta)) + (point.args.x * Math.sin(theta));
     newY = parseInt(newY);
 
-    rotatedPoint = Coordinates.Builder()
+    rotatedPoint = Coordinates.Builder
       .x(newX)
       .y(newY)
       .build();
   }
   else {
     // Translate point so that center is at origin
-    let translatedPoint = Coordinates.Builder()
+    let translatedPoint = Coordinates.Builder
       .x(point.args.x - center.args.x)
       .y(point.args.y - center.args.y)
       .build();
@@ -42,7 +43,7 @@ function GetRotatedPoint(center, point, degrees) {
     newY = parseInt(newY);
 
     // Undo the translation
-    rotatedPoint = Coordinates.Builder()
+    rotatedPoint = Coordinates.Builder
       .x(newX + center.args.x)
       .y(newY + center.args.y)
       .build();

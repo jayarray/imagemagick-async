@@ -1,10 +1,12 @@
-let Path_ = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
-let Path = require(Path_.join(Filepath.PrimitivesDir(), 'path.js')).Path;
-let Coordinates = require(Path_.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
-let HelperFunctions = require(Path_.join(Filepath.ShapesDir(), 'helperfunctions.js'));
-let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let PathPrimitive = require(Path.join(Filepath.PrimitivesDir(), 'path.js')).Path;
+let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
+let HelperFunctions = require(Path.join(Filepath.ShapesDir(), 'helperfunctions.js'));
+let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //---------------------------------
 
@@ -24,59 +26,59 @@ class Star extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} vertices Number of points on the star. 
+       * @param {number} n Number of points on the star. 
        */
-      vertices(vertices) {
-        this.args.vertices = vertices;
+      vertices(n) {
+        this.args.vertices = n;
         return this;
       }
 
       /**
-       * @param {Coordinates} center The center of the star.
+       * @param {Coordinates} coordinates The center of the star.
        */
-      center(center) {
-        this.args.center = center;
+      center(coordinates) {
+        this.args.center = coordinates;
         return this;
       }
 
 
       /**
-       * @param {Coordinates} vertex A point belonging to the star.
+       * @param {Coordinates} coordinates A point belonging to the star.
        */
-      vertex(vertex) {
-        this.args.vertex = vertex;
+      vertex(coordinates) {
+        this.args.vertex = coordinates;
         return this;
       }
 
       /**
-       * @param {number} bloat Factor equal to or greater than zero that affects the thickness of the star. The higher the value, the more 'bloated' the star will look, and will eventually invert.
+       * @param {number} n Factor equal to or greater than zero that affects the thickness of the star. The higher the value, the more 'bloated' the star will look, and will eventually invert.
        */
-      bloat(bloat) {
-        this.args.bloat = bloat;
+      bloat(n) {
+        this.args.bloat = n;
         return this;
       }
 
       /**
-       * @param {Color} strokeColor The color of the outline of the star. (Optional)
+       * @param {Color} color The color of the outline of the star. (Optional)
        */
-      strokeColor(strokeColor) {
-        this.args.strokeColor = strokeColor;
+      strokeColor(color) {
+        this.args.strokeColor = color;
         return this;
       }
 
       /**
-       * @param {number} strokeWidth Width of the outline of the star. Larger values produce thicker lines. (Optional)
+       * @param {number} n Width of the outline of the star. Larger values produce thicker lines. (Optional)
        */
-      strokeWidth(strokeWidth) {
-        this.args.strokeWidth = strokeWidth;
+      strokeWidth(n) {
+        this.args.strokeWidth = n;
         return this;
       }
 
       /**
-       * @param {Color} fillColor The color that will fill the star. (Optional)
+       * @param {Color} color The color that will fill the star. (Optional)
        */
-      fillColor(fillColor) {
-        this.args.fillColor = fillColor;
+      fillColor(color) {
+        this.args.fillColor = color;
         return this;
       }
 
@@ -93,7 +95,7 @@ class Star extends PrimitivesBaseClass {
         return new Star(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -133,7 +135,7 @@ class Star extends PrimitivesBaseClass {
     // Get all minor vertices
     let minorDegrees = majorDegrees / 2;
 
-    let minorVertex = Coordinates.Builder()
+    let minorVertex = Coordinates.Builder
       .x(parseInt(minorX))
       .y(parseInt(minorY))
       .build();
@@ -153,7 +155,7 @@ class Star extends PrimitivesBaseClass {
     }
 
     // Build path
-    let path = Path.Builder()
+    let path = PathPrimitive.Builder
       .points(combinedVertices)
       .strokeColor(this.args.strokeColor)
       .strokeWidth(this.args.strokeWidth)
@@ -171,82 +173,124 @@ class Star extends PrimitivesBaseClass {
   Errors() {
     let params = Star.Parameters();
     let errors = [];
+    let prefix = 'STAR_SHAPE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.vertices))
-      errors.push('STAR_SHAPE_ERROR: Vertices is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.vertices))
-        errors.push('STAR_SHAPE_ERROR: Vertices is not an integer.');
-      else {
-        if (this.args.vertices < params.vertices.min)
-          errors.push(`STAR_SHAPE_ERROR: Vertices is out of bounds. Assigned value is: ${this.args.vertices}. Value must be greater than or equal to ${params.vertices.min}.`);
-      }
-    }
+    let verticesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Vertices')
+      .condition(
+        new Err.NumberCondition.Builder(this.argsw.vertices)
+          .isInteger(true)
+          .min(params.vertices.min)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.center))
-      errors.push('STAR_SHAPE_ERROR: Center is undefined.');
-    else {
-      if (this.args.center.type != 'Coordinates')
-        errors.push('STAR_SHAPE_ERROR: Center is not a Coordinates object.');
-      else {
-        let errs = this.args.center.Errors();
-        if (errs.length > 0)
-          errors.push(`STAR_SHAPE_ERROR: Center has errors: ${errs.join(' ')}`);
-      }
-    }
+    if (verticesErr)
+      errors.push(verticesErr);
 
-    if (!Validate.IsDefined(this.args.vertex))
-      errors.push('STAR_SHAPE_ERROR: Vertex is undefined.');
-    else {
-      if (this.args.vertex.type != 'Coordinates')
-        errors.push('STAR_SHAPE_ERROR: Vertex is not a Coordinates object.');
-      else {
-        let errs = this.args.vertex.Errors();
-        if (errs.length > 0)
-          errors.push(`STAR_SHAPE_ERROR: Vertex has errors: ${errs.join(' ')}`);
-      }
-    }
+    let centerErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Center')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.center)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (centerErr)
+      erorrs.push(centerErr);
+
+    let vertexErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Vertex')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.vertex)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (vertexErr)
+      erorrs.push(vertexErr);
 
     // Check optional args
 
-    if (this.args.bloat) {
-      if (!Validate.IsInteger(this.args.bloat))
-        errors.push('STAR_SHAPE_ERROR: Bloat is not an integer.');
-      else {
-        if (this.args.bloat < params.bloat.min)
-          errors.push(`STAR_SHAPE_ERROR: Bloat is out of bounds. Assigned value is: ${this.args.bloat}. Value must be greater than or equal to ${params.bloat.min}.`);
-      }
+    if (!Validate.IsInteger(this.args.bloat)) {
+      let bloatErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Bloat')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.bloat)
+            .isInteger(true)
+            .min(params.bloat.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (bloatErr)
+        errors.push(bloatErr);
     }
 
     if (this.args.strokeColor) {
-      if (this.args.strokeColor.type != 'Color')
-        errors.push('STAR_SHAPE_ERROR: Stroke color is not a Color object.');
-      else {
-        let errs = this.args.strokeColor.Errors();
-        if (errs.length > 0)
-          errors.push(`STAR_SHAPE_ERROR: Stroke color has errors: ${errs.join(' ')}`);
-      }
+      let strokeColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.strokeColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeColorErr)
+        erorrs.push(strokeColorErr);
     }
 
-    if (this.args.strokeWidth) {
-      if (!Validate.IsInteger(this.args.strokeWidth))
-        errors.push('STAR_SHAPE_ERROR: Stroke width is not an integer.');
-      else {
-        if (this.args.strokeWidth < params.strokeWidth.min)
-          errors.push(`STAR_SHAPE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
-      }
+    if (!Validate.IsInteger(this.args.strokeWidth)) {
+      let strokeWidthErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.strokeWidth)
+            .isInteger(true)
+            .min(params.strokeWidth.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeWidthErr)
+        errors.push(strokeWidthErr);
     }
+
 
     if (this.args.fillColor) {
-      if (this.args.fillColor.type != 'Color')
-        errors.push('STAR_SHAPE_ERROR: Fill color is not a Color object.');
-      else {
-        let errs = this.args.fillColor.Errors();
-        if (errs.length > 0)
-          errors.push(`STAR_SHAPE_ERROR: Fill color has errors: ${errs.join(' ')}`);
-      }
+      let fillColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Fill color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.fillColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fillColorErr)
+        erorrs.push(fillColorErr);
     }
 
     return errors;

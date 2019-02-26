@@ -1,9 +1,10 @@
-let Path_ = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
-let HelperFunctions = require(Path_.join(Filepath.ShapesDir(), 'helperfunctions.js'));
-let Path = require(Path_.join(Filepath.PrimitivesDir(), 'path.js')).Path;
-let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let HelperFunctions = require(Path.join(Filepath.ShapesDir(), 'helperfunctions.js'));
+let PathPrimitive = require(Path.join(Filepath.PrimitivesDir(), 'path.js')).Path;
+let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
 //-------------------------------
 
@@ -23,50 +24,50 @@ class Polygon extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} sides The number of sides on the polygon.
+       * @param {number} n The number of sides on the polygon.
        */
-      sides(sides) {
-        this.args.sides = sides;
+      sides(n) {
+        this.args.sides = n;
         return this;
       }
 
       /**
-       * @param {Coordinates} center The center of the polygon.
+       * @param {Coordinates} coordinates The center of the polygon.
        */
-      center(center) {
-        this.args.center = center;
+      center(coordinates) {
+        this.args.center = coordinates;
         return this;
       }
 
       /**
-       * @param {Coordinates} vertex A vertex belonging to the polygon. Determines the distance from center for all other vertices.
+       * @param {Coordinates} coordinates A vertex belonging to the polygon. Determines the distance from center for all other vertices.
        */
-      vertex(vertex) {
-        this.args.vertex = vertex;
+      vertex(coordinates) {
+        this.args.vertex = coordinates;
         return this;
       }
 
       /**
-       * @param {Color} strokecolor The color of the outline that makes up the polygon. (Optional)
+       * @param {Color} color The color of the outline that makes up the polygon. (Optional)
        */
-      strokeColor(strokecolor) {
-        this.args.strokeColor = strokeColor;
+      strokeColor(color) {
+        this.args.strokeColor = color;
         return this;
       }
 
       /**
-       * @param {number} strokeWidth Width of the outline that makes up the polygon. Larger values produce thicker lines. (Optional)
+       * @param {number} n Width of the outline that makes up the polygon. Larger values produce thicker lines. (Optional)
        */
-      strokeWidth(strokeWidth) {
-        this.args.strokeWidth = strokeWidth;
+      strokeWidth(n) {
+        this.args.strokeWidth = n;
         return this;
       }
 
       /**
-       * @param {Color} fillColor The color that will fill the polygon. (Optional)
+       * @param {Color} color The color that will fill the polygon. (Optional)
        */
-      fillColor(fillColor) {
-        this.args.fillColor = fillColor;
+      fillColor(color) {
+        this.args.fillColor = color;
         return this;
       }
 
@@ -83,7 +84,7 @@ class Polygon extends PrimitivesBaseClass {
         return new Polygon(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -101,7 +102,7 @@ class Polygon extends PrimitivesBaseClass {
     }
 
     // Build path
-    let path = Path.Builder()
+    let path = PathPrimitive.Builder
       .points(vertices)
       .strokeColor(this.args.strokeColor)
       .strokeWidth(this.args.strokeWidth)
@@ -118,73 +119,106 @@ class Polygon extends PrimitivesBaseClass {
   Errors() {
     let params = Polygon.Parameters();
     let errors = [];
+    let prefix = 'POLYGON_SHAPE_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.sides))
-      errors.push('POLYGON_SHAPE_ERROR: Sides is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.sides))
-        errors.push('POLYGON_SHAPE_ERROR: Sides is not an integer.');
-      else {
-        if (this.args.sides < params.sides.min)
-          errors.push(`POLYGON_SHAPE_ERROR: Sides is out of bounds. Assigned value is: ${this.args.sides}. Value must be greater than or equal to ${params.sides.min}.`);
-      }
-    }
+    let sidesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Sides')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.sides)
+          .isInteger(true)
+          .min(params.sides.min)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.center))
-      errors.push('POLYGON_SHAPE_ERROR: Center is undefined.');
-    else {
-      if (this.args.center.type != 'Coordinates')
-        errors.push('POLYGON_SHAPE_ERROR: Center is not a Coordinates object.');
-      else {
-        let errs = this.args.center.Errors();
-        if (errs.length > 0)
-          errors.push(`POLYGON_SHAPE_ERROR: Center has errros: ${errs.join(' ')}`);
-      }
-    }
+    if (sidesErr)
+      errors.push(sidesErr);
 
-    if (!Validate.IsDefined(this.args.vertex))
-      errors.push('POLYGON_SHAPE_ERROR: Vertex is undefined.');
-    else {
-      if (this.args.vertex.type != 'Coordinates')
-        errors.push('POLYGON_SHAPE_ERROR: Vertex is not a Coordinates object.');
-      else {
-        let errs = this.args.vertex.Errors();
-        if (errs.length > 0)
-          errors.push(`POLYGON_SHAPE_ERROR: Vertex has errros: ${errs.join(' ')}`);
-      }
-    }
+    let centerErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Center')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.center)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (centerErr)
+      errors.push(centerErr);
+
+    let vertexErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Vertex')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.vertex)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (vertexErr)
+      errors.push(vertexErr);
 
     // Check optional args
 
     if (this.args.strokeColor) {
-      if (this.args.strokeColor.type != 'Color')
-        errors.push('POLYGON_SHAPE_ERROR: Stroke color is not a Color object.');
-      else {
-        let errs = this.args.strokeColor.Errors();
-        if (errs.length > 0)
-          errors.push(`POLYGON_SHAPE_ERROR: Stroke color has errors: ${errs.join(' ')}`);
-      }
+      let strokeColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.strokeColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeColorErr)
+        errors.push(strokeColorErr);
     }
 
     if (this.args.strokeWidth) {
-      if (!Validate.IsInteger(this.args.strokeWidth))
-        errors.push('POLYGON_SHAPE_ERROR: Stroke width is not an integer.');
-      else {
-        if (this.args.strokeWidth < params.strokeWidth.min)
-          errors.push(`POLYGON_SHAPE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
-      }
+      let strokeWidthErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.strokeWidth)
+            .isInteger(true)
+            .min(params.sides.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeWidthErr)
+        errors.push(strokeWidthErr);
     }
 
     if (this.args.fillColor) {
-      if (this.args.fillColor.type != 'Color')
-        errors.push('POLYGON_SHAPE_ERROR: Fill color is not a Color object.');
-      else {
-        let errs = this.args.fillColor.Errors();
-        if (errs.length > 0)
-          errors.push(`POLYGON_SHAPE_ERROR: Fill color has errors: ${errs.join(' ')}`);
-      }
+      let fillColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Fill color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.fillColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fillColorErr)
+        errors.push(fillColorErr);
     }
 
     return errors;
