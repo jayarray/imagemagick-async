@@ -99,7 +99,7 @@ class Ellipse extends PrimitivesBaseClass {
         return new Ellipse(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -142,7 +142,7 @@ class Ellipse extends PrimitivesBaseClass {
 
     // Check required args
 
-    let centerErr = new Err.ErrorMessage.Builder()
+    let centerErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Center')
       .condition(
@@ -157,7 +157,7 @@ class Ellipse extends PrimitivesBaseClass {
     if (centerErr)
       errors.push(centerErr);
 
-    let widthErr = new Err.ErrorMessage.Builder()
+    let widthErr = Err.ErrorMessage.Builder()
       .prefix(prefix)
       .varName('Width')
       .condition(
@@ -172,7 +172,7 @@ class Ellipse extends PrimitivesBaseClass {
     if (widthErr)
       errors.push(widthErr);
 
-    let heightErr = new Err.ErrorMessage.Builder()
+    let heightErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Height')
       .condition(
@@ -190,7 +190,7 @@ class Ellipse extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.strokeColor) {
-      let strokeColorErr = new Err.ErrorMessage.Builder()
+      let strokeColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke color')
         .condition(
@@ -207,7 +207,7 @@ class Ellipse extends PrimitivesBaseClass {
     }
 
     if (this.args.strokeWidth) {
-      let strokeWidthErr = new Err.ErrorMessage.Builder()
+      let strokeWidthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke width')
         .condition(
@@ -224,7 +224,7 @@ class Ellipse extends PrimitivesBaseClass {
     }
 
     if (this.args.fillColor) {
-      let fillColorErr = new Err.ErrorMessage.Builder()
+      let fillColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Fill color')
         .condition(
@@ -241,7 +241,7 @@ class Ellipse extends PrimitivesBaseClass {
     }
 
     if (this.args.angleStart) {
-      let angleStartErr = new Err.ErrorMessage.Builder()
+      let angleStartErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Angle start')
         .condition(
@@ -257,7 +257,7 @@ class Ellipse extends PrimitivesBaseClass {
 
 
     if (this.args.angleEnd) {
-      let angleEndErr = new Err.ErrorMessage.Builder()
+      let angleEndErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Angle end')
         .condition(

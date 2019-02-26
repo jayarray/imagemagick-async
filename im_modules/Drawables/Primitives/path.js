@@ -77,7 +77,7 @@ class Path extends PrimitivesBaseClass {
         return new Path(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -88,7 +88,7 @@ class Path extends PrimitivesBaseClass {
     let strArray = [];
 
     this.args.points.forEach(p => {
-      let pStr = Coordinates.Builder()
+      let pStr = Coordinates.Builder
         .x(p.args.x + this.offset.x)
         .y(p.args.y + this.offset.y)
         .build()
@@ -141,7 +141,7 @@ class Path extends PrimitivesBaseClass {
 
     // Check required args
 
-    let pointsErr = new Err.ErrorMEssage.Builder()
+    let pointsErr = Err.ErrorMEssage.Builder
       .prefix(prefix)
       .varName('Points')
       .condition(
@@ -163,7 +163,7 @@ class Path extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.strokeColor) {
-      let strokeColorErr = new Err.ErrorMEssage.Builder()
+      let strokeColorErr = Err.ErrorMEssage.Builder
         .prefix(prefix)
         .varName('Stroke color')
         .condition(
@@ -180,7 +180,7 @@ class Path extends PrimitivesBaseClass {
     }
 
     if (this.args.strokeWidth) {
-      let widthErr = new Err.ErrorMEssage.Builder()
+      let widthErr = Err.ErrorMEssage.Builder
         .prefix(prefix)
         .varName('Stroke width')
         .condition(
@@ -197,7 +197,7 @@ class Path extends PrimitivesBaseClass {
     }
 
     if (this.args.fillColor) {
-      let fillColorErr = new Err.ErrorMEssage.Builder()
+      let fillColorErr = Err.ErrorMEssage.Builder
         .prefix(prefix)
         .varName('Fill color')
         .condition(
@@ -214,7 +214,7 @@ class Path extends PrimitivesBaseClass {
     }
 
     if (this.args.isClosed) {
-      let isClosedErr = new Err.ErrorMEssage.Builder()
+      let isClosedErr = Err.ErrorMEssage.Builder
         .prefix(prefix)
         .varName('Is closed flag')
         .condition(

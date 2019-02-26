@@ -88,10 +88,10 @@ class Text extends PrimitivesBaseClass {
       }
 
       build() {
-        return new Path(this);
+        return new Text(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -132,7 +132,7 @@ class Text extends PrimitivesBaseClass {
 
     // Check required args
 
-    let stringErr = new Err.ErrorMessage.Builder()
+    let stringErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('String')
       .condition(
@@ -149,7 +149,7 @@ class Text extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.font) {
-      let fontErr = new Err.ErrorMessage.Builder()
+      let fontErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Font')
         .condition(
@@ -168,56 +168,88 @@ class Text extends PrimitivesBaseClass {
     // CONT
 
     if (this.args.pointSize) {
-      if (!Validate.IsNumber(this.args.pointSize))
-        errors.push('TEXT_PRIMITIVE_ERROR: Point size is not a number.');
-      else {
-        if (this.args.pointSize < params.pointSize.min)
-          errors.push(`TEXT_PRIMITIVE_ERROR: Point size is out of bounds. Assigned value is: ${this.args.pointSize}. Value must be greater than or equal to ${params.pointSize.min}.`);
-      }
+      let pointSizeErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Gravity')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.pointSize)
+            .min(params.pointSize.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (pointSizeErr)
+        errors.push(pointSizeErr);
     }
 
     if (this.args.gravity) {
-      if (!Validate.IsString(this.args.gravity))
-        errors.push('TEXT_PRIMITIVE_ERROR: Gravity is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.gravity))
-          errors.push('TEXT_PRIMITIVE_ERROR: Gravity is empty string.');
-        else if (Validate.IsWhitespace(this.args.gravity))
-          errors.push('TEXT_PRIMITIVE_ERROR: Gravity is whitespace.');
-        else {
-          if (!params.gravity.options.includes(this.args.gravity))
-            errors.push(`TEXT_PRIMITIVE_ERROR: Gravity is invalid. Assigned value is: ${this.args.gravity}. Must be assigned one of the following values: ${params.gravity.options.join(', ')}.`);
-        }
-      }
+      let gravityErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Gravity')
+        .condition(
+          new Err.StringCondition.Builder(this.args.gravity)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .include(params.gravity.options)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (gravityErr)
+        errors.push(gravityErr);
     }
 
     if (this.args.strokeColor) {
-      if (this.args.strokeColor.type != 'Color')
-        errors.push('TEXT_PRIMITIVE_ERROR: Stroke color is not a Color object.');
-      else {
-        let errs = this.args.strokeColor.Errors();
-        if (errs.length > 0)
-          errors.push(`TEXT_PRIMITIVE_ERROR: Stroke color has errors: ${errs.join(' ')}`);
-      }
+      let strokeColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.strokeColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeColorErr)
+        errors.push(strokeColorErr);
     }
 
     if (this.args.strokeWidth) {
-      if (!Validate.IsNumber(this.args.strokeWidth))
-        errors.push('TEXT_PRIMITIVE_ERROR: Stroke width is not a number.');
-      else {
-        if (this.args.strokeWidth < params.strokeWidth.min)
-          errors.push(`TEXT_PRIMITIVE_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
-      }
+      let strokeWidthErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.strokeWidth)
+            .isInteger(true)
+            .min(params.strokeWidth.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeWidthErr)
+        errors.push(strokeWidthErr);
     }
 
     if (this.args.fillColor) {
-      if (this.args.fillColor.type != 'Color')
-        errors.push('TEXT_PRIMITIVE_ERROR: Fill color is not a Color object.');
-      else {
-        let errs = this.args.fillColor.Errors();
-        if (errs.length > 0)
-          errors.push(`TEXT_PRIMITIVE_ERROR: Fill color has errors: ${errs.join(' ')}`);
-      }
+      let fillColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Fill color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.fillColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fillColorErr)
+        errors.push(fillColorErr);
     }
 
     return errors;

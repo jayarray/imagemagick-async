@@ -84,7 +84,7 @@ class PathComposite extends PrimitivesBaseClass {
         return new PathComposite(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -131,7 +131,7 @@ class PathComposite extends PrimitivesBaseClass {
 
     // Check required args
 
-    let startErr = new Err.ErrorMessage.Builder()
+    let startErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Start')
       .condition(
@@ -146,7 +146,7 @@ class PathComposite extends PrimitivesBaseClass {
     if (startErr)
       errors.push(startErr);
 
-    let lineSegmentsErr = new Err.ErrorMessage.Builder()
+    let lineSegmentsErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Line segments')
       .condition(
@@ -168,7 +168,7 @@ class PathComposite extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.strokeColor) {
-      let strokeColorErr = new Err.ErrorMessage.Builder()
+      let strokeColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke color')
         .condition(
@@ -185,7 +185,7 @@ class PathComposite extends PrimitivesBaseClass {
     }
 
     if (this.args.strokeWidth) {
-      let strokeWidthErr = new Err.ErrorMessage.Builder()
+      let strokeWidthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke width')
         .condition(
@@ -202,7 +202,7 @@ class PathComposite extends PrimitivesBaseClass {
     }
 
     if (this.args.fillColor) {
-      let fillColorErr = new Err.ErrorMessage.Builder()
+      let fillColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Fill color')
         .condition(
@@ -219,7 +219,7 @@ class PathComposite extends PrimitivesBaseClass {
     }
 
     if (!Validate.IsDefined(this.args.isClosed)) {
-      let isClosedErr = new Err.ErrorMEssage.Builder()
+      let isClosedErr = Err.ErrorMEssage.Builder
         .prefix(prefix)
         .varName('Is closed flag')
         .condition(

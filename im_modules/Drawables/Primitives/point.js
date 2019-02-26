@@ -58,7 +58,7 @@ class Point extends PrimitivesBaseClass {
         return new Point(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -83,7 +83,7 @@ class Point extends PrimitivesBaseClass {
 
     // Check required args
 
-    let xErr = new Err.ErrorMessage.Builder()
+    let xErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('X')
       .condition(
@@ -97,7 +97,7 @@ class Point extends PrimitivesBaseClass {
     if (xErr)
       errors.push(xErr);
 
-    let yErr = new Err.ErrorMessage.Builder()
+    let yErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Y')
       .condition(
@@ -114,7 +114,7 @@ class Point extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.color) {
-      let colorErr = new Err.ErrorMessage.Builder()
+      let colorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Color')
         .condition(

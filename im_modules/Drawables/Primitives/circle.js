@@ -75,7 +75,7 @@ class Circle extends PrimitivesBaseClass {
         return new Circle(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -120,7 +120,7 @@ class Circle extends PrimitivesBaseClass {
 
     // Check required args
 
-    let centerErr = new Err.ErrorMessage.Builder()
+    let centerErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Center')
       .condition(
@@ -135,7 +135,7 @@ class Circle extends PrimitivesBaseClass {
     if (centerErr)
       errors.push(centerErr);
 
-    let edgeErr = new Err.ErrorMessage.Builder()
+    let edgeErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Edge')
       .condition(
@@ -153,7 +153,7 @@ class Circle extends PrimitivesBaseClass {
     // Checks optional args
 
     if (this.args.strokeColor) {
-      let strokeColorErr = new Err.ErrorMessage.Builder()
+      let strokeColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke color')
         .condition(
@@ -170,7 +170,7 @@ class Circle extends PrimitivesBaseClass {
     }
 
     if (this.args.strokeWidth) {
-      let strokeWidthErr = new Err.ErrorMessage.Builder()
+      let strokeWidthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke width')
         .condition(
@@ -187,7 +187,7 @@ class Circle extends PrimitivesBaseClass {
     }
 
     if (this.args.fillColor) {
-      let fillColorErr = new Err.ErrorMessage.Builder()
+      let fillColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Fill color')
         .condition(

@@ -67,7 +67,7 @@ class Image extends PrimitivesBaseClass {
         return new Image(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -95,7 +95,7 @@ class Image extends PrimitivesBaseClass {
 
     // Check required args
 
-    let sourceErr = new Err.ErrorMessage.Builder()
+    let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Source')
       .condition(
@@ -110,7 +110,7 @@ class Image extends PrimitivesBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
-    let cornerErr = new Err.ErrorMessage.Builder()
+    let cornerErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Corner')
       .condition(
@@ -128,7 +128,7 @@ class Image extends PrimitivesBaseClass {
     // Check optional args
 
     if (Validate.IsDefined(this.args.width) && Validate.IsDefined(this.args.height)) {
-      let widthErr = new Err.ErrorMessage.Builder()
+      let widthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Width')
         .condition(
@@ -143,7 +143,7 @@ class Image extends PrimitivesBaseClass {
       if (widthErr)
         errors.push(widthErr);
 
-      let heightErr = new Err.ErrorMessage.Builder()
+      let heightErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Height')
         .condition(

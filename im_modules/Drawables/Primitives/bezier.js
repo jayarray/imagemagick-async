@@ -68,7 +68,7 @@ class Bezier extends PrimitivesBaseClass {
         return new Bezier(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -79,7 +79,7 @@ class Bezier extends PrimitivesBaseClass {
     let pointStrings = [];
 
     this.args.points.forEach(p => {
-      let pStr = Coordinates.Builder()
+      let pStr = Coordinates.Builder
         .x(p.args.x + this.offset.x)
         .y(p.args.y + this.offset.y)
         .build()
@@ -122,7 +122,7 @@ class Bezier extends PrimitivesBaseClass {
 
     // Check required args
 
-    let pointsErr = new Err.ErrorMEssage.Builder()
+    let pointsErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Points')
       .condition(
@@ -144,7 +144,7 @@ class Bezier extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.strokeColor) {
-      let strokeColorErr = new Err.ErrorMEssage.Builder()
+      let strokeColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke color')
         .condition(
@@ -161,7 +161,7 @@ class Bezier extends PrimitivesBaseClass {
     }
 
     if (this.args.strokeWidth) {
-      let strokeWidthErr = new Err.ErrorMEssage.Builder()
+      let strokeWidthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Stroke width')
         .condition(
@@ -177,7 +177,7 @@ class Bezier extends PrimitivesBaseClass {
     }
 
     if (this.args.fillColor) {
-      let fillColorErr = new Err.ErrorMEssage.Builder()
+      let fillColorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Fill color')
         .condition(

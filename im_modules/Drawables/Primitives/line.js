@@ -67,7 +67,7 @@ class Line extends PrimitivesBaseClass {
         return new Line(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -82,12 +82,12 @@ class Line extends PrimitivesBaseClass {
     if (this.args.width)
       args.push('-strokewidth', this.args.width.Info().hex.string);
 
-    let start = Coordinates.Builder()
+    let start = Coordinates.Builder
       .x(this.args.start.args.x + this.offset.x)
       .y(this.args.start.args.y + this.offset.y)
       .build();
 
-    let end = Coordinates.Builder()
+    let end = Coordinates.Builder
       .x(this.args.end.args.x + this.offset.x)
       .y(this.args.end.args.y + this.offset.y)
       .build();
@@ -107,7 +107,7 @@ class Line extends PrimitivesBaseClass {
 
     // Check required args
 
-    let startErr = new Err.ErrorMessage.Builder()
+    let startErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Start')
       .condition(
@@ -122,7 +122,7 @@ class Line extends PrimitivesBaseClass {
     if (startErr)
       errors.push(startErr);
 
-    let endErr = new Err.ErrorMessage.Builder()
+    let endErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('End')
       .condition(
@@ -140,7 +140,7 @@ class Line extends PrimitivesBaseClass {
     // Check optional args
 
     if (this.args.color) {
-      let colorErr = new Err.ErrorMessage.Builder()
+      let colorErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Color')
         .condition(
@@ -157,7 +157,7 @@ class Line extends PrimitivesBaseClass {
     }
 
     if (this.args.width) {
-      let widthErr = new Err.ErrorMessage.Builder()
+      let widthErr = Err.ErrorMessage.Builder
         .prefix(prefix)
         .varName('Width')
         .condition(
