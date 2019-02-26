@@ -102,12 +102,12 @@ class PathComposite extends PrimitivesBaseClass {
     let args = [];
 
     if (this.args.fillColor)
-      args.push('-fill', this.args.fillColor.Info().hex.string);
+      args.push('-fill', this.args.fillColor.String());
     else
       args.push('-fill', 'none'); // Prevents default black fill color
 
     if (this.args.strokeColor)
-      args.push('-stroke', this.args.strokeColor.Info().hex.string);
+      args.push('-stroke', this.args.strokeColor.String());
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);

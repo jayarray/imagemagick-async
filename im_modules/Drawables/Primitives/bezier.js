@@ -98,12 +98,12 @@ class Bezier extends PrimitivesBaseClass {
     let args = [];
 
     if (this.args.fillColor)
-      args.push('-fill', this.args.fillColor.Info().hex.string); // Applies fill color to areas where the curve is above or below the line computed between the start and end point.
+      args.push('-fill', this.args.fillColor.String()); // Applies fill color to areas where the curve is above or below the line computed between the start and end point.
     else
       args.push('-fill', 'none'); // Outputs lines only
 
     if (this.args.strokeColor)
-      args.push('-stroke', this.args.strokeColor.Info().hex.string);
+      args.push('-stroke', this.args.strokeColor.String());
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);

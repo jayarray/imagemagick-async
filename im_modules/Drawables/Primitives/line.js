@@ -77,10 +77,10 @@ class Line extends PrimitivesBaseClass {
     let args = [];
 
     if (this.args.color)
-      args.push('-stroke', this.args.color.Info().hex.string);
+      args.push('-stroke', this.args.color.String());
 
     if (this.args.width)
-      args.push('-strokewidth', this.args.width.Info().hex.string);
+      args.push('-strokewidth', this.args.width);
 
     let start = Coordinates.Builder
       .x(this.args.start.args.x + this.offset.x)

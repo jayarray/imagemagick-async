@@ -49,8 +49,8 @@ class PointAndColor extends InputsBaseClass {
    * @returns {string} Returns a string representation of the point and color as 'x,y #rrggbb'. 
    */
   String() {
-    let hexStr = this.args.color.Info().hex.string;
-    return `${this.args.point.args.x},${this.point.args.y} ${hexStr}`;
+    let colorStr = this.args.color.String();
+    return `${this.args.point.args.x},${this.point.args.y} ${colorStr}`;
   }
 
   /**
@@ -73,7 +73,7 @@ class PointAndColor extends InputsBaseClass {
       .String();
 
     if (pointErr)
-        errors.push(pointErr);
+      errors.push(pointErr);
 
     let colorErr = Err.ErrorMessage.Builder
       .prefix(prefix)

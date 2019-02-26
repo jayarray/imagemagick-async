@@ -68,7 +68,7 @@ class Point extends PrimitivesBaseClass {
     let args = [];
 
     if (this.args.color)
-      args.push('-fill', this.args.color.Info().hex.string); // Default color is black
+      args.push('-fill', this.args.color.String()); // Default color is black
 
     args.push('-draw', `point ${this.args.x + this.offset.x},${this.args.y + this.offset.y}`);
     return args;

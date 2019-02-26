@@ -101,10 +101,10 @@ class Text extends PrimitivesBaseClass {
     let args = [];
 
     if (this.args.fillColor)
-      args.push('-fill', this.args.fillColor.Info().hex.string); // Default color is black
+      args.push('-fill', this.args.fillColor.String()); // Default color is black
 
     if (this.args.strokeColor)
-      args.push('-stroke', this.args.strokeColor.Info().hex.string);
+      args.push('-stroke', this.args.strokeColor.String());
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);

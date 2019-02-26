@@ -124,7 +124,7 @@ class RadialGradient extends GradientBaseClass {
     if (this.args.extent)
       args.push('-define', `gradient:extent=${this.args.extent}`);
 
-    args.push(`radial-gradient:${this.args.startColor}-${this.args.endColor}`);
+    args.push(`radial-gradient:${this.args.startColor.String()}-${this.args.endColor.String()}`);
 
     return args;
   }
