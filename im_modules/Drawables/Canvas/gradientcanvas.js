@@ -1,13 +1,15 @@
 let Path = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //-----------------------------------
 
 class GradientCanvas extends CanvasBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
@@ -22,18 +24,18 @@ class GradientCanvas extends CanvasBaseClass {
       }
 
       /**
-       * @param {number} width Width in pixels.
+       * @param {number} n Width in pixels.
        */
-      width(width) {
-        this.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
       /**
-       * @param {number} height Height in pixels. 
+       * @param {number} n Height in pixels. 
        */
-      height(height) {
-        this.height = height;
+      height(n) {
+        this.args.height = n;
         return this;
       }
 
@@ -41,15 +43,15 @@ class GradientCanvas extends CanvasBaseClass {
        * @param {Gradient} gradient 
        */
       gradient(gradient) {
-        this.gradient = gradient;
+        this.args.gradient = gradient;
         return this;
       }
 
       /**
-       * @param {Array<Primitive>} primitives A list of Primitive types to draw onto the canvas (Optional)
+       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
        */
-      primitives(primitives) {
-        this.primitives = primitives;
+      primitives(primitivesArr) {
+        this.primitives = primitivesArr;
         return this;
       }
 
@@ -57,12 +59,11 @@ class GradientCanvas extends CanvasBaseClass {
         return new GradientCanvas(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments.
    */
   Args() {
     let args = ['-size', `${this.args.width}x${this.args.height}`].concat(this.args.gradient.Args());
@@ -79,39 +80,68 @@ class GradientCanvas extends CanvasBaseClass {
   Errors() {
     let params = GradientCanvas.Parameters();
     let errors = [];
+    let prefix = 'GRADIENT_CANVAS_ERROR';
 
-    if (!Validate.IsDefined(this.args.width))
-      errors.push('GRADIENT_CANVAS_ERROR: Width is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.width))
-        errors.push('GRADIENT_CANVAS_ERROR: Width is not an integer.');
-      else {
-        if (this.args.width < params.width.min)
-          errors.push(`GRADIENT_CANVAS_ERROR: Width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to ${params.width.min}.`);
-      }
-    }
+    let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.height))
-      errors.push('GRADIENT_CANVAS_ERROR: Height is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.height))
-        errors.push('GRADIENT_CANVAS_ERROR: Height is not an integer.');
-      else {
-        if (this.args.height < params.height.min)
-          errors.push(`GRADIENT_CANVAS_ERROR: Height is out of bounds. Assigned value is: ${this.args.height}. Value must be greater than or equal to ${params.height.min}.`);
-      }
-    }
+    if (widthErr)
+      errors.push(widthErr);
 
-    if (!Validate.IsDefined(this.args.gradient))
-      errors.push('GRADIENT_CANVAS_ERROR: Gradient is undefined.');
-    else {
-      if (this.args.gradient.type != 'Gradient')
-        errors.push('GRADIENT_CANVAS_ERROR: Gradient is not a Gradient object.');
-      else {
-        let errs = this.args.gradient.Errors();
-        if (errs.length > 0)
-          errors.push(`GRADIENT_CANVAS_ERROR: Gradient has errors: ${errs.join(' ')}`);
-      }
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
+    let gradientErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Gradient')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.gradient)
+          .typeName('Gradient')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (gradientErr)
+      errors.push(gradientErr);
+
+    if (this.primitives) {
+      let primitivesErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Primitives')
+        .condition(
+          new Err.ArrayCondition.Builder(this.primitives)
+            .validType('Primitive')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (primitivesErr)
+        errors.push(primitivesErr);
     }
 
     return errors;
@@ -134,6 +164,10 @@ class GradientCanvas extends CanvasBaseClass {
       },
       gradient: {
         type: 'Gradient'
+      },
+      primitives: {
+        type: 'Primitive',
+        isArray: true
       }
     };
   }

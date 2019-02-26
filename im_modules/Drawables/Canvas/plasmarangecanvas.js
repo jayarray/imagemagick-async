@@ -1,70 +1,221 @@
-let PATH = require('path');
-let CANVAS_BASECLASS = require(PATH.join(__dirname, 'canvasbaseclass.js')).CanvasBaseClass;
-
-let MIN_WIDTH = 1;
-let MIN_HEIGHT = 1;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //----------------------------------------
 // COLOR CANVAS
 
-class PlasmaRangeCanvas extends CANVAS_BASECLASS {
-  constructor(width, height, startColor, endColor) {
-    super(width, height);
-    this.startColor_ = startColor;
-    this.endColor_ = endColor;
+class PlasmaRangeCanvas extends CanvasBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
-   * @returns {Array<string|number>} Returns an array of arguments.
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'PlasmaRangeCanvas';
+        this.args = {};
+        this.primitives = [];
+      }
+
+      /**
+       * @param {number} n Width in pixels. 
+       */
+      width(n) {
+        this.args.width = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n Height in pixels.
+       */
+      height(n) {
+        this.args.height = n;
+        return this;
+      }
+
+      /**
+       * @param {Color} color Start color for the plasma.
+       */
+      startColor(color) {
+        this.args.startColor = color;
+        return this;
+      }
+
+      /**
+       * @param {Color} color End color for the plasma.
+       */
+      endColor(color) {
+        this.args.endColor = color;
+        return this;
+      }
+
+      /**
+       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
+       */
+      primitives(primitivesArr) {
+        this.primitives = primitivesArr;
+        return this;
+      }
+
+      build() {
+        return new PlasmaRangeCanvas(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     let plasmaStr = 'plasma:';
 
-    if (this.startColor_) {
-      if (this.endColor_)
-        plasmaStr += `${this.startColor_}-${this.endColor_}`;
+    if (this.args.startColor) {
+      if (this.args.endColor)
+        plasmaStr += `${this.args.startColor.String()}-${this.args.endColor.String()}`;
       else
-        plasmaStr += this.startColor_;
+        plasmaStr += this.args.startColor.String();
     }
 
-    let args = ['-size', `${this.width_}x${this.height_}`, plasmaStr];
+    let args = ['-size', `${this.args.width}x${this.args.height}`, plasmaStr];
 
-    if (this.Primitives().length > 0)
-      this.Primitives().forEach(p => args = args.concat(p.Args()));
+    if (this.primitives.length > 0)
+      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
+  }
+
+
+  /**
+   * @override
+   */
+  Errors() {
+    let params = PlasmaRangeCanvas.Parameters();
+    let errors = [];
+    let prefix = 'PLASMA_RANGE_CANVAS_ERROR';
+
+    // Check required args
+
+    let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (widthErr)
+      errors.push(widthErr);
+
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
+    let startColorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Start color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.startColor)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (startColorErr)
+      errors.push(startColorErr);
+
+    // Check optional args
+
+    if (this.args.endColor) {
+      let endColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('End color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.color)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (endColorErr)
+        errors.push(endColorErr);
+    }
+
+    if (this.primitives) {
+      let primitivesErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Primitives')
+        .condition(
+          new Err.ArrayCondition.Builder(this.primitives)
+            .validType('Primitive')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (primitivesErr)
+        errors.push(primitivesErr);
+    }
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'PlasmaRangeCanvas';
-  }
-
-  /**
-   * Create a PlasmaRangeCanvas object with the specified properties. Omiting the end color will result in a defualt gradient that begins with the start color. Omiting the start color (or both start and end colors) results in a randomly generated gradient.
-   * @param {number} width Width (in pixels)
-   * @param {number} height Height (in pixels)
-   * @param {string} startColor Hex string
-   * @param {string} endColor Hex string
-   * @returns {PlasmaRangeCanvas} Returns a PlasmaRangeCanvas object. If inputs are invalid, it returns null.
-   */
-  static Create(width, height, startColor, endColor) {
-    if (width < MIN_WIDTH || height < MIN_HEIGHT)
-      return null;
-
-    return new PlasmaRangeCanvas(width, height, startColor, endColor);
+  static Parameters() {
+    return {
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      startColor: {
+        type: 'Color'
+      },
+      endColor: {
+        type: 'Color'
+      },
+      primitives: {
+        type: 'Primitive',
+        isArray: true
+      }
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = PlasmaRangeCanvas.Create;
-exports.Name = 'PlasmaRangeCanvas';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.PlasmaRangeCanvas = PlasmaRangeCanvas;

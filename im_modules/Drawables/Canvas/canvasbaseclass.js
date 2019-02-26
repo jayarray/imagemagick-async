@@ -1,5 +1,6 @@
 let Path = require('path');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
 
 //---------------------------------
@@ -13,14 +14,14 @@ class CanvasBaseClass extends DrawableBaseClass {
       offset: properties.offset
     });
 
-    this.command = 'convert';
     this.primitives = properties.primitives ? properties.primitives : [];
+    this.command = 'convert';
   }
 
   /**
    * Add a Primitive to this canvas.
    * @param {Primitive} p 
-   * @param {number} xOffset 
+   * @param {{x: number, y: number}} offset 
    * @param {number} yOffset 
    */
   AddPrimitive(p, offset) {

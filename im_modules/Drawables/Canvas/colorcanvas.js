@@ -1,14 +1,16 @@
 let Path = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
 let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //----------------------------------------
 // COLOR CANVAS
 
 class ColorCanvas extends CanvasBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
@@ -23,17 +25,17 @@ class ColorCanvas extends CanvasBaseClass {
       }
 
       /**
-       * @param {number} width Width in pixels.
+       * @param {number} n Width in pixels.
        */
-      width(width) {
-        this.args.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
       /**
-       * @param {number} height Height in pixels.
+       * @param {number} n Height in pixels.
        */
-      height(height) {
+      height(n) {
         this.args.height = height;
         return this;
       }
@@ -47,10 +49,10 @@ class ColorCanvas extends CanvasBaseClass {
       }
 
       /**
-       * @param {Array<Primitive>} primitives A list of Primitive types to draw onto the canvas (Optional)
+       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
        */
-      primitives(primitives) {
-        this.primitives = primitives;
+      primitives(primitivesArr) {
+        this.primitives = primitivesArr;
         return this;
       }
 
@@ -58,14 +60,14 @@ class ColorCanvas extends CanvasBaseClass {
         return new ColorCanvas(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**
    * @override
    */
   Args() {
-    let args = ['-size', `${this.args.width}x${this.args.height}`, `canvas:${this.args.color.HexString()}`];
+    let args = ['-size', `${this.args.width}x${this.args.height}`, `canvas:${this.args.color.String()}`];
 
     if (this.primitives.length > 0)
       this.primitives.forEach(p => args = args.concat(p.Args()));
@@ -79,61 +81,72 @@ class ColorCanvas extends CanvasBaseClass {
   Errors() {
     let params = ColorCanvas.Parameters();
     let errors = [];
+    let prefix = 'COLOR_CANVAS_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.width))
-      errors.push('COLOR_CANVAS_ERROR: Width is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.width))
-        errors.push('COLOR_CANVAS_ERROR: Width is not an integer.');
-      else {
-        if (this.args.width < params.width.min)
-          errors.push(`COLOR_CANVAS_ERROR: Width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to: ${params.width.min}.`);
-      }
-    }
+    let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.height))
-      errors.push('COLOR_CANVAS_ERROR: Height is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.height))
-        errors.push('COLOR_CANVAS_ERROR: Height is not an integer.');
-      else {
-        if (this.args.height < params.height.min)
-          errors.push(`COLOR_CANVAS_ERROR: Height is out of bounds. Assigned value is: ${this.args.height}. Value must be greater than or equal to: ${params.height.min}.`);
-      }
-    }
+    if (widthErr)
+      errors.push(widthErr);
 
-    if (!Validate.IsDefined(this.args.color))
-      errors.push('COLOR_CANVAS_ERROR: Color is undefined.');
-    else {
-      if (this.args.color.type != 'Color')
-        errors.push('COLOR_CANVAS_ERROR: Color is not a Color object.');
-      else {
-        let errs = this.args.color.Errors();
-        if (errs.length > 0)
-          errors.push(`COLOR_CANVAS_ERROR: Color has errors: ${errs.join(' ')}`);
-      }
-    }
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
+    let colorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.color)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (colorErr)
+      errors.push(colorErr);
 
     // Check optional args
 
     if (this.primitives) {
-      if (!Validate.IsArray(this.primitives))
-        errors.push('COLOR_CANVAS_ERROR: Primtiives is not an array.');
-      else {
-        if (this.primitives.length > 0) {
-          let arrayHasInvalidTypes = Validate.ArrayHasInvalidTypes(this.primitives, 'Primitive');
-          let arrayHasErrors = Validate.ArrayHasErrors(this.primitives);
+      let primitivesErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Primitives')
+        .condition(
+          new Err.ArrayCondition.Builder(this.primitives)
+            .validType('Primitive')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
 
-          if (arrayHasInvalidTypes)
-            error.push('COLOR_CANVAS_ERROR: Primitives contains objects that are not Primitive types.');
-          else {
-            if (arrayHasErrors)
-              errors.push('COLOR_CANVAS_ERROR: Primitives has Primitive objects with errors.');
-          }
-        }
-      }
+      if (primitivesErr)
+        errors.push(primitivesErr);
     }
 
     return errors;

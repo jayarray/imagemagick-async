@@ -1,13 +1,15 @@
 let Path = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
 let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //-----------------------------------
 
 class ImageCanvas extends CanvasBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
@@ -22,34 +24,34 @@ class ImageCanvas extends CanvasBaseClass {
       }
 
       /**
-       * @param {number} width Width in pixels.
+       * @param {number} n Width in pixels.
        */
-      width(width) {
-        this.args.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
       /**
-       * @param {number} height Height in pixels.
+       * @param {number} n Height in pixels.
        */
-      height(height) {
-        this.args.height = height;
+      height(n) {
+        this.args.height = n;
         return this;
       }
 
       /**
-       * @param {number} source The source path.
+       * @param {string} str The source path.
        */
-      source(source) {
-        this.args.source = source;
+      source(str) {
+        this.args.source = str;
         return this;
       }
 
       /**
-       * @param {Array<Primitive>} primitives A list of Primitive types to draw onto the canvas (Optional)
+       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
        */
-      primitives(primitives) {
-        this.primitives = primitives;
+      primitives(primitivesArr) {
+        this.primitives = primitivesArr;
         return this;
       }
 
@@ -57,17 +59,7 @@ class ImageCanvas extends CanvasBaseClass {
         return new ImageCanvas(this);
       }
     }
-    return Builder;
-  }
-
-  /**
-   * @param {number} width Width (in pixels)
-   * @param {number} height Height (in pixels)
-   * @param {string} src Source
-   */
-  constructor(width, height, src) {
-    super(width, height);
-    this.src_ = src;
+    return new Builder();
   }
 
   /** 
@@ -88,40 +80,70 @@ class ImageCanvas extends CanvasBaseClass {
   Errors() {
     let params = ImageCanvas.Parameters();
     let errors = [];
+    let prefix = 'IMAGE_CANVAS_ERROR';
 
-    if (!Validate.IsDefined(this.args.width))
-      errors.push('IMAGE_CANVAS_ERROR: Width is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.width))
-        errors.push('IMAGE_CANVAS_ERROR: Width is not an integer.');
-      else {
-        if (this.args.width < params.width.min)
-          errors.push(`IMAGE_CANVAS_ERROR: Width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to ${params.width.min}.`);
-      }
-    }
+    let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
 
-    if (!Validate.IsDefined(this.args.height))
-      errors.push('IMAGE_CANVAS_ERROR: Height is undefined.');
-    else {
-      if (!Validate.IsInteger(this.args.height))
-        errors.push('IMAGE_CANVAS_ERROR: Height is not an integer.');
-      else {
-        if (this.args.width < params.height.min)
-          errors.push(`IMAGE_CANVAS_ERROR: Height is out of bounds. Assigned value is: ${this.args.height}. Value must be greater than or equal to ${params.height.min}.`);
-      }
-    }
+    if (widthErr)
+      errors.push(widthErr);
 
-    if (!Validate.IsDefined(this.args.source))
-      errors.push('IMAGE_CANVAS_ERROR: Source is not defined.');
-    else {
-      if (!Validate.IsString(this.args.source))
-        errors.push('IMAGE_CANVAS_ERROR: Source is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.source))
-          errors.push('IMAGE_CANVAS_ERROR: Source is empty string.');
-        else if (Validate.IsWhitespace(this.args.source))
-          errors.push('IMAGE_CANVAS_ERROR: Source is whitespace.');
-      }
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    // Check optional args
+
+    if (this.primitives) {
+      let primitivesErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Primitives')
+        .condition(
+          new Err.ArrayCondition.Builder(this.args.primitives)
+            .validType('Primitive')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (primitivesErr)
+        errors.push(primitivesErr);
     }
 
     return errors;
@@ -144,6 +166,10 @@ class ImageCanvas extends CanvasBaseClass {
       },
       source: {
         type: 'string'
+      },
+      primitives: {
+        type: 'Primitive',
+        isArray: true
       }
     };
   }

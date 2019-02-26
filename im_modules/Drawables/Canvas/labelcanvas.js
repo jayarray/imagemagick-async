@@ -1,13 +1,16 @@
 let Path = require('path');
-let Validate = require('./validate.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values;
 let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //---------------------------
 
 class LabelCanvas extends CanvasBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
@@ -22,106 +25,106 @@ class LabelCanvas extends CanvasBaseClass {
       }
 
       /**
-       * @param {number} width Width in pixels. (Optional) 
+       * @param {number} n Width in pixels. (Optional) 
        */
-      width(width) {
-        this.width = width;
+      width(n) {
+        this.args.width = n;
         return this;
       }
 
       /**
-       * @param {number} height Height in pixels. (Optional) 
+       * @param {number} n Height in pixels. (Optional) 
        */
-      height(height) {
-        this.height = height;
+      height(n) {
+        this.args.height = n;
         return this;
       }
 
       /**
-       * @param {string} text The text that makes up the label.
+       * @param {string} str The text that makes up the label.
        */
-      text(text) {
-        this.text = text;
+      text(str) {
+        this.args.text = str;
         return this;
       }
 
       /**
-       * @param {string} font Font name (Optional) 
+       * @param {string} name Font name (Optional) 
        */
-      font(font) {
-        this.font = font;
+      font(name) {
+        this.args.font = name;
         return this;
       }
 
       /**
-       * @param {number} fontSize Font size (Optional)
+       * @param {number} n Font size (Optional)
        */
-      fontSize(fontSize) {
-        this.fontSize = fontSize;
+      fontSize(n) {
+        this.args.fontSize = n;
         return this;
       }
 
       /**
-       * @param {number} kerning Spacing between glyphs/symbols. (Optional)
+       * @param {number} n Spacing between glyphs/symbols. (Optional)
        */
-      kerning(kerning) {
-        this.kerning = kerning;
+      kerning(n) {
+        this.args.kerning = n;
         return this;
       }
 
       /**
-       * @param {number} strokeWidth Thickness of the text outline. (Optional) 
+       * @param {number} n Thickness of the text outline. (Optional) 
        */
-      strokeWidth(strokeWidth) {
-        this.strokeWidth = strokeWidth;
+      strokeWidth(n) {
+        this.args.strokeWidth = n;
         return this;
       }
 
       /**
-       * @param {Color} strokeColor The color of the text outline. (Optional) 
+       * @param {Color} color The color of the text outline. (Optional) 
        */
-      strokeColor(strokeColor) {
-        this.strokeColor = strokeColor;
+      strokeColor(color) {
+        this.args.strokeColor = color;
         return this;
       }
 
       /**
-       * @param {Color} fillColor The color inside of the text outline. (Optional) 
+       * @param {Color} color The color inside of the text outline. (Optional) 
        */
-      fillColor(fillColor) {
-        this.fillColor = fillColor;
+      fillColor(color) {
+        this.args.fillColor = color;
         return this;
       }
 
       /**
-       * @param {Color} underColor The color under the text. (Different than background color). (Optional) 
+       * @param {Color} color The color under the text. (Different than background color). (Optional) 
        */
-      underColor(underColor) {
-        this.underColor = underColor;
+      underColor(color) {
+        this.args.underColor = color;
         return this;
       }
 
       /**
-       * @param {Color} backgroundColor The background color for the entire label. (Optional) 
+       * @param {Color} color The background color for the entire label. (Optional) 
        */
-      backgroundColor(backgroundColor) {
-        this.backgroundColor = backgroundColor;
+      backgroundColor(color) {
+        this.args.backgroundColor = color;
         return this;
       }
 
       /**
-       * @param {string} gravity Gravity of the text. (Optional)
+       * @param {string} str Gravity of the text. (Optional)
        */
-      gravity(gravity) {
-        this.gravity = gravity;
+      gravity(str) {
+        this.args.gravity = str;
         return this;
       }
 
       /**
-       * @param {Array<Primitive>} primitives A list of Primitive types to draw onto the canvas (Optional)
+       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
        */
-      primitives(primitives) {
-        this.primitives = primitives;
+      primitives(primitivesArr) {
+        this.primitives = primitivesArr;
         return this;
       }
 
@@ -129,7 +132,7 @@ class LabelCanvas extends CanvasBaseClass {
         return new LabelCanvas(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 
@@ -143,13 +146,13 @@ class LabelCanvas extends CanvasBaseClass {
 
     args.push('-background');
     if (this.args.backgroundColor)
-      args.push(this.args.backgroundColor);
+      args.push(this.args.backgroundColor.String());
     else
       args.push('none');
 
     args.push('-fill');
     if (this.args.fillColor)
-      args.push(this.args.fillColor);
+      args.push(this.args.fillColor.String());
     else
       args.push('none');
 
@@ -160,10 +163,10 @@ class LabelCanvas extends CanvasBaseClass {
       args.push('-strokewidth', this.args.strokeWidth);
 
     if (this.args.strokeColor)
-      args.push('-stroke', this.args.strokeColor);
+      args.push('-stroke', this.args.strokeColor.String());
 
     if (this.args.underColor)
-      args.push('-undercolor', this.args.underColor);
+      args.push('-undercolor', this.args.underColor.String());
 
     if (this.args.gravity)
       args.push('-gravity', this.args.gravity);
@@ -188,149 +191,234 @@ class LabelCanvas extends CanvasBaseClass {
   Errors() {
     let params = LabelCanvas.Parameters();
     let errors = [];
+    let prefix = 'LABEL_CANVAS_ERROR';
 
     // Check required args
 
-    if (!Validate.IsDefined(this.args.text))
-      errors.push('LABEL_CANVAS_ERROR: Text is undefined');
-    else {
-      if (!Validate.IsString(this.args.text))
-        errors.push('LABEL_CANVAS_ERROR: Text is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.text))
-          errors.push('LABEL_CANVAS_ERROR: Text is empty string.');
-        else if (Validate.IsWhitespace(this.args.text))
-          errors.push('LABEL_CANVAS_ERRROR: Text is whitespace.');
-      }
-    }
+    let textErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Text')
+      .condition(
+        new Err.StringCondition.Builder(this.args.text)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (textErr)
+      errors.push(textErr);
 
     // Check optional args
 
     if (this.args.width) {
-      if (!Validate.IsInteger(this.args.width))
-        errors.push('LABEL_CANVAS_ERROR: Width is not an integer.');
-      else {
-        if (this.args.width < params.width.min)
-          errors.push(`LABEL_CANVAS_ERROR: Width is out of bounds. Assigned value is: ${this.args.width}. Value must be greater than or equal to ${params.width.min}.`);
-      }
+      let widthErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.width)
+            .isInteger(true)
+            .min(params.width.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (widthErr)
+        errors.push(widthErr);
     }
 
     if (this.args.height) {
-      if (!Validate.IsInteger(this.args.height))
-        errors.push('LABEL_CANVAS_ERROR: Height is not an integer.');
-      else {
-        if (this.args.height < params.height.min)
-          errors.push(`LABEL_CANVAS_ERROR: Height is out of bounds. Assigned value is: ${this.args.height}. Value must be greater than or equal to ${params.height.min}.`);
-      }
-    }
+      let heightErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Height')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.height)
+            .isInteger(true)
+            .min(params.height.min)
+            .build()
+        )
+        .build()
+        .String();
 
-    if (this.args.text) {
-      if (!Validate.IsString(this.args.text))
-        errors.push('LABEL_CANVAS_ERROR: Text is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.text))
-          errors.push('LABEL_CANVAS_ERROR: Text is empty string.');
-      }
+      if (heightErr)
+        errors.push(heightErr);
     }
 
     if (this.args.font) {
-      if (!Validate.IsString(this.args.font))
-        errors.push('LABEL_CANVAS_ERROR: Font is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.font))
-          errors.push('LABEL_CANVAS_ERROR: Font is empty string.');
-        else if (Validate.IsWhitespace(this.args.text))
-          error.spush('LABEL_CANVAS_ERROR: Font is whitespace.');
-      }
+      let fontErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Font')
+        .condition(
+          new Err.StringCondition.Builder(this.args.font)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fontErr)
+        errors.push(fontErr);
     }
 
     if (this.args.fontSize) {
-      if (!Validate.IsNumber(this.args.fontSize))
-        errors.push('LABEL_CANVAS_ERROR: Font size is not a number.');
-      else {
-        if (this.args.fontSize < params.fontSize.min)
-          errors.push(`LABEL_CANVAS_ERROR: Font size is out of bounds. Assigned value is: ${this.args.fontSize}. Value must be greater than or equal to ${params.fontSize.min}.`);
-      }
+      let fontSizeErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Font size')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.fontSize)
+            .min(params.fontSize.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fontSizeErr)
+        errors.push(fontSizeErr);
     }
 
     if (this.args.kerning) {
-      if (!Validate.IsNumber(this.args.kerning))
-        errors.push('LABEL_CANVAS_ERROR: Kerning is not a number.');
-      else {
-        if (this.args.kerning < params.kerning.min)
-          errors.push(`LABEL_CANVAS_ERROR: Kerning is out of bounds. Assigned value is: ${this.args.kerning}. Value must be greater than or equal to ${params.kerning.min}.`);
-      }
+      let kerningErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Kerning')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.kerning)
+            .min(params.kerning.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (kerningErr)
+        errors.push(kerningErr);
     }
 
     if (this.args.strokeWidth) {
-      if (!Validate.IsInteger(this.args.strokeWidth))
-        errors.push('LABEL_CANVAS_ERROR: Stroke width is not an integer.');
-      else {
-        if (this.args.strokeWidth < params.strokeWidth.min)
-          errors.push(`LABEL_CANVAS_ERROR: Stroke width is out of bounds. Assigned value is: ${this.args.strokeWidth}. Value must be greater than or equal to ${params.strokeWidth.min}.`);
-      }
+      let strokeWidthErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke width')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.strokeWidth)
+            .min(params.strokeWidth.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeWidthErr)
+        errors.push(strokeWidthErr);
     }
 
     if (this.args.strokeColor) {
-      if (this.args.strokeColor.type != 'Color')
-        error.push('LABEL_CANVAS_ERROR: Stroke color is not a Color type.');
-      else {
-        let errs = this.args.strokeColor.Errors();
-        if (errs.length > 0)
-          errors.push(`LABEL_CANVAS_ERROR: Stroke color has errors: ${errs.join(' ')}`);
-      }
+      let strokeColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Stroke color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.strokeColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (strokeColorErr)
+        errors.push(strokeColorErr);
     }
 
     if (this.args.fillColor) {
-      if (this.args.fillColor.type != 'Color')
-        error.push('LABEL_CANVAS_ERROR: Fill color is not a Color type.');
-      else {
-        let errs = this.args.fillColor.Errors();
-        if (errs.length > 0)
-          errors.push(`LABEL_CANVAS_ERROR: Fill color has errors: ${errs.join(' ')}`);
-      }
+      let fillColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Fill color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.fillColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (fillColorErr)
+        errors.push(fillColorErr);
     }
 
     if (this.args.underColor) {
-      if (this.args.underColor.type != 'Color')
-        error.push('LABEL_CANVAS_ERROR: Under color is not a Color type.');
-      else {
-        let errs = this.args.underColor.Errors();
-        if (errs.length > 0)
-          errors.push(`LABEL_CANVAS_ERROR: Fill color has errors: ${errs.join(' ')}`);
-      }
+      let underColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Under color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.underColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (underColorErr)
+        errors.push(underColorErr);
     }
 
     if (this.args.backgroundColor) {
-      if (this.args.backgroundColor.type != 'Color')
-        error.push('LABEL_CANVAS_ERROR: Background color is not a Color type.');
-      else {
-        let errs = this.args.backgroundColor.Errors();
-        if (errs.length > 0)
-          errors.push(`LABEL_CANVAS_ERROR: Background color has errors: ${errs.join(' ')}`);
-      }
+      let backgroundColorErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Background color')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.backgroundColor)
+            .typeName('Color')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (backgroundColorErr)
+        errors.push(backgroundColorErr);
     }
 
     if (this.args.gravity) {
-      if (!Validate.IsString(this.args.gravity))
-        errors.push('LABEL_CANVAS_ERROR: Gravity is not a string.');
-      else {
-        if (Validate.IsEmptyString(this.args.font))
-          errors.push('LABEL_CANVAS_ERROR: Gravity is empty string.');
-        else if (Validate.IsWhitespace(this.args.text))
-          error.spush('LABEL_CANVAS_ERROR: Gravity is whitespace.');
-        else {
-          if (!params.gravity.options.includes(this.args.gravity))
-            errors.push(`LABEL_CANVAS_ERROR: Gravity is invalid. Assigned value is : ${this.args.gravity}. Value must be assigned to one of the following: ${params.gravity.options.join(', ')}.`);
-        }
-      }
+      let gravityErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Gravity')
+        .condition(
+          new Err.StringCondition.Builder(this.args.gravity)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .include(GravityValues)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (gravityErr)
+        errors.push(gravityErr);
+    }
+
+    if (this.primitives) {
+      let primitivesErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Primitives')
+        .condition(
+          new Err.ArrayCondition.Builder(this.primitives)
+            .validType('Primitive')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (primitivesErr)
+        errors.push(primitivesErr);
     }
 
     return errors;
   }
 
   /**
-   * @overall
+   * @override
    */
   static Parameters() {
     return {
@@ -377,17 +465,11 @@ class LabelCanvas extends CanvasBaseClass {
       },
       gravity: {
         type: 'string',
-        options: [
-          "Center",
-          "East",
-          "North",
-          "NorthEast",
-          "NorthWest",
-          "South",
-          "SouthEast",
-          "SouthWest",
-          "West"
-        ]
+        options: GravityValues
+      },
+      primitives: {
+        type: 'Primitive',
+        isArray: true
       }
     };
   }
