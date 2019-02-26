@@ -1,4 +1,6 @@
-let ObjectInterface = require('./objectinterface.js').ObjectInterface;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let ObjectInterface = require(Path.join(RootDir, 'objectinterface.js')).ObjectInterface;
 
 //--------------------------------------
 

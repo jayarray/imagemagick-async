@@ -1,6 +1,7 @@
 let Path = require('path');
-let Err = require('./error.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, './error.js'));
+let Filepath = require(Path.join(RootDir, './filepath.js')).Filepath;
 let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linesegmentbaseclass.js')).LineSegmentBaseClass;
 
 //------------------------------------

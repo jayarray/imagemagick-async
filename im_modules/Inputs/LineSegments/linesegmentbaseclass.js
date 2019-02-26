@@ -1,8 +1,7 @@
-let PATH = require('path');
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'Inputs');
-let INPUTS_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let InputsBaseClass = require(PATH.join(INPUTS_DIR, 'inputsbaseclass.js')).InputsBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let InputsBaseClass = require(PATH.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
 //------------------------------
 

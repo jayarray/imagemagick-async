@@ -1,6 +1,7 @@
 let Path = require('path');
-let Err = require('./error.js');
-let Filepath = require('./filepath.js').Filepath;
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
 //-------------------------------------
@@ -515,7 +516,7 @@ class Color extends InputsBaseClass {
 
       if (invalidChars.length > 0)
         errors.push('COLOR_ERROR: Hex string is invalid. Contains invalid characters.');
-      
+
     }
     else if (this.args.format == 'integers') {
       // Check red value
@@ -531,7 +532,7 @@ class Color extends InputsBaseClass {
         )
         .build()
         .String();
-      
+
       if (redErr)
         errors.push(redErr);
 
@@ -599,7 +600,7 @@ class Color extends InputsBaseClass {
         )
         .build()
         .String();
-      
+
       if (redErr)
         errors.push(redErr);
 
@@ -712,6 +713,7 @@ exports.RGB_8_BIT_MAX = RGB_8_BIT_MAX;
 exports.RGB_16_BIT_MAX = RGB_16_BIT_MAX;
 exports.PERCENT_MIN = PERCENT_MIN;
 exports.PERCENT_MAX = PERCENT_MAX;
+exports.FORMATS = FORMATS;
 
 exports.Color = Color;
 
