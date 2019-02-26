@@ -42,7 +42,7 @@ class PointAndColor extends InputsBaseClass {
         return new PointAndColor(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 

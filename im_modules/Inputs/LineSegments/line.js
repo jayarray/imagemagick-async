@@ -41,7 +41,7 @@ class Line extends LineSegmentBaseClass {
         return new Line(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

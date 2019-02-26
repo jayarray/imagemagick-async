@@ -50,7 +50,7 @@ class Smooth extends LineSegmentBaseClass {
         return new Smooth(properties);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

@@ -49,7 +49,7 @@ class CubicBezier extends LineSegmentBaseClass {
         return new CubicBezier(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

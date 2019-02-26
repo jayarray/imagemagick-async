@@ -42,7 +42,7 @@ class Vector extends InputsBaseClass {
         return new Vector(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

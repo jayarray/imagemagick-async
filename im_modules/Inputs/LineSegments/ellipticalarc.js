@@ -65,7 +65,7 @@ class EllipticalArc extends LineSegmentBaseClass {
         return new EllipticalArc(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

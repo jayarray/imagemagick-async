@@ -41,7 +41,7 @@ class QuadraticBezier extends LineSegmentBaseClass {
         return new QuadraticBezier(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**

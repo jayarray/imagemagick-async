@@ -50,7 +50,7 @@ class BoundingBox extends InputsBaseClass {
         return new BoundingBox(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 

@@ -91,7 +91,7 @@ class RadialGradient extends GradientBaseClass {
         return new RadialGradient(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 

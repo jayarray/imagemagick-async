@@ -81,7 +81,7 @@ class LinearGradient extends GradientBaseClass {
         return new LinearGradient(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /** 

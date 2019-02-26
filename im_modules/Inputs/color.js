@@ -402,7 +402,7 @@ class Color extends InputsBaseClass {
         return new Color(this);
       }
     }
-    return Builder;
+    return new Builder();
   }
 
   /**
