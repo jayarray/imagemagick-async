@@ -189,10 +189,109 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
+  static ModColorDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ModDir())
+      .dir('Color')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static ModCompareDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ModDir())
+      .dir('Compare')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static ModComposeDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ModDir())
+      .dir('Compose')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static ModCutDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ModDir())
+      .dir('Cut')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static ModMasksDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ModDir())
+      .dir('Masks')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
   static TransformDir() {
     return Filepath.Builder
       .partialPath(Filepath.EffectsDir())
       .dir('Transform')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static TransformDisplaceDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.TransformDir())
+      .dir('Displace')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static TransformDistortDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.TransformDir())
+      .dir('Distort')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static TransformReflectDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.TransformDir())
+      .dir('Reflect')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static TransformResizeDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.TransformDir())
+      .dir('Resize')
       .build()
       .String();
   }
