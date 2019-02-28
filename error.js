@@ -241,6 +241,15 @@ class ArrayCondition {
         return this;
       }
 
+      /**
+       * Specify whether you want to check the object for erorrs using it's built-in Errors() function.
+       * @param {boolean} bool 
+       */
+      checkForErrors(bool) {
+        this.checkForErrors_ = bool;
+        return this;
+      }
+
       minLength(n) {
         this.minLength_ = n;
         return this;
@@ -248,6 +257,11 @@ class ArrayCondition {
 
       maxLength(n) {
         this.maxLength_ = n;
+        return this;
+      }
+
+      hasLength(n) {
+        this.length_ = n;
         return this;
       }
 
@@ -868,30 +882,50 @@ class ErrorMessage {
       return s1 + s2;
     }
 
-    // Check length (if applicable)
-    let minLenIsValid = Validate.IsNumber(arrCond.minLength_);
-    let maxLenIsValid = Validate.IsNumber(arrCond.maxLength_);
+    if (Validate.IsDefined(arrCond.checkForErrors_)) {
+      if (arrCond.checkForErrors_) {
+        let arrayHasErrors = Validate.ArrayHasErrors(arrCond.value_);
 
-    if (minLenIsValid || maxLenIsValid) {
-      s2 += ` has an invalid number of items. Current number of items is: ${arrCond.value_.length}.`;
-
-      if (minLenIsValid && maxLenIsValid) {
-        if (arrCond.value_.length < arrCond.minLength_ || arrCond.value_.length > arrCond.maxLength_) {
-          s2 += ` Must have ${arrCond.minLength_} to ${arrCond.maxLength_} items.`;
+        if (arrayHasErrors) {
+          s2 += ` contains ${arrCond.validType_} objects with errors.`;
           return s1 + s2;
         }
       }
-      else {
-        if (minLenIsValid) {
-          if (arrCond.value_.length < arrCond.minLength_) {
-            s2 += ` Must have ${arrCond.minLength_} or more items.`;
+    }
+
+    // Check length (if applicable)
+
+    if (Validate.IsDefined(arrCond.length_)) {
+      if (arrCond.value_.length != arrCond.length_) {
+        s2 += ` length is invald. Must have exactly ${arrCond.length_} item(s).`;
+        return s1 + s2;
+      }
+    }
+    else {
+      let minLenIsValid = Validate.IsNumber(arrCond.minLength_);
+      let maxLenIsValid = Validate.IsNumber(arrCond.maxLength_);
+
+      if (minLenIsValid || maxLenIsValid) {
+        s2 += ` has an invalid number of items. Current number of items is: ${arrCond.value_.length}.`;
+
+        if (minLenIsValid && maxLenIsValid) {
+          if (arrCond.value_.length < arrCond.minLength_ || arrCond.value_.length > arrCond.maxLength_) {
+            s2 += ` Must have ${arrCond.minLength_} to ${arrCond.maxLength_} items.`;
             return s1 + s2;
           }
         }
-        else if (maxLenIsValid) {
-          if (arrCond.value_.length < arrCond.maxLenIsValid_) {
-            s2 += ` Must have no more than ${arrCond.maxLenIsValid_} items.`;
-            return s1 + s2;
+        else {
+          if (minLenIsValid) {
+            if (arrCond.value_.length < arrCond.minLength_) {
+              s2 += ` Must have ${arrCond.minLength_} or more items.`;
+              return s1 + s2;
+            }
+          }
+          else if (maxLenIsValid) {
+            if (arrCond.value_.length < arrCond.maxLenIsValid_) {
+              s2 += ` Must have no more than ${arrCond.maxLenIsValid_} items.`;
+              return s1 + s2;
+            }
           }
         }
       }
