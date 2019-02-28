@@ -1,53 +1,38 @@
-class Effect {
-  constructor(builder) {
-    this.name = builder.name;
-    this.type = builder.type;
-    this.args = builder.args;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
+
+//----------------------------------
+
+class EffectBaseClass extends DrawableBaseClass {
+  constructor(properties) {
+    super({
+      type: 'Effect',
+      name: properties.name,
+      args: properties.args,
+      offset: properties.offset
+    });
+
+    this.subtype = properties.subtype;  // Store
   }
 
-  static get Builder() {
-    class Builder {
-      constructor() {}
+  /**
+   * @override
+   */
+  static IsLayer() {
+    return true;
+  }
 
-      /**
-       * @param {string} name
-       */
-      name(name) {
-        this.name = name;
-        return this;
-      }
-
-      /**
-       * @param {string} type
-       */
-      type(type) {
-        this.type = type;
-        return this;
-      }
-
-      /**
-       * @param {Array<{name: string, type: string, value: any}>} tuples
-       */
-      args(tuples) {
-        this.args = {};
-
-        tuples.forEach(t => {
-          this.args[t.name] = { type: t.type, value: t.value };
-        });
-
-        return this;
-      }
-
-      build() {
-        return new Effect(this);
-      }
-    }
-
-    return Builder;
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
   }
 }
 
-//-------------------------------
+//---------------------------
 // EXPORTS
 
-exports.Builder = Effect.Builder;
+exports.EffectBase = PrimitivesBaseClass;
