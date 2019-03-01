@@ -2,7 +2,6 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let Validate = require(Path.join(RootDir, 'validate.js'));
 let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.js')).CanvasBaseClass;
 
 //----------------------------------------
