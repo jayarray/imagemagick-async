@@ -3,6 +3,131 @@ let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 
 //------------------------------------------
+// Helper functions
+
+function IsNode(moduleItem) {
+  // Check if item has a build function
+  try {
+    let x = moduleItem.Builder.build();
+    return false;
+  }
+  catch (err) {
+    return true;
+  }
+}
+
+
+/**
+ * @param {object} rootNode
+ * @param {string} moduleName
+ */
+function GetImModule(rootNode, moduleName) {
+  let imModule = null;
+  let nodeNames = Object.keys(rootNode);
+  let needToBeChecked = nodeNames.map(name => rootNode[name]);
+
+  while (needToBeChecked.length != 0) {
+    let curr = needToBeChecked[i];
+
+    if (IsNode(curr)) {
+      let childrenNames = Object.keys(curr);
+
+      if (childrenNames.length > 0) {
+        let children = childrenNames.map(name => curr[name]);
+        needToBeChecked.push(children);
+      }
+    }
+    else {
+      if (curr.name == moduleName) {
+        imModule = curr;
+        break;
+      }
+    }
+
+    // Remove currently checked item
+    needToBeChecked = needToBeChecked.slice(1);
+  }
+
+  return imModule;
+}
+
+//------------------------------------------
+// Object Builder
+
+class ObjectBuilder {
+  constructor(api) {
+    this.api = api;
+    this.objectName = null;
+    this.args = [];
+    this.nodeNames = [];
+  }
+
+  /**
+   * Declare the name of the object you wish to build.
+   * @param {string} str 
+   */
+  name(str) {
+    this.objectName = str;
+    return this;
+  }
+
+  /**
+   * Use this when specifying the path to a module inside the API object. Example: in('Drawables').in('Canvas') searches in api.Drawables.Canvas and any other child nodes in this path. If no node names are specified, the entire API structure will be searched.
+   * @param {string} nodeName 
+   */
+  in(nodeName) {
+    this.nodeNames.push(nodeName);
+    return this;
+  }
+
+  /**
+   * Pass in an argument to the object's builder.
+   * @param {string} name Name of the argument.
+   * @param {string} value Value of the argument.
+   */
+  passArg(name, value) {
+    this.args.push({
+      name: name,
+      value
+    });
+
+    return this;
+  }
+
+  build() {
+    let imModule = null;
+
+    // Acquire specified im module
+    if (this.nodeNames.length > 0) {
+      let node = this.api;
+
+      for (let i = 0; i < this.nodeNames.length; ++i) {
+        let currNodeName = this.nodeNames[i];
+        node = node[currNodeName];
+      }
+
+      if (IsNode(node))
+        imModule = GetImModule(node, this.name);
+    }
+    else
+      imModule = GetImModule(this.api, this.name);
+
+    if (imModule) {
+      // Build and return object
+      let currBuilder = imModule.Builder;
+      this.args.forEach(a => currBuilder = currBuilder[a.name](a.value));
+
+      let o = currBuilder.build();
+      return o;
+    }
+
+    return null;
+  }
+}
+
+exports.ObjectBuilder = ObjectBuilder;
+
+//------------------------------------------
 // API
 
 let api = {};
@@ -150,4 +275,26 @@ api.Drawables = {
       }
     }
   }
+};
+
+
+// Inputs
+
+api.Inputs = {
+  Gradient: {
+    BoundingBox: require(Path.join(Filepath.GradientDir(), 'boundingbox.js')).BoundingBox,
+    LinearGradient: require(Path.join(Filepath.GradientDir(), 'lineargradient.js')).LinearGradient,
+    RadialGradient: require(Path.join(Filepath.GradientDir(), 'radialgradient.js')).RadialGradient
+  },
+  LineSegments: {
+    CubicBezier: require(Path.join(Filepath.LineSegmentsDir(), 'cubicbezier.js')).CubicBezier,
+    EllipticalArc: require(Path.join(Filepath.LineSegmentsDir(), 'ellipticalarc.js')).EllipticalArc,
+    Line: require(Path.join(Filepath.LineSegmentsDir(), 'line.js')).Line,
+    QuadraticBezier: require(Path.join(Filepath.LineSegmentsDir(), 'quadraticbezier.js')).QuadraticBezier,
+    Smooth: require(Path.join(Filepath.LineSegmentsDir(), 'smooth.js')).Smooth
+  },
+  Color: require(Path.join(Filepath.InputsDir(), 'color.js')).Color,
+  Coordinates: require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates,
+  PointAndColor: require(Path.join(Filepath.InputsDir(), 'pointandcolor.js')).PointAndColor,
+  Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
