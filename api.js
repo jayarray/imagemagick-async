@@ -5,6 +5,11 @@ let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 //------------------------------------------
 // Helper functions
 
+/**
+ * Check if an object is a node.
+ * @param {object} moduleItem 
+ * @returns {boolean} Returns true if it is just another object that is part of the API structure. Otherwise, the object is a module that can be built.
+ */
 function IsNode(moduleItem) {
   // Check if item has a build function
   try {
@@ -20,6 +25,7 @@ function IsNode(moduleItem) {
 /**
  * @param {object} rootNode
  * @param {string} moduleName
+ * @returns {object} Returns the specified module located within the root node's structure.
  */
 function GetImModule(rootNode, moduleName) {
   let imModule = null;
@@ -72,7 +78,7 @@ class ObjectBuilder {
   }
 
   /**
-   * Use this when specifying the path to a module inside the API object. Example: in('Drawables').in('Canvas') searches in api.Drawables.Canvas and any other child nodes in this path. If no node names are specified, the entire API structure will be searched.
+   * Use this when specifying the path to a module inside the API object. Example: in('Drawables').in('Canvas') searches in api.Drawables.Canvas and any other child nodes in this path. If no node names are specified, the entire API structure will be searched. (Optional)
    * @param {string} nodeName 
    */
   in(nodeName) {
