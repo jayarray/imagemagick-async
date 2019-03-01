@@ -1,1 +1,9 @@
-{"values":["Circle","Diagonal","Ellipse","Maximum","Minimum"]}
+{
+  "values": [
+    "Circle",
+    "Diagonal",
+    "Ellipse",
+    "Maximum",
+    "Minimum"
+  ]
+}
