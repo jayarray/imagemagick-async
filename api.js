@@ -298,3 +298,5 @@ api.Inputs = {
   PointAndColor: require(Path.join(Filepath.InputsDir(), 'pointandcolor.js')).PointAndColor,
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
+
+exports.Api = api;
