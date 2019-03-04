@@ -14,7 +14,7 @@ class EffectBaseClass extends DrawableBaseClass {
       offset: properties.offset
     });
 
-    this.subtype = properties.subtype;  // Store
+    this.subtype = properties.subtype;  // Store the type of effect (i.e. fx, mod, transform)
   }
 
   /**
@@ -28,7 +28,7 @@ class EffectBaseClass extends DrawableBaseClass {
    * @override
    */
   static IsConsolidatable() {
-    return true;
+    // Override
   }
 }
 
