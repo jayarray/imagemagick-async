@@ -16,13 +16,6 @@ class FxBaseClass extends EffectBaseClass {
 
     this.command = 'convert';
   }
-
-  /**
-   * @override
-   */
-  static IsLayer() {
-    return true;
-  }
 }
 
 //--------------------------------
