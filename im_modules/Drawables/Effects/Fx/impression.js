@@ -1,58 +1,153 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Impression extends FX_BASECLASS {
-  constructor(src, direction, elevation) {
-    super();
-    this.src_ = src;
-    this.direction_ = direction;
-    this.elevation_ = elevation;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-shade', `${this.direction_}x${this.elevation_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Impression extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Impression';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Impression';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Value determines the direction of the light source. A value of zero degrees starts east of the screen. A positive value indicates clockwise direction and a negative value indicates counter clockwisem direction.
+       */
+      direction(n) {
+        this.args.direction = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n Value determines the elevation of the light source. A Value of zero degrees indicates the light source is parallel to the image, and a value of 90 degrees indicates the light source is right above the image.
+       */
+      elevation(n) {
+        this.args.elevation = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Impression(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create an Impression object. Depending on the input image, the resulting image may appear as if it was carved or engraved in a clay or stone like surface.
-   * @param {string} src 
-   * @param {number} direction Value determines the direction of the light source. A value of zero degrees starts east of the screen. A positive value indicates clockwise direction and a negative value indicates counter clockwisem direction.
-   * @param {number} elevation Value determines the elevation of the light source. A Value of zero degrees indicates the light source is parallel to the image, and a value of 90 degrees indicates the light source is right above the image.
-   * @returns {Impression} Returns an Impression object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, direction, elevation) {
-    if (!src || isNaN(direction) || isNaN(elevation))
-      return null;
+  Args() {
+    return ['-shade', `${this.args.direction}x${this.args.elevation}`];
+  }
 
-    return new Impression(src, direction, elevation);
+  /**
+      * @override
+      */
+  Errors() {
+    let params = Impression.Parameters();
+    let errors = [];
+    let prefix = 'IMPRESSION_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let directionErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Direction')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.direction)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (directionErr)
+      errors.push(directionErr);
+
+
+    let elevationErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Elevation')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.elevation)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (elevationErr)
+      errors.push(elevationErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      direction: {
+        type: 'number',
+      },
+      elevation: {
+        type: 'number',
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = Impression.Create;
-exports.Name = 'Impression';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Impression = Impression;

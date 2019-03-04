@@ -1,66 +1,192 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Blur extends FX_BASECLASS {
-  constructor(src, radius, sigma, hasTransparency) {
-    super();
-    this.src_ = src;
-    this.radius_ = radius;
-    this.sigma_ = sigma;
-    this.hasTransparency_ = hasTransparency;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    let args = [];
-
-    if (this.hasTransparency_)
-      args.push('-channel', 'RGBA');
-    args.push('-blur', `${this.radius_}x${this.sigma_}`);
-
-    return args;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Blur extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Blur';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Blur';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
+       */
+      radius(n) {
+        this.args.radius = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
+       */
+      sigma(n) {
+        this.args.sigma = n;
+        return this;
+      }
+
+      /**
+       * @param {boolean} bool Assign as true if the image contains transparent pixels. False otherwise.
+       */
+      hasTransparency(bool) {
+        this.args.hasTransparency = bool;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Blur(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a Blur object. Applies a blur filter to an image.
-   * @param {string} src 
-   * @param {number} radius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
-   * @param {number} sigma A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
-   * @param {boolean} hasTransparency Assign as true if the image contains transparent pixels. False otherwise.
-   * @returns {Blur} Returns a Blur object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, radius, sigma, hasTransparency) {
-    if (!src || radius < 0 || sigma < 0 || hasTransparency == null || hasTransparency === undefined)
-      return null;
+  Args() {
+    let args = [];
 
-    return new Blur(src, radius, sigma, hasTransparency);
+    if (this.args.hasTransparency)
+      args.push('-channel', 'RGBA');
+    args.push('-blur', `${this.args.radius}x${this.args.sigma}`);
+
+    return args;
+  }
+
+  /**
+   * @override
+   */
+  Errors() {
+    let params = Blur.Parameters();
+    let errors = [];
+    let prefix = 'BLUR_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+
+    let radiusErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Radius')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.radius)
+          .isInteger(true)
+          .min(params.radius.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (radiusErr)
+      errors.push(radiusErr);
+
+    let sigmaErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Sigma')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.sigma)
+          .isInteger(true)
+          .min(params.sigma.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sigmaErr)
+      errors.push(sigmaErr);
+
+    let hasTransparencyErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Has transparency flag')
+      .condition(
+        new Err.BooleanCondition.Builder(this.args.hasTransparency)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (hasTransparencyErr)
+      errors.push(hasTransparencyErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      radius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      sigma: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      hasTransparency: {
+        type: 'boolean',
+        default: false
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = Blur.Create;
-exports.Name = 'Blur';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Blur = Blur;

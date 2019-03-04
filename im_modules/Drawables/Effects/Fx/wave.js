@@ -1,58 +1,152 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Wave extends FX_BASECLASS {
-  constructor(src, amplitude, frequency) {
-    super();
-    this.src_ = src;
-    this.amplitude_ = amplitude;
-    this.frequency_ = frequency;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-background', 'transparent', '-wave', `${this.amplitude_}x${this.frequency_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Wave extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Wave';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Wave';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Total height of the wave in pixels. Uses formula F(x) = A * sin(Bx), where A is the amplitude and B is the frequency.
+       */
+      amplitude(n) {
+        this.args.amplitude = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n The number of pixels in one cycle. Values greater than 1 result in tighter waves. Values less than 1 result in wider waves. Uses formula F(x) = A * sin(Bx), where A is the amplitude and B is the frequency.
+       */
+      frequency(n) {
+        this.args.frequency = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Wave(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a Wave object. Applies a wave effect to an image. Uses formula F(x) = A * sin(Bx), where A is the amplitude and B is the frequency.
-   * @param {string} src
-   * @param {number} amplitude Total height of the wave in pixels.
-   * @param {number} frequency The number of pixels in one cycle. Values greater than 1 result in tighter waves. Values less than 1 result in wider waves. 
-   * @returns {Wave} Returns a Wave object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, amplitude, frequency) {
-    if (!src || !amplitude || !frequency)
-      return null;
+  Args() {
+    return ['-background', 'transparent', '-wave', `${this.args.amplitude}x${this.args.frequency}`];
+  }
 
-    return new Wave(src, amplitude, frequency);
+  /**
+    * @override
+    */
+  Errors() {
+    let params = Wave.Parameters();
+    let errors = [];
+    let prefix = 'WAVE_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let amplitudeErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Amplitude')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.amplitude)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (amplitudeErr)
+      errors.push(amplitudeErr);
+
+    let frequencyErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Frequency')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.frequency)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (frequencyErr)
+      errors.push(frequencyErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      amplitude: {
+        type: 'number'
+      },
+      frequency: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.Create = Wave.Create;
-exports.Name = 'Wave';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Wave = Wave;

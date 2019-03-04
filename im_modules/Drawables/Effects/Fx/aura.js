@@ -1,74 +1,228 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Aura extends FX_BASECLASS {
-  constructor(src, color, opacity, blurRadius, blurSigma) {
-    super();
-    this.src_ = src;
-    this.color_ = color;
-    this.opacity_ = opacity;
-    this.blurRadius_ = blurRadius;
-    this.blurSigma_ = blurSigma;
+class Aura extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Aura';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color 
+       */
+      color(color) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} n 
+       */
+      opacity(n) {
+        this.args.opacity = n;
+        return this;
+      }
+
+      /**
+       * Controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
+       * @param {number} n 
+       */
+      blurRadius(n) {
+        this.args.blurRadius = n;
+        return this;
+      }
+
+      /**
+       * A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
+       * @param {number} n 
+       */
+      blurSigma(n) {
+        this.args.blurSigma = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Aura(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override 
    */
   Args() {
-    let args = ['\\(', '+clone', '-channel', 'A', '-blur', `${this.blurRadius_}x${this.blurSigma_}`];
+    let args = ['\\(', '+clone', '-channel', 'A', '-blur', `${this.args.blurRadius}x${this.args.blurSigma}`];
 
-    let adjustedOpacity = 100 - this.opacity_;
+    let adjustedOpacity = 100 - this.args.opacity;
 
     if (adjustedOpacity >= 1)
       adjustedOpacity = Math.min(adjustedOpacity, 100);
     else
       adjustedOpacity = Math.max(adjustedOpacity, 0.1);
 
-    args.push('-level', `0,${adjustedOpacity}%`, '+channel', '+level-colors', this.color_, '\\)', '-compose', 'DstOver', '-composite');
+    args.push('-level', `0,${adjustedOpacity}%`, '+channel', '+level-colors', this.args.color.String(), '\\)', '-compose', 'DstOver', '-composite');
 
     return args;
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Aura.Parameters();
+    let errors = [];
+    let prefix = 'AURA_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let colorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.color)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (colorErr)
+      errors.push(colorErr);
+
+
+    let opacityErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Opacity')
+      .condition()
+      .build(
+        new Err.NumberCondition.Builder(this.args.opacity)
+          .min(params.opacity.min)
+          .max(params.opacity.max)
+          .build()
+      )
+      .String();
+
+    if (opacityErr)
+      errors.push(opacityErr);
+
+    let blurRadiusErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Blur radius')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.blurRadius)
+          .isInteger(true)
+          .min(params.blurRadius.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (blurRadiusErr)
+      errors.push(blurRadiusErr);
+
+    let blurSigmaErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Blur sigma')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.blurSigma)
+          .isInteger(true)
+          .min(params.blurSigma.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (blurSigmaErr)
+      errors.push(blurSigmaErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Aura';
+  static IsConsolidatable() {
+    return false;
   }
 
   /**
-   * Create an Aura object. Applies an aura around the image.
-   * @param {string} src 
-   * @param {string} color
-   * @param {number} opacity 
-   * @param {number} blurRadius An integer value that controls how big an area the operator should look at when spreading pixels. Minimum value is 0 or at least double that of sigma.
-   * @param {number} blurSigma A floating point value used as an approximation of how much you want the image to spread/blur in pixels. (Think of it as the size of the brush used to blur the image.) Minimum value is 0.
-   * @returns {Blur} Returns a Blur object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, color, opacity, blurRadius, blurSigma) {
-    if (!src || !color || isNaN(opacity) || isNaN(blurRadius) || isNaN(blurSigma))
-      return null;
-
-    return new Aura(src, color, opacity, blurRadius, blurSigma);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      color: {
+        type: 'Color'
+      },
+      opacity: {
+        type: 'number',
+        min: 0,
+        max: 100
+      },
+      blurRadius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      blurSigma: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = Aura.Create;
-exports.Name = 'Aura';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
-exports.SingleCommand = true;
+exports.Aura = Aura;

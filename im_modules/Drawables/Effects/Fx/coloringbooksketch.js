@@ -1,22 +1,66 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class ColoringBookSketch extends FX_BASECLASS {
-  constructor(src, isHeavilyShaded) {
-    super();
-    this.src_ = src;
-    this.isHeavilyShaded_ = isHeavilyShaded;
+class ColoringBookSketch extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ColoringBookSketch';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {boolean} bool Assign as true if the image has a lot of shading. False otherwise.
+       */
+      isHeavilyShaded(bool) {
+        this.args.isHeavilyShaded = bool;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ColoringBookSketch(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     let args = [];
 
-    if (this.isHeavilyShaded_)
+    if (this.args.isHeavilyShaded)
       args.push('-segment', '1x1', '+dither', '-colors', 2);
     args.push('-edge', 1, '-negate', '-normalize', '-colorspace', 'Gray', '-blur', '0x.5', '-contrast-stretch', '0x50%');
 
@@ -24,39 +68,69 @@ class ColoringBookSketch extends FX_BASECLASS {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+     * @override
+     */
+  Errors() {
+    let params = ColoringBookSketch.Parameters();
+    let errors = [];
+    let prefix = 'COLORING_BOOK_SKETCH_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+
+    let isHeavilyShadedErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Is heavily shaded flag')
+      .condition(
+        new Err.BooleanCondition.Builder(this.args.isHeavilyShaded)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (isHeavilyShadedErr)
+      errors.push(isHeavilyShadedErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ColoringBookSketch';
+  static IsConsolidatable() {
+    return false;
   }
 
   /**
-   * Create a ColoringBookSketch object. Applies a coloring book sketch filter to an image.
-   * @param {string} src 
-   * @param {boolean} isHeavilyShaded Assign as true if the image has a lot of shading. False otherwise.
-   * @returns {ColoringBookSketch} Returns a ColoringBookSketch object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, isHeavilyShaded) {
-    if (!src || !isHeavilyShaded)
-      return null;
-
-    return new ColoringBookSketch(src, isHeavilyShaded);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      isHeavilyShaded: {
+        type: 'boolean',
+        default: false
+      }
+    };
   }
 }
 
 //--------------------------------
 // EXPORTS
 
-exports.Create = ColoringBookSketch.Create;
-exports.Name = 'ColoringBookSketch';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ColoringBookSketch = ColoringBookSketch;

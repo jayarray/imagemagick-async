@@ -1,56 +1,129 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class RadialBlur extends FX_BASECLASS {
-  constructor(src, degrees) {
-    super();
-    this.src_ = src;
-    this.degrees_ = degrees;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-channel', 'RGBA', '-radial-blur', this.degrees_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class RadialBlur extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'RadialBlur';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'RadialBlur';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n 
+       */
+      degrees(n) {
+        this.args.degrees = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new RadialBlur(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a RadialBlur object. Applies a radial blur filter to an image.
-   * @param {string} src Source
-   * @param {number} degrees 
-   * @returns {RadialBlur} Returns a RadialBlur object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, degrees) {
-    if (!src || isNaN(degrees))
-      return null;
+  Args() {
+    return ['-channel', 'RGBA', '-radial-blur', this.args.degrees];
+  }
 
-    return new RadialBlur(src, degrees);
+  /**
+    * @override
+    */
+  Errors() {
+    let params = RadialBlur.Parameters();
+    let errors = [];
+    let prefix = 'RADIAL_BLUR_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+
+    let degreesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Degrees')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.degrees)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (degreesErr)
+      errors.push(degreesErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      degrees: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = RadialBlur.Create;
-exports.Name = 'RadialBlur';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.RadialBlur = RadialBlur;

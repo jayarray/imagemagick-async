@@ -1,56 +1,137 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class CharcoalSketch extends FX_BASECLASS {
-  constructor(src, charcoalValue) {
-    super();
-    this.src_ = src;
-    this.charcoalValue_ = charcoalValue;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-charcoal', this.charcoalValue_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class CharcoalSketch extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'CharcoalSketch';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'CharcoalSketch';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n An integer value greater than 0 that determines the intensity of the filter. Higher values will make it look more smudged and more like a charcoal sketch.
+       */
+      charcoalValue(n) {
+        this.args.charcoalValue = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new CharcoalSketch(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a CharcoalSketch object. Applies a charcoal sketch filter to an image.
-   * @param {string} src 
-   * @param {number} charcoalValue An integer value greater than 0 that determines the intensity of the filter. Higher values will make it look more smudged and more like a charcoal sketch.
-   * @returns {CharcoalSketch} Returns a CharcoalSketch object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, charcoalValue) {
-    if (!src || !charcoalValue)
-      return null;
+  Args() {
+    return ['-charcoal', this.args.charcoalValue];
+  }
 
-    return new CharcoalSketch(src, charcoalValue);
+  /**
+     * @override
+     */
+  Errors() {
+    let params = CharcoalSketch.Parameters();
+    let errors = [];
+    let prefix = 'CHARCOAL_SKETCH_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let charcoalValueErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Charcoal value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.charcoalValue)
+          .isInteger(true)
+          .min(params.charcoalValue.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (charcoalValueErr)
+      errors.push(charcoalValueErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      radius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      charcoalValue: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.Create = CharcoalSketch.Create;
-exports.Name = 'CharcoalSketch';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.CharcoalSketch = CharcoalSketch;

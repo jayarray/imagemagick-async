@@ -1,60 +1,186 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class MotionBlur extends FX_BASECLASS {
-  constructor(src, radius, sigma, angle) {
-    super();
-    this.src_ = src;
-    this.radius_ = radius;
-    this.sigma_ = sigma;
-    this.angle_ = angle;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-channel', 'RGBA', '-motion-blur', `${this.radius_}x${this.sigma_}+${this.angle_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class MotionBlur extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'MotionBlur';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'MotionBlur';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n How big of an area the operator should look at when spreading pixels.
+       */
+      radius(n) {
+        this.args.radius = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n The amount of 'spread' (or blur) in pixels.
+       */
+      sigma(n) {
+        this.args.sigma = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n The angle in which the blur should occur.
+       */
+      angle(n) {
+        this.args.angle = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new MotionBlur(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a MotionBlur object. Applies a motion blur filter to an image.
-   * @param {string} src Source
-   * @param {number} radius How big of an area the operator should look at when spreading pixels.
-   * @param {number} sigma The amount of 'spread' (or blur) in pixels.
-   * @param {number} angle The angle in which the blur should occur.
-   * @returns {MotionBlur} Returns a RadialBlur object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, radius, sigma, angle) {
-    if (!src || isNaN(radius) || isNaN(sigma) || isNaN(angle))
-      return null;
+  Args() {
+    return ['-channel', 'RGBA', '-motion-blur', `${this.args.radius}x${this.args.sigma}+${this.args.angle}`];
+  }
 
-    return new MotionBlur(src, radius, sigma, angle);
+  /**
+  * @override
+  */
+  Errors() {
+    let params = MotionBlur.Parameters();
+    let errors = [];
+    let prefix = 'MOTION_BLUR_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+
+    let radiusErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Radius')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.radius)
+          .isInteger(true)
+          .min(params.radius.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (radiusErr)
+      errors.push(radiusErr);
+
+    let sigmaErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Sigma')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.sigma)
+          .isInteger(true)
+          .min(params.sigma.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sigmaErr)
+      errors.push(sigmaErr);
+
+
+    let angleErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Angle')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.angle)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (angleErr)
+      errors.push(angleErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      radius: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      sigma: {
+        type: 'number',
+        subtype: 'integer',
+        min: 0
+      },
+      angle: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = MotionBlur.Create;
-exports.Name = 'MotionBlur';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.MotionBlur = MotionBlur;

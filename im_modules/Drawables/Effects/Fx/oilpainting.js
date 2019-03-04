@@ -1,56 +1,132 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class OilPainting extends FX_BASECLASS {
-  constructor(src, paintValue) {
-    super();
-    this.src_ = src;
-    this.paintValue_ = paintValue;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-paint', this.paintValue_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class OilPainting extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'OilPainting';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'OilPainting';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n An integer value greater than 0 that determines the intensity of the filter. Higher values will make it look more abstract and more like a painting.
+       */
+      paintValue(n) {
+        this.args.paintValue = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new OilPainting(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a OilPainting object. Applies an oil painting filter to an image.
-   * @param {string} src 
-   * @param {number} paintValue An integer value greater than 0 that determines the intensity of the filter. Higher values will make it look more abstract and more like a painting.
-   * @returns {OilPainting} Returns an OilPainting object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, paintValue) {
-    if (!src || !paintValue)
-      return null;
+  Args() {
+    return ['-paint', this.args.paintValue];
+  }
 
-    return new OilPainting(src, paintValue);
+  /**
+  * @override
+  */
+  Errors() {
+    let params = OilPainting.Parameters();
+    let errors = [];
+    let prefix = 'OIL_PAINTING_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let paintValueErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Paint value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.paintValue)
+          .isInteger(true)
+          .min(params.paintValue.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (paintValueErr)
+      errors.push(paintValueErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      paintValue: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
   }
 }
 
 //--------------------------
 // EXPORTs
 
-exports.Create = OilPainting.Create;
-exports.Name = 'OilPainting';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.OilPainting = OilPainting;

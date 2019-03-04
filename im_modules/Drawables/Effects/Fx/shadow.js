@@ -1,60 +1,183 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Shadow extends FX_BASECLASS {
-  constructor(src, color, percentOpacity, sigma) {
-    super();
-    this.src_ = src;
-    this.color_ = color;
-    this.percentOpacity_ = percentOpacity;
-    this.sigma_ = sigma;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-background', this.color_, '-shadow', `${this.percentOpacity_}x${this.sigma_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Shadow extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Shadow';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Shadow';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color The color of the shadow.
+       */
+      color(color) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} percentOpacity Value between 0 and 100 representing how opaque the shadow will be. 
+       */
+      percentOpacity(n) {
+        this.args.percentOpacity = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n Represents the 'spread' of pixels.
+       */
+      sigma(n) {
+        this.args.sigma = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Shadow(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a Shadow object. Creates a shadow of the original image.
-   * @param {string} src 
-   * @param {string} color 
-   * @param {number} percentOpacity Value between 0 and 100 representing how opaque the shadow will be. 
-   * @param {number} sigma Represents the 'spread' of pixels.
-   * @returns {Shadow} Returns a Shadow object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, color, percentOpacity, sigma) {
-    if (!src || !color || isNaN(percentOpacity) || isNaN(sigma))
-      return null;
+  Args() {
+    return ['-background', this.args.color.String(), '-shadow', `${this.args.percentOpacity}x${this.args.sigma}`];
+  }
 
-    return new Shadow(src, color, percentOpacity, sigma);
+
+  /**
+    * @override
+    */
+  Errors() {
+    let params = Shadow.Parameters();
+    let errors = [];
+    let prefix = 'SHADOW_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let colorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.color)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+
+    let percentOpacityErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Percent opacity')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.percentOpacity)
+          .min(params.percentOpacity.min)
+          .max(params.percentOpacity.max)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (percentOpacityErr)
+      errors.push(percentOpacityErr);
+
+    let sigmaErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Sigma')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.sigma)
+          .min(params.sigma.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sigmaErr)
+      errors.push(sigmaErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      color: {
+        type: 'Color'
+      },
+      percentOpacity: {
+        type: 'number',
+        min: 0,
+        max: 100
+      },
+      sigma: {
+        type: 'number',
+        min: 0
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = Shadow.Create;
-exports.Name = 'Shadow';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Shadow = Shadow;

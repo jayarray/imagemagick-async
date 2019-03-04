@@ -1,56 +1,133 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Edge extends FX_BASECLASS {
-  constructor(src, edgeValue) {
-    super();
-    this.src_ = src;
-    this.edgeValue_ = edgeValue;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-edge', this.edgeValue_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Edge extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Edge';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Edge';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Value used to determine how thick to draw edges around an image. The higher the value, the thicker the lines.
+       */
+      edgeValue(n) {
+        this.args.edgeValue = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Edge(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create an Edge object. Applies an edge filter to an image.
-   * @param {string} src Source
-   * @param {number} edgeValue Value used to determine how thick to draw edges around an image. The higher the value, the thicker the lines.
-   * @returns {Edge} Returns an Edge object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, edgeValue) {
-    if (!src || isNaN(edgeValue))
-      return null;
+  Args() {
+    return ['-edge', this.args.edgeValue];
+  }
 
-    return new Edge(src, edgeValue);
+  /**
+     * @override
+     */
+  Errors() {
+    let params = Edge.Parameters();
+    let errors = [];
+    let prefix = 'EDGE_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let edgeValueErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Edge value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.edgeValue)
+          .isInteger(true)
+          .min(params.edgeValue.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (edgeValueErr)
+      errors.push(edgeValueErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      edgeValue: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = Edge.Create;
-exports.Name = 'Edge';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Edge = Edge;

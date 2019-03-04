@@ -1,56 +1,128 @@
-let PATH = require('path');
-let FX_BASECLASS = require(PATH.join(__dirname, 'fxbaseclass.js')).FxBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
 
 //---------------------------------
 
-class Swirl extends FX_BASECLASS {
-  constructor(src, degrees) {
-    super();
-    this.src_ = src;
-    this.degrees_ = degrees;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-swirl', this.degrees_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Swirl extends FxBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Swirl';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Swirl';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Number of degrees to swirl. Positive values mean clockwise swirl. Negative values mean counter-clockwise swirl.
+       */
+      degrees(n) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Swirl(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a Swirl object. Applies a swirl effect to an image.
-   * @param {string} src
-   * @param {number} degrees Number of degrees to swirl. Positive values mean clockwise swirl. Negative values mean counter-clockwise swirl.
-   * @returns {Swirl} Returns a Swirl object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, degrees) {
-    if (!src || isNaN(degrees))
-      return null;
+  Args() {
+    return ['-swirl', this.args.degrees];
+  }
 
-    return new Swirl(src, degrees);
+  /**
+    * @override
+    */
+  Errors() {
+    let params = Swirl.Parameters();
+    let errors = [];
+    let prefix = 'SWIRL_FX_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let degreesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Degrees')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.degrees)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (degreesErr)
+      errors.push(degreesErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      degrees: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //-----------------------
 // EXPORTs
 
-exports.Create = Swirl.Create;
-exports.Name = 'Swirl';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Swirl = Swirl;
