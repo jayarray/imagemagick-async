@@ -1,54 +1,90 @@
-let PATH = require('path');
-let COLOR_BASECLASS = require(PATH.join(__dirname, 'colorbaseclass.js')).ColorBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ColorBaseClass = require(Path.join(Filepath.ModColorDir(), 'colorbaseclass.js')).ColorBaseClass;
 
 //------------------------------
 
-class GrayscaleFormat extends COLOR_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+class GrayscaleFormat extends ColorBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'GrayscaleFormat';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new GrayscaleFormat(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-colorspace', 'Gray'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = GrayscaleFormat.Parameters();
+    let errors = [];
+    let prefix = 'GRAYSCALE_FORMAT_COLOR_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'GrayscaleFormat';
+  static IsConsolidatable() {
+    return true;
   }
 
   /**
-   * Create a GrayscaleFormat object. Converts an image to grayscale format.
-   * @param {string} src
-   * @returns {GrayscaleFormat} Returns a Grayscale object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new GrayscaleFormat(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = GrayscaleFormat.Create;
-exports.Name = 'GrayscaleFormat';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.GrayscaleFormat = GrayscaleFormat;

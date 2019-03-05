@@ -1,30 +1,77 @@
-let PATH = require('path');
-let COMPOSE_BASECLASS = require(PATH.join(__dirname, 'composebaseclass.js')).ComposeBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.js')).values;
+let ComposeBaseClass = require(Path.join(Filepath.ModComposeDir(), 'composebaseclass.js')).ComposeBaseClass;
+
 
 //------------------------------
 
-class Composite extends COMPOSE_BASECLASS {
-  constructor(filepaths, gravity) {
-    super();
-    this.filepaths_ = filepaths;
-    this.gravity_ = gravity;
+class Composite extends ComposeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Composite';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {Array<string>} strArr List of paths. The first path is the bottom-most layer, and the last path is the top-most layer.
+       */
+      filepaths(strArr) {
+        this.args.filepaths = strArr;
+        return this;
+      }
+
+      /**
+       * @param {string} str Method of how all images will overlap.
+       */
+      gravity(str) {
+        this.args.gravity = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Composite(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     let args = [];
 
-    if (this.gravity_)
-      args.push('-gravity', this.gravity_);
+    if (this.args.gravity)
+      args.push('-gravity', this.args.gravity);
 
     // Add first 2 paths
-    args.push(this.filepaths_[0], this.filepaths_[1]);
+    args.push(this.args.filepaths[0], this.args.filepaths[1]);
 
     // Add other parts accordingly
-    for (let i = 2; i < this.filepaths_.length; ++i) {
-      args.push('-composite', this.filepaths_[i]);
+    for (let i = 2; i < this.args.filepaths.length; ++i) {
+      args.push('-composite', this.args.filepaths[i]);
     }
 
     args.push('-composite');
@@ -33,45 +80,35 @@ class Composite extends COMPOSE_BASECLASS {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return this.Args();
+  Errors() {
+    let params = Composite.Parameters();
+    let errors = [];
+    let prefix = 'COMPOSITE_COMPOSE_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
    */
-  NumberOfSources() {
-    return 0;
-  }
-
-  /**
-   * @override
-   */
-  Name() {
-    return 'Composite';
-  }
-
-  /**
-   * Create a Composite object. Creates a single image from a list of provided images. The first image is the bottom-most layer and the last image is the top-most layer.
-   * @param {Array<string>} filepaths
-   * @returns {Composite} Returns a Composite object. If inputs are invalid, it returns null.
-   */
-  static Create(filepaths, gravity) {
-    if (!filepaths || filepaths.length < 2)
-      return null;
-
-    return new Composite(filepaths, gravity);
+  static Parameters() {
+    return {
+      filepaths: {
+        type: 'string',
+        isArray: true,
+        min: 2
+      },
+      gravity: {
+        type: 'string',
+        options: GravityValues
+      }
+    };
   }
 }
 
 //--------------------------
 // EXPORTS
 
-exports.Create = Composite.Create;
-exports.Name = 'Composite';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Composite = Composite;

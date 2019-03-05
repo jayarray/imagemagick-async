@@ -1,56 +1,103 @@
-let PATH = require('path');
-let COLOR_BASECLASS = require(PATH.join(__dirname, 'colorbaseclass.js')).ColorBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ColorBaseClass = require(Path.join(Filepath.ModColorDir(), 'colorbaseclass.js')).ColorBaseClass;
 
 //------------------------------
 
-class Hue extends COLOR_BASECLASS {
-  constructor(src, value) {
-    super();
-    this.src_ = src;
-    this.value_ = value;
+class Hue extends ColorBaseClass {
+  constructor(builder) {
+    super(builder);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Hue';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n Hue value between 0 and 200. A value of 100 will make no changes.
+       */
+      value(n) {
+        this.args.value = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Hue(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return ['-modulate', `100,100,${this.value_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+    return ['-modulate', `100,100,${this.args.value}`];
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Hue';
+  Errors() {
+    let params = Hue.Parameters();
+    let errors = [];
+    let prefix = 'HUE_COLOR_MOD_ERROR';
+
+    // CONT
   }
 
   /**
-   * Create a Hue object. Modifies an image's hue.
-   * @param {string} src
-   * @param {number} value Hue value between 0 and 200. A value of 100 will make no changes.
-   * @returns {Brightness} Returns a Brightness object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, value) {
-    if (!src || !value)
-      return null;
+  static IsConsolidatable() {
+    return true;
+  }
 
-    return new Hue(src, value);
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      value: {
+        type: 'number',
+        min: 0,
+        max: 200
+      }
+    };
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.Create = Hue.Create;
-exports.Name = 'Hue';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Hue = Hue;

@@ -1,66 +1,113 @@
-let PATH = require('path');
-let COLOR_BASECLASS = require(PATH.join(__dirname, 'colorbaseclass.js')).ColorBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ColorBaseClass = require(Path.join(Filepath.ModColorDir(), 'colorbaseclass.js')).ColorBaseClass;
 
 //------------------------------
 
-class Transparency extends COLOR_BASECLASS {
-  constructor(src, percent) {
-    super();
-    this.src_ = src;
-    this.percent_ = percent;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    let adjustedTransPercent = 0;
-    if (this.percent_ > 100)
-      adjustedTransPercent = 100;
-    else if (this.percent_ < 0)
-      adjustedTransPercent = 0;
-    else
-      adjustedTransPercent = this.percent_;
-
-    let opaqueValue = (100 - adjustedTransPercent) / 100;
-
-    return ['-alpha', 'on', '-channel', 'a', '-evaluate', 'multiply', `${opaqueValue}`, '+channel'];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class Transparency extends ColorBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Transparency';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Transparency';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n The percent of transparency. Value closer to zero is opaque and value closer to 100 is transparent.
+       */
+      percent(n) {
+        this.args.percent = n;
+        return this;
+      }
+
+      /**
+       * @param {Color} color The desired tint color. Adds tint of color to mid-range colors. Pure colors such as black, red, yellow, white will not be affected.
+       */
+      color(color) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Transparency(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a Transparency object. Makes an image transparent.
-   * @param {string} src
-   * @param {number} percent
-   * @returns {Replace} Returns a Transparency object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, percent) {
-    if (!src || !percent)
-      return null;
+  Args() {
+    let opaqueValue = (100 - this.args.percent) / 100;
 
-    return new Transparency(src, percent);
+    return ['-alpha', 'on', '-channel', 'a', '-evaluate', 'multiply', `${opaqueValue}`, '+channel'];
+  }
+
+  /**
+   * @override
+   */
+  Errors() {
+    let params = Transparency.Parameters();
+    let errors = [];
+    let prefix = 'TRANSPARENCY_COLOR_MOD_ERROR';
+
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return false;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      percent: {
+        type: 'number',
+        min: 0,
+        max: 100
+      }
+    };
   }
 }
 
 //--------------------------
 // EXPORTS
 
-exports.Create = Transparency.Create;
-exports.Name = 'Transparency';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Transparency = Transparency;

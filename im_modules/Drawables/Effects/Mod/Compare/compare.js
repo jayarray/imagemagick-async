@@ -1,73 +1,122 @@
-let PATH = require('path');
-let COMPARE_BASECLASS = require(PATH.join(__dirname, 'comparebaseclass.js')).CompareBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let CompareBaseClass = require(Path.join(Filepath.ModCompareDir(), 'comparebaseclass.js')).CompareBaseClass;
 
 //------------------------------------
 
-class Compare extends COMPARE_BASECLASS {
-  constructor(src1, src2, highlightColor, lowlightColor) {
-    super();
-    this.src1_ = src1;
-    this.src2_ = src2;
-    this.highlightColor_ = highlightColor;
-    this.lowlightColor_ = lowlightColor;
+class Compare extends CompareBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Compare';
+        this.args = {};
+        this.offset = null;
+        this.command = 'compare';
+      }
+
+      /**
+       * @param {string} str The path of the image file used as a base for comparison.
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
+
+      /**
+       * @param {string} str The path of the image file being compared to source1.
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color This color shows the differences between the two images.
+       */
+      highlightColor(color) {
+        this.args.highlightColor = color;
+        return this;
+      }
+
+      /**
+       * @param {Color} color This color serves as a background for the highlight color. Omitting it results in the image from source1 being displayed in the background. (Optional)
+       */
+      lowlightColor(color) {
+        this.args.highlightColor = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Compare(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
-    let args = ['-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.highlightColor_];
+    let args = [this.args.source1, this.args.source2, '-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.args.highlightColor.String()];
 
-    if (this.lowlightColor_)
-      args.push('-lowlight-color', this.lowlightColor_);
+    if (this.args.lowlightColor)
+      args.push('-lowlight-color', this.args.lowlightColor.String());
 
     return args;
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src1_, this.src2_].concat(this.Args());
+  Errors() {
+    let params = Compare.Parameters();
+    let errors = [];
+    let prefix = 'COMPARE_COMPARE_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Compare';
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the comparison.
-   */
-  Command() {
-    return 'compare';
-  }
-
-  /**
-   * Create a Compare object. Creates an image that highlights the differences between two images. Compares src2 to src1.
-   * @param {string} src1
-   * @param {string} src2
-   * @param {string} highlightColor Highlight color. This color shows the differences between the two images.
-   * @param {string} lowlightColor (Optional) Lowlight color. This color serves as a background for the highlight color. Omitting it results in the image from src1 being displayed in the background.
-   * @returns {Compare} Returns a Compare object. If inputs are invalid, it returns null.
-   */
-  static Create(src1, src2, highlightColor, lowlightColor) {
-    if (!src1 || !src2 || !highlightColor)
-      return null;
-
-    return new Compare(src1, src2, highlightColor, lowlightColor);
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      },
+      highlightColor: {
+        type: 'Color'
+      },
+      lowlightColor: {
+        type: 'Color'
+      }
+    };
   }
 }
 
 //------------------------------
 // EXPORTS
 
-exports.Create = Compare.Create;
-exports.Name = 'Compare';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Compare = Compare;

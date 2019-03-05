@@ -1,56 +1,95 @@
-let PATH = require('path');
-let MASK_BASECLASS = require(PATH.join(__dirname, 'maskbaseclass.js')).MaskBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let MaskBaseClass = require(Path.join(Filepath.ModMasksDir(), 'maskbaseclass.js')).MaskBaseClass;
 
 //------------------------------
 
-class ColorMask extends MASK_BASECLASS {
-  constructor(src, color) {
-    super();
-    this.src_ = src;
-    this.color_ = color;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-alpha', 'extract', '-background', this.color_, '-alpha', 'shape'];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class ColorMask extends MaskBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ColorMask';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ColorMask';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color
+       */
+      color(color) {
+        this.args.color = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ColorMask(this);
+      }
+    }
+    return new Builder();
+  }
+
+
+  /**
+   * @override
+   */
+  Args() {
+    return ['-alpha', 'extract', '-background', this.args.color.String(), '-alpha', 'shape'];
   }
 
   /**
-   * Create a ColorMask object. Creates a mask and fills it the specified color.
-   * @param {string} src
-   * @param {string} color
-   * @returns {Mask} Returns a ColorMask object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, color) {
-    if (!src || !color)
-      return null;
+  Errors() {
+    let params = ColorMask.Parameters();
+    let errors = [];
+    let prefix = 'COLOR_MASK_MASK_MOD_ERROR';
 
-    return new ColorMask(src, color);
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      color: {
+        type: 'Color'
+      }
+    }
   }
 }
 
 //----------------------
 // EXPORTS
 
-exports.Create = ColorMask.Create;
-exports.Name = 'ColorMask';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ColorMask = ColorMask;

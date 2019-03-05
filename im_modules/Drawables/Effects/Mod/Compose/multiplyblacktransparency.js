@@ -1,76 +1,94 @@
-let PATH = require('path');
-let COMPOSE_BASECLASS = require(PATH.join(__dirname, 'composebaseclass.js')).ComposeBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ComposeBaseClass = require(Path.join(Filepath.ModComposeDir(), 'composebaseclass.js')).ComposeBaseClass;
 
 //------------------------------
 
-class MultiplyBlackTransparency extends COMPOSE_BASECLASS {
-  constructor(src1, src2) {
-    super();
-    this.src1_ = src1;
-    this.src2_ = src2;
+class MultiplyBlackTransparency extends ComposeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  NumberOfSources() {
-    return 2;
-  }
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'MultiplyBlackTransparency';
+        this.args = {};
+        this.offset = null;
+      }
 
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-compose', 'Screen', this.src1_, this.src2_, '-composite'];
-  }
+      /**
+       * @param {string} str
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
 
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return this.Args();
-  }
+      /**
+       * @param {string} str
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
 
-  /**
-   * Replace current source with new source.
-   */
-  UpdateSources(newSources) {
-    for (let i = 0; i < this.NumberOfSources(); ++i) {
-      let currNewSrc = newSources[i];
-      if (currNewSrc) {
-        let variableName = `src${i + 1}_`;
-        this[variableName] = currNewSrc;
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new MultiplyBlackTransparency(this);
       }
     }
+    return new Builder();
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'MultiplyBlackTransparency';
+  Args() {
+    return ['-compose', 'Screen', this.args.source1, this.args.source2, '-composite'];
   }
 
   /**
-   * Create a MultiplyBlackTransparency object. Overlay colors of image with black background onto the other. Overlaying colors attenuate to white. That is, this operation only lightens colors (never darkens them). NOTE: White will result in white.
-   * @param {string} src1
-   * @param {string} src2
-   * @returns {MultiplyBlackTransparency} Returns a MultiplyBlackTransparency object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src1, src2) {
-    if (!src1 || !src2)
-      return null;
+  Errors() {
+    let params = MultiplyBlackTransparency.Parameters();
+    let errors = [];
+    let prefix = 'MULTIPLY_BLACK_TRANSPARENCY_COMPOSE_MOD_ERROR';
 
-    return new MultiplyBlackTransparency(src1, src2);
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      },
+    };
   }
 }
 
 //----------------------
 // EXPORTS
 
-exports.Create = MultiplyBlackTransparency.Create;
-exports.Name = 'MultiplyBlackTransparency';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.MultiplyBlackTransparency = MultiplyBlackTransparency;

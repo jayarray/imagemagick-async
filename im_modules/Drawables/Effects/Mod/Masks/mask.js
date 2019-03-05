@@ -1,54 +1,83 @@
-let PATH = require('path');
-let MASK_BASECLASS = require(PATH.join(__dirname, 'maskbaseclass.js')).MaskBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let MaskBaseClass = require(Path.join(Filepath.ModMasksDir(), 'maskbaseclass.js')).MaskBaseClass;
 
 //------------------------------
 
-class Mask extends MASK_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+class Mask extends MaskBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Mask';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Mask(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-alpha', 'extract'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Mask.Parameters();
+    let errors = [];
+    let prefix = 'MASK_MASK_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Mask';
-  }
-
-  /**
-   * Create a Mask object. Transparent color is turned black and everything else is turned white. The final image is a black and white image.
-   * @param {string} src
-   * @returns {Mask} Returns a Mask object. If inputs are invalid, it returns null.
-   */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new Mask(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    }
   }
 }
 
 //------------------------
 // EXPORTS
 
-exports.Create = Mask.Create;
-exports.Name = 'Mask';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Mask = Mask;

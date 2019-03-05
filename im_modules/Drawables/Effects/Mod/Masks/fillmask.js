@@ -1,58 +1,105 @@
-let PATH = require('path');
-let MASK_BASECLASS = require(PATH.join(__dirname, 'maskbaseclass.js')).MaskBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let MaskBaseClass = require(Path.join(Filepath.ModMasksDir(), 'maskbaseclass.js')).MaskBaseClass;
 
 //------------------------------
 
-class FillMask extends MASK_BASECLASS {
-  constructor(src, whiteReplacement, blackReplacement) {
-    super();
-    this.src_ = src;
-    this.whiteReplacement_ = whiteReplacement;
-    this.blackReplacement_ = blackReplacement;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-alpha', 'extract', '-background', this.whiteReplacement_, '-alpha', 'shape', '-background', this.blackReplacement_, '-alpha', 'remove'];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class FillMask extends MaskBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'FillMask';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'FillMask';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color Color that will replace black part of mask.
+       */
+      blackReplacement(color) {
+        this.args.blackReplacement = color;
+        return this;
+      }
+
+      /**
+       * @param {Color} color Color that will replace white part of mask.
+       */
+      whiteReplacement(color) {
+        this.args.whiteReplacement = color;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new FillMask(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a FillMask object. Takes an image, creates a mask, and replaces the white and black colors with others.
-   * @param {string} src
-   * @param {string} whiteReplacement Color that will replace white part of mask.
-   * @param {string} blackReplacement Color that will replace black part of mask.
-   * @returns {Mask} Returns a FillMask object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, whiteReplacement, blackReplacement) {
-    if (!src || !whiteReplacement || !blackReplacement)
-      return null;
+  Args() {
+    return ['-alpha', 'extract', '-background', this.args.whiteReplacement.String(), '-alpha', 'shape', '-background', this.args.blackReplacement.String(), '-alpha', 'remove'];
+  }
 
-    return new FillMask(src, whiteReplacement, blackReplacement);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = FillMask.Parameters();
+    let errors = [];
+    let prefix = 'FILL_MASK_MASK_MOD_ERROR';
+
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      blackReplacement: {
+        type: 'Color'
+      },
+      whiteReplacement: {
+        type: 'Color'
+      }
+    }
   }
 }
 
 //--------------------------
 // EXPORTS
 
-exports.Create = FillMask.Create;
-exports.Name = 'FillMask';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.FillMask = FillMask;

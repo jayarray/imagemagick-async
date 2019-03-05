@@ -1,50 +1,29 @@
-let PATH = require('path');
-
-let parts = __dirname.split(PATH.sep);
-let index = parts.findIndex(x => x == 'im_modules');
-let IM_MODULES_DIR = parts.slice(0, index + 1).join(PATH.sep);
-let LAYER_BASECLASS = require(PATH.join(IM_MODULES_DIR, 'Layer', 'layerbaseclass.js')).LayerBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ModBaseClass = require(Path.join(Filepath.ModDir(), 'modbaseclass.js')).ModBaseClass;
 
 //------------------------------
 
-class ComposeBaseClass extends LAYER_BASECLASS {
-  constructor() {
-    super();
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments.
-   */
-  Args() {
-    // Override
-  }
-
-  /**
-   * @override
-   * @returns {string} Returns a string of the command used to render the mod.
-   */
-  Command() {
-    return 'convert';
-  }
-
-  /**
-   * @returns {number} Returns the number of source inputs.
-   */
-  NumberOfSources() {
-    // Override
+class ComposeBaseClass extends ModBaseClass {
+  constructor(properties) {
+    super({
+      name: properties.name,
+      args: properties.args,
+      offset: properties.offset,
+      command: 'convert'
+    });
   }
 
   /**
    * @override
-   * @returns {string} Returns a string of the type name.
    */
-  Type() {
-    return 'mod';
+  static IsConsolidatable() {
+    return false;
   }
 }
 
-//------------------------------
+//--------------------------------
 // EXPORTS
 
 exports.ComposeBaseClass = ComposeBaseClass;
-exports.ComponentType = 'private';

@@ -1,76 +1,94 @@
-let PATH = require('path');
-let COMPOSE_BASECLASS = require(PATH.join(__dirname, 'composebaseclass.js')).ComposeBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ComposeBaseClass = require(Path.join(Filepath.ModComposeDir(), 'composebaseclass.js')).ComposeBaseClass;
 
 //------------------------------
 
-class Intersection extends COMPOSE_BASECLASS {
-  constructor(src1, src2) {
-    super();
-    this.src1_ = src1;
-    this.src2_ = src2;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return [this.src1_, this.src2_, '-compose', 'Darken', '-composite'];
+class Intersection extends ComposeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  NumberOfSources() {
-    return 2;
-  }
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Intersection';
+        this.args = {};
+        this.offset = null;
+      }
 
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return this.Args();
-  }
+      /**
+       * @param {string} str
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
 
-  /**
-   * Replace current source with new source.
-   */
-  UpdateSources(newSources) {
-    for (let i = 0; i < this.NumberOfSources(); ++i) {
-      let currNewSrc = newSources[i];
-      if (currNewSrc) {
-        let variableName = `src${i + 1}_`;
-        this[variableName] = currNewSrc;
+      /**
+       * @param {string} str
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Exclusion(this);
       }
     }
+    return new Builder();
   }
 
   /**
-  * @override
-  */
-  Name() {
-    return 'Intersection';
-  }
-
-  /**
-   * Create an Intersection object. Get the intersection of pixels. If images are colored, the intersecting pixels are blacked out. (Best used with black and white images/masks)
-   * @param {string} src1
-   * @param {string} src2
-   * @returns {Intersectionion} Returns an Intersection object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src1, src2) {
-    if (!src1 || !src2)
-      return null;
+  Args() {
+    return [this.args.source1, this.args.source2, '-compose', 'Darken', '-composite'];
+  }
 
-    return new Intersection(src1, src2);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = Intersection.Parameters();
+    let errors = [];
+    let prefix = 'INTERSECTION_COMPOSE_MOD_ERROR';
+
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      },
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = Intersection.Create;
-exports.Name = 'Intersection';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Intersection = Intersection;

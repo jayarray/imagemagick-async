@@ -1,64 +1,96 @@
-let PATH = require('path');
-let COMPARE_BASECLASS = require(PATH.join(__dirname, 'comparebaseclass.js')).CompareBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let CompareBaseClass = require(Path.join(Filepath.ModCompareDir(), 'comparebaseclass.js')).CompareBaseClass;
 
 //------------------------------------
 
-class Difference extends COMPARE_BASECLASS {
-  constructor(src1, src2) {
-    super();
-    this.src1_ = src1;
-    this.src2_ = src2;
+class Difference extends CompareBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Difference';
+        this.args = {};
+        this.offset = null;
+        this.command = 'composite';
+      }
+
+      /**
+       * @param {string} str The path of the image file used as a base for comparison.
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
+
+      /**
+       * @param {string} str The path of the image file being compared to source1.
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Difference(this);
+      }
+    }
+    return new Builder();
+  }
+
+
+  /**
+   * @verride
    */
   Args() {
-    return ['-compose', 'difference'];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src1_, this.src2_].concat(this.Args());
+    return [this.args.source1, this.args.source2, '-compose', 'difference'];
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Difference';
+  Errors() {
+    let params = Difference.Parameters();
+    let errors = [];
+    let prefix = 'DIFFERENCE_COMPARE_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
-   * @returns {string} Returns a string of the command used to render the comparison.
    */
-  Command() {
-    return 'composite';
-  }
-
-  /**
-   * Create a Difference object. Renders an image that shows the differences between two images by utilizing brightness to correlate how major the changes are. The brighter the color, the more major the difference is. Compares src2 to src1.
-   * @param {string} src1
-   * @param {string} src2
-   * @returns {Difference} Returns a Difference object. If inputs are invalid, it returns null.
-   */
-  static Create(src1, src2) {
-    if (!src1 || !src2)
-      return null;
-
-    return new Difference(src1, src2);
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      }
+    };
   }
 }
 
 //------------------------
 // EXPORTS
 
-exports.Create = Difference.Create;
-exports.Name = 'Difference';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Difference = Difference;

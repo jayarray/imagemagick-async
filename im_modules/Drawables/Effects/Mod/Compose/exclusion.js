@@ -1,76 +1,94 @@
-let PATH = require('path');
-let COMPOSE_BASECLASS = require(PATH.join(__dirname, 'composebaseclass.js')).ComposeBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ComposeBaseClass = require(Path.join(Filepath.ModComposeDir(), 'composebaseclass.js')).ComposeBaseClass;
 
 //------------------------------
 
-class Exclusion extends COMPOSE_BASECLASS {
-  constructor(src1, src2) {
-    super();
-    this.src1_ = src1;
-    this.src2_ = src2;
+class Exclusion extends ComposeBaseClass {
+  constructor(builder) {
+    super(builder);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Exclusion';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Exclusion(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    return [this.src1_, this.src2_, '-compose', 'Minus_Src', '-composite'];
+    return [this.args.source1, this.args.source2, '-compose', 'Minus_Src', '-composite'];
   }
 
   /**
    * @override
    */
-  NumberOfSources() {
-    return 2;
-  }
+  Errors() {
+    let params = Exclusion.Parameters();
+    let errors = [];
+    let prefix = 'EXCLUSION_COMPOSE_MOD_ERROR';
 
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return this.Args();
-  }
-
-  /**
-   * Replace current source with new source.
-   */
-  UpdateSources(newSources) {
-    for (let i = 0; i < this.NumberOfSources(); ++i) {
-      let currNewSrc = newSources[i];
-      if (currNewSrc) {
-        let variableName = `src${i + 1}_`;
-        this[variableName] = currNewSrc;
-      }
-    }
+    // CONT
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Exclusion';
-  }
-
-  /**
-   * Create an Exclusion object. Get the exclusion (relative complement) of pixels. Results in A-B => Everything in A that is NOT in B. If the images are colored, the result is src2 overlapping src1. (Best used with black and white images/masks)
-   * @param {string} src1
-   * @param {string} src2
-   * @returns {Exclusion} Returns a Exclusion object. If inputs are invalid, it returns null.
-   */
-  static Create(src1, src2) {
-    if (!src1 || !src2)
-      return null;
-
-    return new Exclusion(src1, src2);
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      },
+    };
   }
 }
 
 //-------------------------
 // EXPORTS
 
-exports.Create = Exclusion.Create;
-exports.Name = 'Exclusion';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Exclusion = Exclusion;

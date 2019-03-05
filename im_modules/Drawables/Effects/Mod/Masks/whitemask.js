@@ -1,54 +1,83 @@
-let PATH = require('path');
-let MASK_BASECLASS = require(PATH.join(__dirname, 'maskbaseclass.js')).MaskBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let MaskBaseClass = require(Path.join(Filepath.ModMasksDir(), 'maskbaseclass.js')).MaskBaseClass;
 
 //------------------------------
 
 class WhiteMask extends MASK_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'WhiteMask';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path of the image file you are modifying.
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new WhiteMask(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-alpha', 'extract', '-alpha', 'on'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = WhiteMask.Parameters();
+    let errors = [];
+    let prefix = 'WHITE_MASK_MASK_MOD_ERROR';
+
+    // CONT
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'WhiteMask';
-  }
-
-  /**
-   * Create a WhiteMask object. Transparent color is unaffected, but everything else is turned white. The final image is a white silhouette with transparent background.
-   * @param {string} src
-   * @returns {Mask} Returns a WhiteMask object. If inputs are invalid, it returns null.
-   */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new WhiteMask(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    }
   }
 }
 
 //---------------------
 // EXPORTS
 
-exports.Create = WhiteMask.Create;
-exports.Name = 'WhiteMask';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.WhiteMask = WhiteMask;

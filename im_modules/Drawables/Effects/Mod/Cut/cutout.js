@@ -1,56 +1,94 @@
-let PATH = require('path');
-let CUT_BASECLASS = require(PATH.join(__dirname, 'cutbaseclass.js')).CutBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let CutBaseClass = require(Path.join(Filepath.ModCutDir(), 'cutbaseclass.js')).CutBaseClass;
 
 //------------------------------------
 
-class CutOut extends CUT_BASECLASS {
-  constructor(baseImagePath, cutoutImagePath) {
-    super();
-    this.src1_ = baseImagePath;
-    this.src2_ = cutoutImagePath;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return [this.src1_, this.src2_, '-compose', 'Dst_Out', '-composite'];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return this.Args();
+class CutOut extends CutBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'CutOut';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'CutOut';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str The path for the image you want to cut out of. (It's like removing dough with a cookie cutter.)
+       */
+      source1(str) {
+        this.args.source1 = str;
+        return this;
+      }
+
+      /**
+       * @param {string} str The path for the image you want to use as a mask.
+       */
+      source2(str) {
+        this.args.source2 = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new CutOut(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a CutOut object. Cut an image out from the other. (It's like removing dough with a cookie cutter.)
-   * @param {string} baseImagePath The path for the image you want to cut out of.
-   * @param {string} cutoutImagePath The path for the image you want to use as a mask.
-   * @returns {CutOut} Returns a CutOut object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(baseImagePath, cutoutImagePath) {
-    if (!baseImagePath || !cutoutImagePath)
-      return null;
+  Args() {
+    return [this.args.source1, this.args.source2, '-compose', 'Dst_Out', '-composite'];
+  }
 
-    return new CutOut(baseImagePath, cutoutImagePath);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = CutOut.Parameters();
+    let errors = [];
+    let prefix = 'CUT_OUT_CUT_MOD_ERROR';
+
+    // CONT
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source1: {
+        type: 'string'
+      },
+      source2: {
+        type: 'string'
+      }
+    }
   }
 }
 
 //-------------------------
 // EXPORTS
 
-exports.Create = CutOut.Create;
-exports.Name = 'CutOut';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.CutOut = CutOut;
