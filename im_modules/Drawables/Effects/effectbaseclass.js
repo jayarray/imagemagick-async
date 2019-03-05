@@ -23,13 +23,6 @@ class EffectBaseClass extends DrawableBaseClass {
   static IsLayer() {
     return true;
   }
-
-  /**
-   * @override
-   */
-  static IsConsolidatable() {
-    // Override
-  }
 }
 
 //---------------------------
