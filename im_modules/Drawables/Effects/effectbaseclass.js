@@ -28,4 +28,4 @@ class EffectBaseClass extends DrawableBaseClass {
 //---------------------------
 // EXPORTS
 
-exports.EffectBase = PrimitivesBaseClass;
+exports.EffectBase = EffectBaseClass;
