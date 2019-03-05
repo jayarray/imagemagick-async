@@ -21,6 +21,9 @@ class Roll extends DisplaceBaseClass {
         this.name = 'Roll';
         this.args = {};
         this.offset = null;
+
+        this.args.horizontal = 0;
+        this.args.vertical = 0;
       }
 
       /**
@@ -108,6 +111,38 @@ class Roll extends DisplaceBaseClass {
 
     if (sourceErr)
       errors.push(sourceErr);
+
+    if (Validate.IsDefined(this.args.horizontal)) {
+      let horizontalErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Horizontal')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.horizontal)
+            .isInteger(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (horizontalErr)
+        errors.push(horizontalErr);
+    }
+
+    if (Validate.IsDefined(this.args.vertical)) {
+      let verticalErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Vertical')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.vertical)
+            .isInteger(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (verticalErr)
+        errors.push(verticalErr);
+    }
 
     return errors;
   }

@@ -1,7 +1,6 @@
 let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
-let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let DisplaceBaseClass = require(Path.join(Filepath.TransformDisplaceDir(), 'displacebaseclass.js')).DisplaceBaseClass;
 
@@ -92,6 +91,36 @@ class Offset extends DisplaceBaseClass {
 
     if (sourceErr)
       errors.push(sourceErr);
+
+    let startErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Start')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.start)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (startErr)
+      errors.push(startErr);
+
+    let endErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('End')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.end)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (endErr)
+      errors.push(endErr);
 
     return errors;
   }

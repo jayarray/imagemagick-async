@@ -85,6 +85,19 @@ class ArcDistortion extends DistortBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let degreesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.degrees)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (degreesErr)
+      errors.push(degreesErr);
+
     return errors;
   }
 

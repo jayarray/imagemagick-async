@@ -93,6 +93,36 @@ class ResizeFillGivenArea extends ResizeBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+      let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (widthErr)
+      errors.push(widthErr);
+
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
     return errors;
   }
 

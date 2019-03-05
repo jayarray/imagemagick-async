@@ -85,6 +85,19 @@ class RotateAroundCenter extends DisplaceBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let degreesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Degrees')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.degrees)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (degreesErr)
+      errors.push(degreesErr);
+
     return errors;
   }
 

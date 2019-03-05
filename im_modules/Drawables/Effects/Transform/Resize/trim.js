@@ -103,6 +103,35 @@ class Trim extends ResizeBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let borderColorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Border color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.borderColor)
+          .typeName('Color')
+          .checkForError(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (borderColorErr)
+      errors.push(borderColorErr);
+
+    let fuzzErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Fuzz')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.fuzz)
+          .min(params.fuzz.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (fuzzErr)
+      errors.push(fuzzErr);
+
     return errors;
   }
 

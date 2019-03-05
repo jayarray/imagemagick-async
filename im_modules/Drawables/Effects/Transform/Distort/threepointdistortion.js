@@ -104,7 +104,50 @@ class ThreePointDistortion extends DistortBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
-    // NOTE: All 3 vectors must be defined.
+    let centerVectorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Center vector')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.centerVector)
+          .typeName('Vector')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (centerVectorErr)
+      errors.push(centerVectorErr);
+
+    let xAxisVectorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('X-axis vector')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.xAxisVector)
+          .typeName('Vector')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (xAxisVectorErr)
+      errors.push(xAxisVectorErr);
+
+    let yAxisVectorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Y-axis vector')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.yAxisVector)
+          .typeName('Vector')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (yAxisVectorErr)
+      errors.push(yAxisVectorErr);
 
     return errors;
   }

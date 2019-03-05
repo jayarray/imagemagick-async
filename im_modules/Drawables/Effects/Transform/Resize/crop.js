@@ -127,6 +127,64 @@ class Crop extends ResizeBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let widthErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (widthErr)
+      errors.push(widthErr);
+
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
+
+    let cornerErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Corner')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.corner)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (cornerErr)
+      errors.push(cornerErr);
+
+    let removeVirtualCanvasErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Remove virtual canvas flag')
+      .condition(
+        new Err.BooleanCondition.Builder(this.args.removeVirtualCanvas)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (removeVirtualCanvasErr)
+      errors.push(removeVirtualCanvasErr);
+
     return errors;
   }
 

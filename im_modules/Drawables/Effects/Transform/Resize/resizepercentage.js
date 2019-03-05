@@ -86,6 +86,20 @@ class ResizePercentage extends ResizeBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let percentErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Percent')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.percent)
+          .min(params.percent.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (percentErr)
+      errors.push(percentErr);
+
     return errors;
   }
 

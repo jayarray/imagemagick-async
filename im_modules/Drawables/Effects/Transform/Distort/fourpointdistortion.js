@@ -103,7 +103,39 @@ class FourPointDistortion extends DistortBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
-    // NOTE: Both control sets must have equal number of points.
+    let controlSet1Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Control set 1')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.controlSet1)
+          .validType('Coordinates')
+          .minLength(params.controlSet1.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (controlSet1Err)
+      errors.push(controlSet1Err);
+
+    let controlSet2Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Control set 2')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.controlSet2)
+          .validType('Coordinates')
+          .minLength(params.controlSet2.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (controlSet2Err)
+      errors.push(controlSet2Err);
+
+    if (this.args.controlSet1.length != this.args.controlSet2.length)
+      errors.push(`${prefix}: Control set sizes do not match.`);
+
 
     return errors;
   }

@@ -93,6 +93,34 @@ class RotateAroundPoint extends DisplaceBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let pointErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Point')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.point)
+          .typeName('Coordinates')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (pointErr)
+      errors.push(pointErr);
+
+    let degreesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.degrees)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (degreesErr)
+      errors.push(degreesErr);
+
     return errors;
   }
 

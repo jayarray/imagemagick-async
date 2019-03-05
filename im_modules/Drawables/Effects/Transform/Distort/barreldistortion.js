@@ -138,6 +138,77 @@ class BarrelDistortion extends DistortBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    let aErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('A-value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.a)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (aErr)
+      errors.push(aErr);
+
+    let bErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('B-value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.b)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (bErr)
+      errors.push(bErr);
+
+    let cErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('C-value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.c)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (cErr)
+      errors.push(cErr);
+
+    if (Validate.IsDefined(this.args.d)) {
+      let dErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('D-value')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.d)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (dErr)
+        errors.push(dErr);
+    }
+
+    if (Validate.IsDefined(this.args.center)) {
+      let centerErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Center')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.center)
+            .typeName('Coordinates')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (centerErr)
+        errors.push(centerErr);
+    }
+
     return errors;
   }
 

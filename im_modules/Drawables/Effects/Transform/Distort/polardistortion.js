@@ -132,6 +132,87 @@ class PolarDistortion extends DistortBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
+    if (Validate.IsDefined(this.args.center)) {
+      let centerErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Center')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.center)
+            .typeName('Coordinates')
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (centerErr)
+        errors.push(centerErr);
+    }
+
+    if (Validate.IsDefined(this.args.radiusMin)) {
+      let radiusMinErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Radius min')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.radiusMin)
+            .isInteger(true)
+            .min(params.radiusMin.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (radiusMinErr)
+        errors.push(radiusMinErr);
+    }
+
+    if (Validate.IsDefined(this.args.radiusMax)) {
+      let radiusMaxErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Radius max')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.radiusMax)
+            .isInteger(true)
+            .min(params.radiusMax.min)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (radiusMaxErr)
+        errors.push(radiusMaxErr);
+    }
+
+    if (Validate.IsDefined(this.args.startAngle)) {
+      let startAngleErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Start angle')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.startAngle)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (startAngleErr)
+        errors.push(startAngleErr);
+    }
+
+    if (Validate.IsDefined(this.args.endAngle)) {
+      let endAngleErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('End angle')
+        .condition(
+          new Err.NumberCondition.Builder(this.args.endAngle)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (endAngleErr)
+        errors.push(endAngleErr);
+    }
+
     return errors;
   }
 
@@ -148,10 +229,12 @@ class PolarDistortion extends DistortBaseClass {
       },
       radiusMin: {
         type: 'number',
+        subtype: 'integer',
         min: 0
       },
       radiusMax: {
         type: 'number',
+        subtype: 'integer',
         min: 0
       },
       startAngle: {
