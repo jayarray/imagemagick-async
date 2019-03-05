@@ -1,54 +1,132 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DistortBaseClass = require(Path.join(Filepath.TransformDistortDir(), 'distortbaseclass.js')).DistortBaseClass;
 
 //-----------------------------------
 
-class ThreePointDistortion extends TRANSFORM_BASECLASS {
-  constructor(src, centerVector, xAxisVector, yAxisVector) {
-    super();
-    this.src_ = src;
-    this.centerVector_ = centerVector;
-    this.xAxisVector_ = xAxisVector;
-    this.yAxisVector_ = yAxisVector;
+class ThreePointDistortion extends DistortBaseClass {
+  constructor(builder) {
+    super(builder);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ThreePointDistortion';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Vector} vector
+       */
+      centerVector(vector) {
+        this.args.centerVector = vector;
+        return this;
+      }
+
+      /**
+       * @param {Vector} vector
+       */
+      xAxisVector(vector) {
+        this.args.xAxisVector = vector;
+        return this;
+      }
+
+      /**
+       * @param {Vector} vector
+       */
+      yAxisVector(vector) {
+        this.args.yAxisVector = vector;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ThreePointDistortion(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
    * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
    */
   Args() {
-    let cVectStr = `${this.centerVector_.start_.x_},${this.centerVector_.start_.y_} ${this.centerVector_.end_.x_},${this.centerVector_.end_.y_}`;
-    let xVectStr = `${this.xAxisVector_.start_.x_},${this.xAxisVector_.start_.y_} ${this.xAxisVector_.end_.x_},${this.xAxisVector_.end_.y_}`;
-    let yVectStr = `${this.yAxisVector_.start_.x_},${this.yAxisVector_.start_.y_} ${this.yAxisVector_.end_.x_},${this.yAxisVector_.end_.y_}`;
+    let cVectStr = `${this.args.centerVector.args.start.String()} ${this.args.centerVector.args.end.String()}`;
+    let xVectStr = `${this.args.xAxisVector.args.start.String()} ${this.args.xAxisVector.args.end.String()}`;
+    let yVectStr = `${this.args.yAxisVector.args.start.String()} ${this.args.yAxisVector.args.end.String()}`;
     return ['-virtual-pixel', 'background', '-background', 'none', '-distort', 'Affine', `${cVectStr} ${xVectStr} ${yVectStr}`];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+    * @override
+    */
+  Errors() {
+    let params = ThreePointDistortion.Parameters();
+    let errors = [];
+    let prefix = 'THREE_POINT_DISTORTION_DISTORT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    // NOTE: All 3 vectors must be defined.
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ThreePointDistortion';
-  }
-
-  /**
-   * Create a ThreePointDistortion object. Distorts the image according to 3 vectors: center, x-axis, and y-axis.
-   * @param {string} src
-   * @param {Vector} centerVector
-   * @param {Vector} xAxisVector
-   * @param {Vector} yAxisVector
-   * @returns {ThreePointDistortion} Returns a ThreePointDistortion object. If inputs are invalid, it returns null.
-   */
-  static Create(src, centerVector, xAxisVector, yAxisVector) {
-    if (!src || !centerVector || !xAxisVector || !yAxisVector)
-      return null;
-
-    return new ThreePointDistortion(src, centerVector, xAxisVector, yAxisVector);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      centerVector: {
+        type: 'Vector'
+      },
+      xAxisVector: {
+        type: 'Vector'
+      },
+      yAxisVector: {
+        type: 'Vector'
+      }
+    };
   }
 }
 

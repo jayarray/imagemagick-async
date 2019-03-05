@@ -1,27 +1,79 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ResizeBaseClass = require(Path.join(Filepath.TransformResizeDir(), 'resizebaseclass.js')).ResizeBaseClass;
 
 //-----------------------------------
 
-class Trim extends TRANSFORM_BASECLASS {
-  constructor(src, borderColor, fuzz) {
-    super();
-    this.src_ = src;
-    this.borderColor_ = borderColor;
-    this.fuzz_ = fuzz;
+class Trim extends ResizeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Trim';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Color} color Declare the color to trim. (Optional)
+       */
+      borderColor(color) {
+        this.args.borderColor = color;
+        return this;
+      }
+
+      /**
+       * @param {number} n Declare this value after declaring border color. (Optional)
+       */
+      fuzz(n) {
+        this.args.fuzz = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Trim(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     let args = [];
 
-    if (this.borderColor_)
-      args.push('-bordercolor', this.borderColor_);
+    if (this.args.borderColor)
+      args.push('-bordercolor', this.args.borderColor.String());
 
-    if (this.fuzz_ && this.fuzz_ > 0)
-      args.push('-fuzz', this.fuzz_);
+    if (Validate.IsDefined(this.args.fuzz) && this.args.fuzz > 0)
+      args.push('-fuzz', this.args.fuzz);
 
     args.push('-trim', '+repage');
 
@@ -29,40 +81,58 @@ class Trim extends TRANSFORM_BASECLASS {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Trim.Parameters();
+    let errors = [];
+    let prefix = 'TRIM_RESIZE_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Trim';
+  static IsConsolidatable() {
+    return false;
   }
 
   /**
-   * Create a Trim object. Trim surrounding transparent pixels from an image.
-   * @param {string} src
-   * @param {string} borderColor
-   * @param {number} fuzz
-   * @returns {Trim} Returns a Trim object.
+   * @override
    */
-  static Create(src, borderColor, fuzz) {
-    if (!src)
-      return null;
-
-    return new Trim(src, borderColor, fuzz);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      borderColor: {
+        type: 'Color'
+      },
+      fuzz: {
+        type: 'number',
+        min: 0
+      }
+    };
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.Create = Trim.Create;
-exports.Name = 'Trim';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Trim = Trim;

@@ -1,27 +1,79 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DistortBaseClass = require(Path.join(Filepath.TransformDistortDir(), 'distortbaseclass.js')).DistortBaseClass;
 
 //-----------------------------------
 // Perspective distortion
 
-class FourPointDistortion extends TRANSFORM_BASECLASS {
-  constructor(src, controlSet1, controlSet2) {
-    super();
-    this.src_ = src;
-    this.controlSet1_ = controlSet1;
-    this.controlSet2_ = controlSet2;
+class FourPointDistortion extends DistortBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'FourPointDistortion';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Array<Coordinates>} coordinatesArr A set of at least 4 coordinates where the distortion begins. Must have same number of coordinates as control set 2.
+       */
+      controlSet1(coordinatesArr) {
+        this.args.controlSet1 = coordinatesArr;
+        return this;
+      }
+
+      /**
+       * @param {Array<Coordinates>} coordinatesArr A set of at least 4 coordinates where the distortion ends. Must have same number of coordinates as control set 1.
+       */
+      controlSet2(coordinatesArr) {
+        this.args.controlSet2 = coordinatesArr;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new FourPointDistortion(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     let strArr = [];
 
-    for (let i = 0; i < this.controlSet1_.length; ++i) {
-      let c1 = this.controlSet1_[i];
-      let c2 = this.controlSet2_[i];
-      let s = `${c1.x_},${c1.y_} ${c2.x_},${c2.y_}`;
+    for (let i = 0; i < this.args.controlSet1.length; ++i) {
+      let c1 = this.args.controlSet1[i];
+      let c2 = this.args.controlSet2[i];
+      let s = `${c1.String()} ${c2.String()}`;
       strArr.push(s);
     }
 
@@ -29,31 +81,52 @@ class FourPointDistortion extends TRANSFORM_BASECLASS {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+    * @override
+    */
+  Errors() {
+    let params = FourPointDistortion.Parameters();
+    let errors = [];
+    let prefix = 'FOUR_POINT_DISTORTION_DISTORT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    // NOTE: Both control sets must have equal number of points.
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'FourPointDistortion';
-  }
-
-  /**
-   * Create a FourPointDistortion object. Distorts the image using 2 control sets of points with at least 4 points each.
-   * @param {string} src
-   * @param {Array<Coordinates>} controlSet1 A set of at least 4 coordinates where the distortion begins.
-   * @param {Array<Coordinates>} controlSet2 A set of at least 4 coordinates where the distortion ends.
-   * @returns {FourPointDistortion} Returns a FourPointDistortion object. If inputs are invalid, it returns null.
-   */
-  static Create(src, controlSet1, controlSet2) {
-    if (!src || !controlSet1 || controlSet1.length < 4 || !controlSet2 || controlSet2.length < 4 || controlSet1.length != controlSet2.length)
-      return null;
-
-    return new FourPointDistortion(src, src, controlSet1, controlSet2);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      constrolSet1: {
+        type: 'Coordinates',
+        isArray: true,
+        min: 4
+      },
+      constrolSet2: {
+        type: 'Coordinates',
+        isArray: true,
+        min: 4
+      }
+    };
   }
 }
 
@@ -61,9 +134,4 @@ class FourPointDistortion extends TRANSFORM_BASECLASS {
 
 // EXPORTs
 
-exports.Create = FourPointDistortion.Create;
-exports.Name = 'FourPointDistortion';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.FourPointDistortion = FourPointDistortion;

@@ -1,65 +1,170 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DistortBaseClass = require(Path.join(Filepath.TransformDistortDir(), 'distortbaseclass.js')).DistortBaseClass;
 
 //-----------------------------------
 
-class PolarDistortion extends TRANSFORM_BASECLASS {
-  constructor(src, center, radiusMin, radiusMax, startAngle, endAngle) {
-    super();
-    this.src_ = src;
-    this.center_ = center;
-    this.radiusMin_ = radiusMin;
-    this.radiusMax_ = radiusMax;
-    this.startAngle_ = startAngle;
-    this.endAngle_ = endAngle;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    let polarStr = `${this.radiusMax_},${this.radiusMin_} ${this.center_.x_},${this.center_.y_} ${this.startAngle_},${this.endAngle_}`;
-    return ['-virtual-pixel', 'background', '-background', 'none', '-distort', 'Polar', polarStr];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class PolarDistortion extends DistortBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'PolarDistortion';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'PolarDistortion';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates
+       */
+      center(coordinates) {
+        this.args.center = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      radiusMin(n) {
+        this.args.radiusMin = n;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      radiusMax(n) {
+        this.args.radiusMax = n;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      startAngle(n) {
+        this.args.startAngle = n;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      endAngle(n) {
+        this.args.endAngle = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new PolarDistortion(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a PolarDistortion object. Distorts the image around a circle. Does not attempt to preserve aspect ratios of images.
-   * @param {string} src
-   * @param {Coordinates} center
-   * @param {number} radiusMin
-   * @param {number} radiusMax
-   * @param {number} startAngle
-   * @param {number} endAngle
-   * @returns {PolarDistortion} Returns a PolarDistortion object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, center, radiusMin, radiusMax, startAngle, endAngle) {
-    if (!src || !center || radiusMin < 0 || radiusMax < 0 || isNaN(startAngle) || isNaN(endAngle))
-      return null;
+  Args() {
+    let allInputsDefined = Validate.IsDefined(this.args.center)
+      && Validate.IsDefined(this.args.radiusMin)
+      && Validate.IsDefined(this.args.radiusMax)
+      && Validate.IsDefined(this.args.startAngle)
+      && Validate.IsDefined(this.args.endAngle);
 
-    return new PolarDistortion(src, center, radiusMin, radiusMax, startAngle, endAngle);
+    let args = ['-virtual-pixel', 'background', '-background', 'none', '-distort', 'Polar'];
+
+    if (allInputsDefined) {
+      let polarStr = `${this.args.radiusMax},${this.args.radiusMin} ${this.center.String()} ${this.args.startAngle},${this.args.endAngle}`;
+      args.push(polarStr);
+    }
+    else
+      args.push(0); // Default (standard) polar distortion
+
+    return args;
+  }
+
+  /**
+   * @override
+   */
+  Errors() {
+    let params = PolarDistortion.Parameters();
+    let errors = [];
+    let prefix = 'POLAR_DISTORTION_DISTORT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      center: {
+        type: 'Coordinates'
+      },
+      radiusMin: {
+        type: 'number',
+        min: 0
+      },
+      radiusMax: {
+        type: 'number',
+        min: 0
+      },
+      startAngle: {
+        type: 'number'
+      },
+      endAngle: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //--------------------------
 // EXPORTS
 
-exports.Create = PolarDistortion.Create;
-exports.Name = 'PolarDistortion';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.PolarDistortion = PolarDistortion;

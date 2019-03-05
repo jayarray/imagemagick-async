@@ -1,56 +1,118 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ResizeBaseClass = require(Path.join(Filepath.TransformResizeDir(), 'resizebaseclass.js')).ResizeBaseClass;
 
 //-----------------------------------
 
-class ResizePercentage extends TRANSFORM_BASECLASS {
-  constructor(src, percent) {
-    super();
-    this.src_ = src;
-    this.percent_ = percent;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-resize', `${this.percent_}%`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class ResizePercentage extends ResizeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ResizePercentage';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ResizePercentage';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      percent(n) {
+        this.args.percent = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ResizePercentage(this);
+      }
+    }
+    return new Builder();
+  }
+
+
+  /**
+   * @override
+   */
+  Args() {
+    return ['-resize', `${this.args.percent}%`];
   }
 
   /**
-   * Create a ResizePercentage object. Resize image by the specified percentage.
-   * @param {string} src
-   * @param {number} percent Percent for increasing/decreasing the size. Minimum value is 0.
-   * @returns {ResizePercentage} Returns a ResizePercentage object. 
+   * @override
    */
-  static Create(src, percent) {
-    if (!src || !percent)
-      return null;
+  Errors() {
+    let params = ResizePercentage.Parameters();
+    let errors = [];
+    let prefix = 'RESIZE_PERCENTAGE_RESIZE_MOD_ERROR';
 
-    return new ResizePercentage(src, percent);
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      percent: {
+        type: 'number',
+        min: 0
+      }
+    };
   }
 }
 
 //----------------------------
-// EXPORTs
+// EXPORTS
 
-exports.Create = ResizePercentage.Create;
-exports.Name = 'ResizePercentage';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ResizePercentage = ResizePercentage;

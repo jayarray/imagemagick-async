@@ -1,54 +1,105 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ReflectBaseClass = require(Path.join(Filepath.TransformReflectDir(), 'reflectbaseclass.js')).ReflectBaseClass;
 
 //-----------------------------------
 
-class Transverse extends TRANSFORM_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+class Transverse extends ReflectBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Transverse';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Transverse(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-transverse'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Args() {
+    return ['-transpose'];
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Transverse';
+  Errors() {
+    let params = Transverse.Parameters();
+    let errors = [];
+    let prefix = 'TRANSVERSE_REFLECT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
-   * Create a Transverse object. Create a mirror image flipped bottom-left to top-right.
-   * @param {string} src
-   * @returns {Transverse} Returns a Transverse object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new Transverse(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    };
   }
 }
 
 //---------------------------------
 // EXPORTS
 
-exports.Create = Transverse.Create;
-exports.Name = 'Transverse';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Transverse = Transverse;

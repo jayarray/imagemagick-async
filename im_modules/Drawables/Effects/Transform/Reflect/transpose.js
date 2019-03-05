@@ -1,54 +1,98 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ReflectBaseClass = require(Path.join(Filepath.TransformReflectDir(), 'reflectbaseclass.js')).ReflectBaseClass;
 
 //-----------------------------------
 
-class Transpose extends TRANSFORM_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+class Transpose extends ReflectBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Transpose';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Transpose(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-transpose'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Transpose.Parameters();
+    let errors = [];
+    let prefix = 'TRANSPOSE_REFLECT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Transpose';
-  }
-
-  /**
-   * Create a Transpose object. Flips an image diagonally, top-left to bottom-right.
-   * @param {string} src
-   * @returns {Transpose} Returns a Transpose object. If inputs are invalid, it returns null.
-   */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new Transpose(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = Transpose.Create;
-exports.Name = 'Transpose';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Transpose = Transpose;

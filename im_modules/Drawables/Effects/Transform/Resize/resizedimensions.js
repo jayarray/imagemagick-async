@@ -1,58 +1,137 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ResizeBaseClass = require(Path.join(Filepath.TransformResizeDir(), 'resizebaseclass.js')).ResizeBaseClass;
 
 //-----------------------------------
 
-class ResizeDimensions extends TRANSFORM_BASECLASS {
-  constructor(src, width, height) {
-    this.src_ = src;
-    this.width_ = width;
-    this.height_ = height;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-resize', `${this.width_}x${this.height_}!`];
-
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class ResizeDimensions extends ResizeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ResizeDimensions';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ResizeDimensions';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      width(n) {
+        this.args.width = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      height(n) {
+        this.args.height = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ResizeDimensions(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a ResizeDimensions object. Resize image while ignoring aspect ratio and distort image to the size specified.
-   * @param {string} src
-   * @param {number} width
-   * @param {number} height
-   * @returns {ResizeDimensions} Returns a ResizeDimensions object. 
+   * @override
    */
-  static Create(src, width, height) {
-    if (!src || !width || !height)
-      return null;
+  Args() {
+    return ['-resize', `${this.args.width}x${this.args.height}!`];
+  }
 
-    return new ResizeDimensions(src, width, height);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = Crop.Parameters();
+    let errors = [];
+    let prefix = 'CROP_RESIZE_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      corner: {
+        type: 'Coordinates'
+      },
+      removeVirtualCanvas: {
+        type: 'boolean'
+      }
+    };
   }
 }
 
 //---------------------------
 // EXPORTS
 
-exports.Create = ResizeDimensions.Create;
-exports.Name = 'ResizeDimensions';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ResizeDimensions = ResizeDimensions;

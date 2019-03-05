@@ -1,58 +1,120 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DisplaceBaseClass = require(Path.join(Filepath.TransformDisplaceDir(), 'displacebaseclass.js')).DisplaceBaseClass;
 
 //-----------------------------------
 
-class Offset extends TRANSFORM_BASECLASS {
-  constructor(src, start, end) {
-    super();
-    this.src_ = src;
-    this.start_ = start;
-    this.end_ = end;
+class Offset extends DisplaceBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Offset';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates 
+       */
+      start(coordinates) {
+        this.args.start = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates 
+       */
+      end(coordinates) {
+        this.args.end = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Offset(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
-    return ['-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.start_.x_},${this.start_.y_} ${this.end_.x_},${this.end_.y_}`];
+    return ['-virtual-pixel', 'transparent', '-distort', 'Affine', `${this.args.start.String()} ${this.args.end.String()}`];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Offset.Parameters();
+    let errors = [];
+    let prefix = 'OFFSET_TRANSFORM_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
-  * @override
-  */
-  Name() {
-    return 'Offset';
-  }
-
-  /**
-   * Create an Offset object.Shift an image relative to the start and end coordinates. Shift is computed as: Xshift = x1 - x0 and Yshift = y1 - y0.
-   * @param {string} src
-   * @param {Coordinates} start Relative start position.
-   * @param {Coordinates} end Relative end position.
-   * @returns {Offset} Returns an Offset object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, start, end) {
-    if (!src || !start || !end)
-      return null;
-
-    return new Offset(src, start, end);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      start: {
+        type: 'Coordinates'
+      },
+      end: {
+        type: 'Coordinates'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXDPORTS
 
-exports.Create = Offset.Create;
-exports.Name = 'Offset';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Offset = Offset;

@@ -1,16 +1,82 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ResizeBaseClass = require(Path.join(Filepath.TransformResizeDir(), 'resizebaseclass.js')).ResizeBaseClass;
 
 //-----------------------------------
 
-class Crop extends TRANSFORM_BASECLASS {
-  constructor(src, width, height, corner, removeVirtualCanvas) {
-    super();
-    this.src_ = src;
-    this.width_ = width;
-    this.height_ = height;
-    this.corner_ = corner;
-    this.removeVirtualCanvas_ = removeVirtualCanvas;
+class Crop extends ResizeBaseClass {
+  constructor(builder) {
+    super(builder);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Crop';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      width(n) {
+        this.args.width = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      height(n) {
+        this.args.height = n;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates The top left corner where the image will be cropped from.
+       */
+      corner(coordinates) {
+        this.args.corner = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {boolean} bool Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
+       */
+      removeVirtualCanvas(bool) {
+        this.args.removeVirtualCanvas = bool;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Crop(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
@@ -19,62 +85,87 @@ class Crop extends TRANSFORM_BASECLASS {
   Args() {
     let args = ['-crop'];
 
-    let cropStr = `${this.width_}x${this.height_}`;
+    let cropStr = `${this.args.width}x${this.args.height}`;
 
-    if (this.corner_.x_ >= 0)
-      cropStr += `+${this.corner_.x_}`;
+    if (this.args.corner.args.x_ >= 0)
+      cropStr += `+${this.args.corner.args.x_}`;
     else
-      cropStr += this.corner_.x_.toString();
+      cropStr += this.args.corner.args.x.toString();
 
-    if (this.y_ >= 0)
-      cropStr += `+${this.corner_._y}`;
+    if (this.args.corner.args.y >= 0)
+      cropStr += `+${this.args.corner.args.y}`;
     else
-      cropStr += this.corner_.y_.toString();
+      cropStr += this.args.corner.args.y.toString();
     args.push(cropStr)
 
-    if (this.removeVirtualCanvas_)
+    if (this.args.removeVirtualCanvas)
       args.push('+repage');
 
     return args;
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Crop.Parameters();
+    let errors = [];
+    let prefix = 'CROP_RESIZE_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Crop';
+  static IsConsolidatable() {
+    return false;
   }
 
   /**
-   * Create a Crop object. Crop an image starting from (x,y) with specified width and height.
-   * @param {string} src
-   * @param {number} width Width (in pixels)
-   * @param {number} height Height (in pixels)
-   * @param {Coordinates} corner the top left corner where the image will be cropped from.
-   * @param {boolean} removeVirtualCanvas Assign as true if you wish to only keep the specified area of the crop. Assign as false if you wish to keep the dimensions of the original image while leaving the crop where it was positioned in the original image (will be surrounded by empty space). NOTE: some image formats don't make use of the virtual canvas, so the image will not appear inside the virtual canvas when previewed. However, Image Magick adds some metadata to preserve the virtual canvas size for later use by other Image Magick commands.
-   * @returns {Crop} Returns a Crop object. 
+   * @override
    */
-  static Create(src, width, height, corner, removeVirtualCanvas) {
-    if (!src || !width || !height || !corner || !removeVirtualCanvas)
-      return null;
-
-    return new Crop(src, width, height, corner, removeVirtualCanvas);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      corner: {
+        type: 'Coordinates'
+      },
+      removeVirtualCanvas: {
+        type: 'boolean'
+      }
+    };
   }
 }
 
 //--------------------------------
 // EXPORTs
 
-exports.Create = Crop.Create;
-exports.Name = 'Crop';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Crop = Crop;

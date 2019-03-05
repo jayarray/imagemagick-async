@@ -1,54 +1,130 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ResizeBaseClass = require(Path.join(Filepath.TransformResizeDir(), 'resizebaseclass.js')).ResizeBaseClass;
 
 //-----------------------------------
 
-class ResizeFillGivenArea extends TRANSFORM_BASECLASS {
-  constructor(src, width, height) {
-    super(src, width, height);
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-resize', `${this.width_}x${this.height_}^`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class ResizeFillGivenArea extends ResizeBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'ResizeFillGivenArea';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'ResizeFillGivenArea';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      width(n) {
+        this.args.width = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      height(n) {
+        this.args.height = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new ResizeFillGivenArea(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a ResizeFillGivenArea object. Resize image based on the smallest fitting dimension. Image is resized to completely fill (and even overflow) the pixel area given.
-   * @param {string} src
-   * @param {number} width
-   * @param {number} height
-   * @returns {ResizeFillGivenArea} Returns a ResizeFillGivenArea object. 
+   * @override
    */
-  static Create(src, width, height) {
-    if (!src || !width || !height)
-      return null;
+  Args() {
+    return ['-resize', `${this.args.width}x${this.args.height}^`];
+  }
 
-    return new ResizeFillGivenArea(src, width, height);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = ResizeFillGivenArea.Parameters();
+    let errors = [];
+    let prefix = 'RESIZE_FILL_GIVEN_AREA_RESIZE_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      width: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      },
+      height: {
+        type: 'number',
+        subtype: 'integer',
+        min: 1
+      }
+    };
   }
 }
 //---------------------------
 // EXPORTS
 
-exports.Create = ResizeFillGivenArea.Create;
-exports.Name = 'ResizeFillGivenArea';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ResizeFillGivenArea = ResizeFillGivenArea;

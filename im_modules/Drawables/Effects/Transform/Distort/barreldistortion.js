@@ -1,10 +1,93 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DistortBaseClass = require(Path.join(Filepath.TransformDistortDir(), 'distortbaseclass.js')).DistortBaseClass;
 
 //-----------------------------------
 // Perspective distortion
 
-class BarrelDistortion extends TRANSFORM_BASECLASS {
+class BarrelDistortion extends DistortBaseClass {
+  constructor(builder) {
+    super(builder);
+  }
+
+  /**
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'BarrelDistortion';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      a(n) {
+        this.args.a = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      b(n) {
+        this.args.b = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n
+       */
+      c(n) {
+        this.args.c = n;
+        return this;
+      }
+
+      /**
+       * @param {number} n  (Optional)
+       */
+      d(n) {
+        this.args.d = n;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates Can be provided after declaring the d-value. (Optional)
+       */
+      center(coordinates) {
+        this.args.center = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new BarrelDistortion(this);
+      }
+    }
+    return new Builder();
+  }
+
   constructor(src, a, b, c, d, center) {
     super();
     this.src_ = src;
@@ -16,47 +99,72 @@ class BarrelDistortion extends TRANSFORM_BASECLASS {
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
    */
   Args() {
     let args = ['-virtual-pixel', 'background', '-background', 'none', '-distort', 'Barrel'];
+    let barrelStr = `${this.args.a} ${this.args.b} ${this.args.c}`;
 
-    let barrelStr = `${this.a_} ${this.b_} ${this.c_}`;
-    if (this.d_)
-      barrelStr += ` ${this.d_}`;
-    if (this.center_)
-      barrelStr += ` ${this.center_.String()}`;
+    if (Validate.IsDefined(this.args.d))
+      barrelStr += ` ${this.args.d}`;
+
+    if (this.args.center)
+      barrelStr += ` ${this.args.center.String()}`;
     args.push(barrelStr);
 
     return args;
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = BarrelDistortion.Parameters();
+    let errors = [];
+    let prefix = 'BARREL_DISTORTION_DISTORT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'BarrelDistortion';
-  }
-
-  /**
-   * Create a BarrelDistortion object. Distorts the image using 2 control sets of points with at least 4 points each.
-   * @param {string} src
-   * @param {Array<Coordinates>} controlSet1 A set of at least 4 coordinates where the distortion begins.
-   * @param {Array<Coordinates>} controlSet2 A set of at least 4 coordinates where the distortion ends.
-   * @returns {BarrelDistortion} Returns a BarrelDistortion object. If inputs are invalid, it returns null.
-   */
-  static Create(src, controlSet1, controlSet2) {
-    if (!src || !controlSet1 || controlSet1.length < 4 || !controlSet2 || controlSet2.length < 4 || controlSet1.length != controlSet2.length)
-      return null;
-
-    return new BarrelDistortion(src, src, controlSet1, controlSet2);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      a: {
+        type: 'number'
+      },
+      b: {
+        type: 'number'
+      },
+      c: {
+        type: 'number'
+      },
+      d: {
+        type: 'number'
+      },
+      center: {
+        type: 'Coordinates'
+      }
+    };
   }
 }
 
@@ -64,9 +172,4 @@ class BarrelDistortion extends TRANSFORM_BASECLASS {
 
 // EXPORTs
 
-exports.Create = BarrelDistortion.Create;
-exports.Name = 'BarrelDistortion';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.BarrelDistortion = BarrelDistortion;

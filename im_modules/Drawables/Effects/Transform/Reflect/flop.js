@@ -1,54 +1,98 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let ReflectBaseClass = require(Path.join(Filepath.TransformReflectDir(), 'reflectbaseclass.js')).ReflectBaseClass;
 
 //-----------------------------------
 
-class Flop extends TRANSFORM_BASECLASS {
-  constructor(src) {
-    super();
-    this.src_ = src;
+class Flop extends ReflectBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
+   * @override
+   */
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'Flop';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new Flop(this);
+      }
+    }
+    return new Builder();
+  }
+
+  /**
+   * @override
    */
   Args() {
     return ['-flop'];
   }
 
   /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
+   * @override
    */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+  Errors() {
+    let params = Flop.Parameters();
+    let errors = [];
+    let prefix = 'FLOP_REFLECT_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'Flop';
-  }
-
-  /**
-   * Create a Flop object. Reflects an image horizontally.
-   * @param {string} src
-   * @returns {MirrorHorizontal} Returns a Flop object. If inputs are invalid, it returns null.
-   */
-  static Create(src) {
-    if (!src)
-      return null;
-
-    return new Flop(src);
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      }
+    };
   }
 }
 
 //-------------------------------
 // EXPORTS
 
-exports.Create = Flop.Create;
-exports.Name = 'Flop';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Flop = Flop;

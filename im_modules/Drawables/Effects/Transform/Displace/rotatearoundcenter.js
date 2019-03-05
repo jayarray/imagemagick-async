@@ -1,56 +1,109 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DisplaceBaseClass = require(Path.join(Filepath.TransformDisplaceDir(), 'displacebaseclass.js')).DisplaceBaseClass;
 
 //-----------------------------------
 
-class RotateAroundCenter extends TRANSFORM_BASECLASS {
-  constructor(src, degrees) {
-    super();
-    this.src_ = src;
-    this.degrees_ = degrees;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-distort', 'SRT', this.degrees_];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class RotateAroundCenter extends DisplaceBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'RotateAroundCenter';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'RotateAroundCenter';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      degrees(n) {
+        this.args.degrees = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new RotateAroundCenter(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a RotateAroundCenter object. Rotate an image around the center.
-   * @param {string} src
-   * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
-   * @returns {RotateAroundCenter} Returns a RotateAroundCenter object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, degrees) {
-    if (!src || isNaN(degrees))
-      return null;
+  Args() {
+    return ['-distort', 'SRT', this.args.degrees];
+  }
 
-    return new RotateAroundCenter(src, degrees);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = RotateAroundCenter.Parameters();
+    let errors = [];
+    let prefix = 'ROTATE_AROUND_CENTER_TRANSFORM_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      degrees: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //----------------------------
 // EXPORTS
 
-exports.Create = RotateAroundCenter.Create;
-exports.Name = 'RotateAroundCenter';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.RotateAroundCenter = RotateAroundCenter;

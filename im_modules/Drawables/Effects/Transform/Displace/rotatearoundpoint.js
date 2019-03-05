@@ -1,58 +1,120 @@
-let PATH = require('path');
-let TRANSFORM_BASECLASS = require(PATH.join(__dirname, 'transformbaseclass.js')).TransformBaseClass;
+let Path = require('path');
+let RootDir = Path.resolve('.');
+let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let DisplaceBaseClass = require(Path.join(Filepath.TransformDisplaceDir(), 'displacebaseclass.js')).DisplaceBaseClass;
 
 //-----------------------------------
 
-class RotateAroundPoint extends TRANSFORM_BASECLASS {
-  constructor(src, point, degrees) {
-    super();
-    this.src_ = src;
-    this.point_ = point;
-    this.degrees_ = degrees;
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of image magick arguments associated with this layer.
-   */
-  Args() {
-    return ['-distort', 'SRT', `${this.point_.x_},${this.point_.y_} ${this.degrees_}`];
-  }
-
-  /**
-   * @returns {Array<string|number>} Returns an array of arguments used for rendering this layer.
-   */
-  RenderArgs() {
-    return [this.src_].concat(this.Args());
+class RotateAroundPoint extends DisplaceBaseClass {
+  constructor(builder) {
+    super(builder);
   }
 
   /**
    * @override
    */
-  Name() {
-    return 'RotateAroundPoint';
+  static get Builder() {
+    class Builder {
+      constructor() {
+        this.name = 'RotateAroundPoint';
+        this.args = {};
+        this.offset = null;
+      }
+
+      /**
+       * @param {string} str
+       */
+      source(str) {
+        this.args.source = str;
+        return this;
+      }
+
+      /**
+       * @param {Coordinates} coordinates
+       */
+      point(coordinates) {
+        this.args.point = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {number}
+       */
+      degrees(n) {
+        this.args.degrees = n;
+        return this;
+      }
+
+      /**
+       * @param {number} x 
+       * @param {number} y 
+       */
+      offset(x, y) {
+        this.offset = { x: x, y: y };
+        return this;
+      }
+
+      build() {
+        return new RotateAroundPoint(this);
+      }
+    }
+    return new Builder();
   }
 
   /**
-   * Create a RotateAroundPoint object. Rotate an image around a point.
-   * @param {string} src
-   * @param {Coordinates} point Point to rotate about.
-   * @param {numbers} degrees Integer value representing the number of degrees to rotate the image. A positive value indicates clockwise rotation. A negative value indicates counter-clockwise rotation.
-   * @returns {RotateAroundPoint} Returns a RotateAroundPoint object. If inputs are invalid, it returns null.
+   * @override
    */
-  static Create(src, point, degrees) {
-    if (!src || !point || isNaN(degrees))
-      return null;
+  Args() {
+    return ['-distort', 'SRT', `${this.point.String()} ${this.args.degrees}`];
+  }
 
-    return new RotateAroundPoint(src, point, degrees);
+  /**
+   * @override
+   */
+  Errors() {
+    let params = RotateAroundPoint.Parameters();
+    let errors = [];
+    let prefix = 'ROTATE_AROUND_POINT_TRANSFORM_MOD_ERROR';
+
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
+  }
+
+  /**
+   * @override
+   */
+  static Parameters() {
+    return {
+      source: {
+        type: 'string'
+      },
+      point: {
+        type: 'Coordinates'
+      },
+      degrees: {
+        type: 'number'
+      }
+    };
   }
 }
 
 //-----------------------------
 // EXPORTS
 
-exports.Create = RotateAroundPoint.Create;
-exports.Name = 'RotateAroundPoint';
-exports.Layer = true;
-exports.Consolidate = true;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.RotateAroundPoint = RotateAroundPoint;
