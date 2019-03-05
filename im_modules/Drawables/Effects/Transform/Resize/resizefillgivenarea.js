@@ -93,7 +93,7 @@ class ResizeFillGivenArea extends ResizeBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
-      let widthErr = Err.ErrorMessage.Builder
+    let widthErr = Err.ErrorMessage.Builder
       .prefix(prefix)
       .varName('Width')
       .condition(
