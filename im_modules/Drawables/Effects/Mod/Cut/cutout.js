@@ -70,7 +70,37 @@ class CutOut extends CutBaseClass {
     let errors = [];
     let prefix = 'CUT_OUT_CUT_MOD_ERROR';
 
-    // CONT
+    let source1Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source 1')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source1)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (source1Err)
+      errors.push(source1Err);
+
+    let source2Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source 2')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source2)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (source2Err)
+      errors.push(source2Err);
+
+    return errors;
   }
 
   /**

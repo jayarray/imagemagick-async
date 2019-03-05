@@ -84,7 +84,52 @@ class UnchangedPixels extends ComposeBaseClass {
     let errors = [];
     let prefix = 'UNCHANGED_PIXELS_COMPOSE_MOD_ERROR';
 
-    // CONT
+    let source1Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source 1')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source1)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (source1Err)
+      errors.push(source1Err);
+
+    let source2Err = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source 2')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source2)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (source2Err)
+      errors.push(source2Err);
+
+    let fuzzErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Fuzz')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.fuzz)
+          .min(params.fuzz.min)
+          .max(params.fuzz.max)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (fuzzErr)
+      errors.push(fuzzErr);
+
+    return errors;
   }
 
   /**

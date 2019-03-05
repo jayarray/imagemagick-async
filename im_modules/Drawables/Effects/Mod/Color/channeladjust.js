@@ -68,7 +68,7 @@ class ChannelAdjust extends ColorBaseClass {
    * @override
    */
   Args() {
-    return ['-alpha', 'set', '-channel', this.args.channel_, '-evaluate', 'set', this.value_];
+    return ['-alpha', 'set', '-channel', this.args.channel, '-evaluate', 'set', this.args.value];
   }
 
   /**

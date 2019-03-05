@@ -87,7 +87,58 @@ class Composite extends ComposeBaseClass {
     let errors = [];
     let prefix = 'COMPOSITE_COMPOSE_MOD_ERROR';
 
-    // CONT
+    let filepathsErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.filepaths)
+          .minLength(params.filepaths.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (filepathsErr)
+      errors.push(filepathsErr);
+
+    for (let i = 0; i < this.args.filepaths.length; ++i) {
+      let currFilepath = this.args.filepaths[i];
+
+      let err = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Filepath')
+        .condition(
+          new Err.StringCondition.Builer(currFilepath)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (err) {
+        errors.push(`${prefix}: Filepaths contains an invalid string.`);
+        break;
+      }
+    }
+
+    let gravityErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Gravity')
+      .condition(
+        new Err.StringCondition.Builder(this.args.gravity)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .include(params.gravity.options)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (gravityErr)
+      errors.push(gravityErr);
+
+    return errors;
   }
 
   /**

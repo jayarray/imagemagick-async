@@ -71,7 +71,37 @@ class ColorMask extends MaskBaseClass {
     let errors = [];
     let prefix = 'COLOR_MASK_MASK_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let colorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.color)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (colorErr)
+      errors.push(colorErr);
+
+    return errors;
   }
 
   /**

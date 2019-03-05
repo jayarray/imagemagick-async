@@ -60,7 +60,22 @@ class AutoLevel extends ColorBaseClass {
     let errors = [];
     let prefix = 'AUTO_LEVEL_COLOR_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**

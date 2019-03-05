@@ -62,7 +62,22 @@ class BlackMask extends MaskBaseClass {
     let errors = [];
     let prefix = 'BLACK_MASK_MASK_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    return errors;
   }
 
   /**

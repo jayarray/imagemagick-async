@@ -80,7 +80,37 @@ class Transparency extends ColorBaseClass {
     let errors = [];
     let prefix = 'TRANSPARENCY_COLOR_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let percentErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Percent')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.percent)
+          .min(params.percent.min)
+          .max(params.percent.max)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (percentErr)
+      errors.push(percentErr);
+
+    return errors;
   }
 
   /**

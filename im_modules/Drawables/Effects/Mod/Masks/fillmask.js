@@ -78,7 +78,52 @@ class FillMask extends MaskBaseClass {
     let errors = [];
     let prefix = 'FILL_MASK_MASK_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let whiteReplacementErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('White replacement')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.whiteReplacement)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (whiteReplacementErr)
+      errors.push(whiteReplacementErr);
+
+    let blackReplacementErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Black replacement')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.blackReplacement)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (blackReplacementErr)
+      errors.push(blackReplacementErr);
+
+    return errors;
   }
 
   /**

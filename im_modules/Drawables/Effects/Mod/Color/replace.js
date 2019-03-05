@@ -92,7 +92,67 @@ class Replace extends ColorBaseClass {
     let errors = [];
     let prefix = 'REPLACE_COLOR_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let targetColorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Target color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.targetColor)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (targetColorErr)
+      errors.push(targetColorErr);
+
+    let desiredColorErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Desired color')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.desiredColor)
+          .typeName('Color')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (desiredColorErr)
+      errors.push(desiredColorErr);
+
+    let fuzzErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Fuzz')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.fuzz)
+          .min(params.fuzz.min)
+          .max(params.fuzz.max)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (fuzzErr)
+      errors.push(fuzzErr);
+
+    return errors;
   }
 
   /**

@@ -69,7 +69,38 @@ class Brightness extends ColorBaseClass {
     let errors = [];
     let prefix = 'BRIGHTNESS_COLOR_MOD_ERROR';
 
-    // CONT
+    let sourceErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Source')
+      .condition(
+        new Err.StringCondition.Builder(this.args.source)
+          .isempty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (sourceErr)
+      errors.push(sourceErr);
+
+    let valueErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Value')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.value)
+          .isInteger(true)
+          .min(params.value.min)
+          .max(params.value.max)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (valueErr)
+      errors.push(valueErr);
+
+    return errors;
   }
 
   /**
@@ -87,8 +118,9 @@ class Brightness extends ColorBaseClass {
       source: {
         type: 'string'
       },
-      brightness: {
+      value: {
         type: 'number',
+        subtype: 'integer',
         min: 0,
         max: 200
       }
