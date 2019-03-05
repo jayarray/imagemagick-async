@@ -49,7 +49,7 @@ class Intersection extends ComposeBaseClass {
       }
 
       build() {
-        return new Exclusion(this);
+        return new Intersection(this);
       }
     }
     return new Builder();
