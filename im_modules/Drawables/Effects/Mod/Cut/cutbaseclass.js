@@ -5,7 +5,7 @@ let ModBaseClass = require(Path.join(Filepath.ModDir(), 'modbaseclass.js')).ModB
 
 //------------------------------
 
-class CompareBaseClass extends ModBaseClass {
+class CutBaseClass extends ModBaseClass {
   constructor(properties) {
     super({
       name: properties.name,
@@ -26,4 +26,4 @@ class CompareBaseClass extends ModBaseClass {
 //-------------------------------
 // EXPORTS
 
-exports.CompareBaseClass = CompareBaseClass;
+exports.CutBaseClass = CutBaseClass;
