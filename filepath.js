@@ -354,10 +354,21 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
-  static ListDir() {
+  static QueryListDir() {
     return Filepath.Builder
       .partialPath(Filepath.QueryDir())
       .dir('List')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static QueryInfoDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.QueryDir())
+      .dir('Info')
       .build()
       .String();
   }
