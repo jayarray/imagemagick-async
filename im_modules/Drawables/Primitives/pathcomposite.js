@@ -9,8 +9,8 @@ let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitiv
 //-----------------------------------
 
 class PathComposite extends PrimitivesBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

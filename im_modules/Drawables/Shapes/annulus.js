@@ -10,8 +10,8 @@ let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitive
 //---------------------------------
 
 class Annulus extends PrimitivesBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

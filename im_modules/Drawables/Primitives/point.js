@@ -7,8 +7,8 @@ let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitiv
 //-----------------------------------
 
 class Point extends PrimitivesBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

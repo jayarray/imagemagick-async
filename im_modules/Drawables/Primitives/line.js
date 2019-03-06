@@ -8,8 +8,8 @@ let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitive
 //-----------------------------------
 
 class Line extends PrimitivesBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
