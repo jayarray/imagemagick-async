@@ -259,7 +259,8 @@ Api.Drawables = {
         Offset: require(Path.join(Filepath.TransformDisplaceDir(), 'offset.js')).Offset,
         Roll: require(Path.join(Filepath.TransformDisplaceDir(), 'roll.js')).Roll,
         RotateAroundCenter: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundcenter.js')).RotateAroundCenter,
-        RotateAroundPoint: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundcenter.js')).RotateAroundPoint
+        RotateAroundPoint: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundcenter.js')).RotateAroundPoint,
+        RotateImage: require(Path.join(Filepath.TransformDisplaceDir(), 'rotateimage.js')).RotateImage
       },
       Distort: {
         ArcDistortion: require(Path.join(Filepath.TransformDistortDir(), 'arcdistortion.js')).ArcDistortion,
