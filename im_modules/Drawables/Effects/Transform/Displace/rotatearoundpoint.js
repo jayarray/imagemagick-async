@@ -40,7 +40,7 @@ class RotateAroundPoint extends DisplaceBaseClass {
       }
 
       /**
-       * @param {number}
+       * @param {number} n
        */
       degrees(n) {
         this.args.degrees = n;
@@ -110,7 +110,7 @@ class RotateAroundPoint extends DisplaceBaseClass {
 
     let degreesErr = Err.ErrorMessage.Builder
       .prefix(prefix)
-      .varName('Source')
+      .varName('Degrees')
       .condition(
         new Err.NumberCondition.Builder(this.args.degrees)
           .build()
@@ -122,6 +122,13 @@ class RotateAroundPoint extends DisplaceBaseClass {
       errors.push(degreesErr);
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
   }
 
   /**

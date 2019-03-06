@@ -128,6 +128,13 @@ class Offset extends DisplaceBaseClass {
   /**
    * @override
    */
+  static IsConsolidatable() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
   static Parameters() {
     return {
       source: {

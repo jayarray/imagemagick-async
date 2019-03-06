@@ -32,7 +32,7 @@ class RotateAroundCenter extends DisplaceBaseClass {
       }
 
       /**
-       * @param {number}
+       * @param {number} n
        */
       degrees(n) {
         this.args.degrees = n;
@@ -99,6 +99,13 @@ class RotateAroundCenter extends DisplaceBaseClass {
       errors.push(degreesErr);
 
     return errors;
+  }
+
+  /**
+   * @override
+   */
+  static IsConsolidatable() {
+    return true;
   }
 
   /**
