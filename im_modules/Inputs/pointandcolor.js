@@ -58,7 +58,7 @@ class PointAndColor extends InputsBaseClass {
    */
   Errors() {
     let errors = [];
-    let prefix = 'POINT_AND_COLOR';
+    let prefix = 'POINT_AND_COLOR_ERROR';
 
     let pointErr = Err.ErrorMessage.Builder
       .prefix(prefix)
