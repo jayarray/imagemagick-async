@@ -13,13 +13,6 @@ class DisplaceBaseClass extends TransformBaseClass {
       offset: properties.offset,
     });
   }
-
-  /**
-   * @override
-   */
-  static IsConsolidatable() {
-    return true;
-  }
 }
 
 //--------------------------------
