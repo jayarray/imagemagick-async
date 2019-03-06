@@ -239,7 +239,8 @@ api.Drawables = {
         MultiplyBlackTransparency: require(Path.join(Filepath.ModComposeDir(), 'multiplyblacktransparency.js')).MultiplyBlackTransparency,
         MultiplyWhiteTransparency: require(Path.join(Filepath.ModComposeDir(), 'multiplywhitetransparency.js')).MultiplyWhiteTransparency,
         Subtract: require(Path.join(Filepath.ModComposeDir(), 'subtract.js')).Subtract,
-        UnchangedPixels: require(Path.join(Filepath.ModComposeDir(), 'unchangedpixels.js')).UnchangedPixels
+        UnchangedPixels: require(Path.join(Filepath.ModComposeDir(), 'unchangedpixels.js')).UnchangedPixels,
+        Union: require(Path.join(Filepath.ModComposeDir(), 'union.js')).Union
       },
       Cut: {
         CutIn: require(Path.join(Filepath.ModCutDir(), 'cutin.js')).CutIn,
@@ -277,7 +278,8 @@ api.Drawables = {
         Crop: require(Path.join(Filepath.TransformResizeDir(), 'crop.js')).Crop,
         ResizeDimensions: require(Path.join(Filepath.TransformResizeDir(), 'resizedimensions.js')).ResizeDimensions,
         ResizeFillGivenArea: require(Path.join(Filepath.TransformResizeDir(), 'resizefillgivenarea.js')).ResizeFillGivenArea,
-        ResizePercentage: require(Path.join(Filepath.TransformResizeDir(), 'resizepercentage.js')).ResizePercentage
+        ResizePercentage: require(Path.join(Filepath.TransformResizeDir(), 'resizepercentage.js')).ResizePercentage,
+        Trim: require(Path.join(Filepath.TransformResizeDir(), 'trim.js')).Trim
       }
     }
   }
