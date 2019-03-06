@@ -304,6 +304,7 @@ Api.Inputs = {
   },
   Color: require(Path.join(Filepath.InputsDir(), 'color.js')).Color,
   Coordinates: require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates,
+  Offset: require(Path.join(Filepath.InputsDir(), 'offset.js')).Offset,
   PointAndColor: require(Path.join(Filepath.InputsDir(), 'pointandcolor.js')).PointAndColor,
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
