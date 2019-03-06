@@ -307,4 +307,11 @@ api.Inputs = {
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
 
+
+// Query
+
+api.Query = {
+  GetFileInfo: require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo
+}
+
 exports.Api = api;
