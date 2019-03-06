@@ -10,6 +10,8 @@ let DisplaceBaseClass = require(Path.join(Filepath.TransformDisplaceDir(), 'disp
 class RotateImage extends DisplaceBaseClass {
   constructor(builder) {
     super(builder);
+
+    this.hypotenuse = builder.hypotenuse;
   }
 
   /**
@@ -21,6 +23,8 @@ class RotateImage extends DisplaceBaseClass {
         this.name = 'RotateImage';
         this.args = {};
         this.offset = null;
+
+        this.hypotenuse = null;
       }
 
       /**
@@ -65,6 +69,39 @@ class RotateImage extends DisplaceBaseClass {
       }
 
       build() {
+        /**
+         *  Calculate dimensions for blank canvas. 
+         * 
+         *  NOTES: 
+         *        1) This will rotate the image around the center.
+         *        2) This will produce an image that is slightly larger than the original.
+         *        3) This prevents cropping when pixels are rotated passed the image's original dimensions. 
+         *        4) Image Magick's built-in rotate feature DOES NOT prevent cropping passed the image's dimensions.
+         */
+
+        let aSquared = Math.pow(this.args.width, 2);
+        let bSquared = Math.pow(this.args.height, 2);
+        let sumSquareRoot = Math.sqrt(aSquared + bSquared);
+        this.hypotenuse = Math.ceil(sumSquareRoot);
+
+        /**
+         *  Adjust the offsets.
+         * 
+         *  NOTES: 
+         *        1) The slightly larger rendered image will throw off any offsets.
+         *        2) This will prevent any miscalculations when rendering the image elsewhere or displacing it.
+         */
+
+        let xOffset = Math.floor((hypotenuse - this.args.width) / 2);
+        let yOffset = Math.floor((hypotenuse - this.args.height) / 2);
+
+        if (this.offset) {
+          this.offset.x -= xOffset;
+          this.offset.y -= yOffset;
+        }
+        else
+          this.offset = { x: -xOffset, y: -yOffset };
+
         return new RotateImage(this);
       }
     }
@@ -75,26 +112,7 @@ class RotateImage extends DisplaceBaseClass {
    * @override
    */
   Args() {
-    /**
-     *  Calculate dimensions for blank canvas. 
-     * 
-     *  NOTES: 
-     *        1) This will rotate the image around the center.
-     *        2) This prevents cropping when pixels are rotated passed the image's original dimensions. 
-     *        3) Image Magick's built-in rotate feature DOES NOT prevent cropping passed the image's dimensions.
-     */
-
-    let aSquared = Math.pow(this.args.width, 2);
-    let bSquared = Math.pow(this.args.height, 2);
-    let sumSquareRoot = Math.sqrt(aSquared + bSquared);
-    let hypotenuse = Math.ceil(sumSquareRoot);
-
-    // Build command
-
-    let args = ['-size', `${hypotenuse}x${hypotenuse}`, 'canvas:none', '-gravity', 'Center', '-draw', `image over 0,0 0,0 '${this.args.source}'`];
-    args = args.concat(['-distort', 'SRT', this.args.degrees]);
-
-    return args;
+    return ['-size', `${this.hypotenuse}x${this.hypotenuse}`, 'canvas:none', '-gravity', 'Center', '-draw', `image over 0,0 0,0 '${this.args.source}'`, '-distort', 'SRT', this.args.degrees];
   }
 
   /**
@@ -103,7 +121,7 @@ class RotateImage extends DisplaceBaseClass {
   Errors() {
     let params = RotateImage.Parameters();
     let errors = [];
-    let prefix = 'ROTATE_IMAGE_TRANSFORM_MOD_ERROR';
+    let prefix = 'ROTATE_IMAGE_DISPLACE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)
