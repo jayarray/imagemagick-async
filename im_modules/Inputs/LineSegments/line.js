@@ -7,8 +7,8 @@ let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linese
 //------------------------------------
 
 class Line extends LineSegmentBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

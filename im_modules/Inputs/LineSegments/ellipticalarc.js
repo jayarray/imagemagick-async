@@ -7,8 +7,8 @@ let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linese
 //------------------------------------
 
 class EllipticalArc extends LineSegmentBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

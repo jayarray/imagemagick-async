@@ -8,8 +8,8 @@ let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.j
 //-----------------------------
 
 class Offset extends InputsBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

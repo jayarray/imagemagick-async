@@ -7,8 +7,8 @@ let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.j
 //-----------------------------
 
 class PointAndColor extends InputsBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**

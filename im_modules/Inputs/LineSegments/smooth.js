@@ -7,8 +7,8 @@ let LineSegmentBaseClass = require(Path.join(Filepath.LineSegmentsDir(), 'linese
 //------------------------------------
 
 class Smooth extends LineSegmentBaseClass {
-  constructor(properties) {
-    super(properties);
+  constructor(builder) {
+    super(builder);
   }
 
   /**
@@ -47,7 +47,7 @@ class Smooth extends LineSegmentBaseClass {
       }
 
       build() {
-        return new Smooth(properties);
+        return new Smooth(builder);
       }
     }
     return new Builder();

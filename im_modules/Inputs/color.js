@@ -334,9 +334,9 @@ function ParseHextString(hexStr) {
 // COLOR
 
 class Color extends InputsBaseClass {
-  constructor(properties) {
-    super(properties);
-    this.format = properties.format;
+  constructor(builder) {
+    super(builder);
+    this.format = builder.format;
   }
 
   /**
