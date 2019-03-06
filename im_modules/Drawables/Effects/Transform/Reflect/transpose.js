@@ -60,7 +60,7 @@ class Transpose extends ReflectBaseClass {
   Errors() {
     let params = Transpose.Parameters();
     let errors = [];
-    let prefix = 'TRANSPOSE_REFLECT_MOD_ERROR';
+    let prefix = 'TRANSPOSE_REFLECT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

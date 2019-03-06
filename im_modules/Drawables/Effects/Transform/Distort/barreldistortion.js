@@ -121,7 +121,7 @@ class BarrelDistortion extends DistortBaseClass {
   Errors() {
     let params = BarrelDistortion.Parameters();
     let errors = [];
-    let prefix = 'BARREL_DISTORTION_DISTORT_MOD_ERROR';
+    let prefix = 'BARREL_DISTORTION_DISTORT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

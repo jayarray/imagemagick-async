@@ -75,7 +75,7 @@ class Offset extends DisplaceBaseClass {
   Errors() {
     let params = Offset.Parameters();
     let errors = [];
-    let prefix = 'OFFSET_TRANSFORM_MOD_ERROR';
+    let prefix = 'OFFSET_DISPLACE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

@@ -86,7 +86,7 @@ class FourPointDistortion extends DistortBaseClass {
   Errors() {
     let params = FourPointDistortion.Parameters();
     let errors = [];
-    let prefix = 'FOUR_POINT_DISTORTION_DISTORT_MOD_ERROR';
+    let prefix = 'FOUR_POINT_DISTORTION_DISTORT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

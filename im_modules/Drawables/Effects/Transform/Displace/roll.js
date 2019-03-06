@@ -95,7 +95,7 @@ class Roll extends DisplaceBaseClass {
   Errors() {
     let params = Roll.Parameters();
     let errors = [];
-    let prefix = 'ROLL_TRANSFORM_MOD_ERROR';
+    let prefix = 'ROLL_DISPLACE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

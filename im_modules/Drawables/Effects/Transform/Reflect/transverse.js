@@ -67,7 +67,7 @@ class Transverse extends ReflectBaseClass {
   Errors() {
     let params = Transverse.Parameters();
     let errors = [];
-    let prefix = 'TRANSVERSE_REFLECT_MOD_ERROR';
+    let prefix = 'TRANSVERSE_REFLECT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

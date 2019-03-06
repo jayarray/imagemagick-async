@@ -115,7 +115,7 @@ class PolarDistortion extends DistortBaseClass {
   Errors() {
     let params = PolarDistortion.Parameters();
     let errors = [];
-    let prefix = 'POLAR_DISTORTION_DISTORT_MOD_ERROR';
+    let prefix = 'POLAR_DISTORTION_DISTORT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

@@ -87,7 +87,7 @@ class ThreePointDistortion extends DistortBaseClass {
   Errors() {
     let params = ThreePointDistortion.Parameters();
     let errors = [];
-    let prefix = 'THREE_POINT_DISTORTION_DISTORT_MOD_ERROR';
+    let prefix = 'THREE_POINT_DISTORTION_DISTORT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

@@ -110,7 +110,7 @@ class Crop extends ResizeBaseClass {
   Errors() {
     let params = Crop.Parameters();
     let errors = [];
-    let prefix = 'CROP_RESIZE_MOD_ERROR';
+    let prefix = 'CROP_RESIZE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

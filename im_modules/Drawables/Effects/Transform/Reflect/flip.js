@@ -60,7 +60,7 @@ class Flip extends ReflectBaseClass {
   Errors() {
     let params = Flip.Parameters();
     let errors = [];
-    let prefix = 'FLIP_REFLECT_MOD_ERROR';
+    let prefix = 'FLIP_REFLECT_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

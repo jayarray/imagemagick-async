@@ -69,7 +69,7 @@ class ResizePercentage extends ResizeBaseClass {
   Errors() {
     let params = ResizePercentage.Parameters();
     let errors = [];
-    let prefix = 'RESIZE_PERCENTAGE_RESIZE_MOD_ERROR';
+    let prefix = 'RESIZE_PERCENTAGE_RESIZE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

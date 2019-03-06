@@ -76,7 +76,7 @@ class ResizeFillGivenArea extends ResizeBaseClass {
   Errors() {
     let params = ResizeFillGivenArea.Parameters();
     let errors = [];
-    let prefix = 'RESIZE_FILL_GIVEN_AREA_RESIZE_MOD_ERROR';
+    let prefix = 'RESIZE_FILL_GIVEN_AREA_RESIZE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)

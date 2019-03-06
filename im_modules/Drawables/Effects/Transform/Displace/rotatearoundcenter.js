@@ -68,7 +68,7 @@ class RotateAroundCenter extends DisplaceBaseClass {
   Errors() {
     let params = RotateAroundCenter.Parameters();
     let errors = [];
-    let prefix = 'ROTATE_AROUND_CENTER_TRANSFORM_MOD_ERROR';
+    let prefix = 'ROTATE_AROUND_CENTER_DISPLACE_TRANSFORM_ERROR';
 
     let sourceErr = Err.ErrorMessage.Builder
       .prefix(prefix)
