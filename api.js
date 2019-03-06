@@ -136,19 +136,19 @@ exports.ObjectBuilder = ObjectBuilder;
 //------------------------------------------
 // API
 
-let api = {};
+let Api = {};
 
 
 // Animation
 
-api.Animation = {
+Api.Animation = {
   Gif: require(Path.join(Filepath.AnimationDir(), 'gif.js')).Gif
 };
 
 
 // Constants
 
-api.Constants = {
+Api.Constants = {
   ColorChannels: require(Path.join(Filepath.ConstantsDir(), 'color_channels.json')).values,
   Dispose: require(Path.join(Filepath.ConstantsDir(), 'dispose.json')).values,
   Fonts: require(Path.join(Filepath.ConstantsDir(), 'fonts.json')).values,
@@ -160,7 +160,7 @@ api.Constants = {
 
 // Drawables
 
-api.Drawables = {
+Api.Drawables = {
   Canvases: {
     BarycentricCanvas: require(Path.join(Filepath.CanvasDir(), 'barycentriccanvas.js')).BarycentricCanvas,
     BilinearCanvas: require(Path.join(Filepath.CanvasDir(), 'bilinearcanvas.js')).BilinearCanvas,
@@ -288,7 +288,7 @@ api.Drawables = {
 
 // Inputs
 
-api.Inputs = {
+Api.Inputs = {
   Gradient: {
     BoundingBox: require(Path.join(Filepath.GradientDir(), 'boundingbox.js')).BoundingBox,
     LinearGradient: require(Path.join(Filepath.GradientDir(), 'lineargradient.js')).LinearGradient,
@@ -310,8 +310,12 @@ api.Inputs = {
 
 // Query
 
-api.Query = {
+Api.Query = {
   GetFileInfo: require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo
 }
 
-exports.Api = api;
+
+//-------------------------------------
+// EXPORTS
+
+exports.Api = Api;
