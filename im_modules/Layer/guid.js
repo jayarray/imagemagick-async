@@ -32,8 +32,6 @@ function Filename(length, format) {
 //-----------------------------------
 // EXPORTS
 
+exports.DEFAULT_LENGTH = DEFAULT_LENGTH;
 exports.Create = Create;
 exports.Filename = Filename;
-exports.DEFAULT_LENGTH = DEFAULT_LENGTH;
-
-exports.ComponentType = 'private';
