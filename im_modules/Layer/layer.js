@@ -4,6 +4,7 @@ let Err = require(Path.join(RootDir, 'error.js'));
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Offset = require(Path.join(Filepath.InputsDir(), 'offset.js')).Offset;
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.js')).values;
 let ObjectInterface = require(Path.join(RootDir, 'objectinterface.js')).ObjectInterface;
 
 //-------------------------------------
@@ -31,7 +32,8 @@ class Layer extends ObjectInterface {
           primitives: [],
           offset: Offset.Builder.x(0).y(0).build(),
           id: null,
-          drawPrimitivesFirst: true
+          drawPrimitivesFirst: true,
+          gravity: 'Center'
         };
       }
 
@@ -103,6 +105,15 @@ class Layer extends ObjectInterface {
         return this;
       }
 
+      /**
+       * Specify the gravity that will be used when overlaying layers.
+       * @param {string} str 
+       */
+      gravity(str) {
+        this.args.gravity = str;
+        return this;
+      }
+
       build() {
         return new Layer(this);
       }
@@ -115,6 +126,17 @@ class Layer extends ObjectInterface {
    */
   Errors() {
     let errors = [];
+
+    // foundation
+    // overlays
+    // applied effects
+    // primitives
+    // offset
+    // id
+    // drawPrimitivesFirst
+    // gravity
+
+    // CONT
   }
 
   /**
@@ -150,6 +172,10 @@ class Layer extends ObjectInterface {
       drawPrimitivesFirst: {
         type: 'boolean',
         default: true
+      },
+      gravity: {
+        type: 'string',
+        options: GravityValues
       }
     };
   }
