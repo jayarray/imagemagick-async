@@ -181,6 +181,7 @@ class ArrayCondition {
     this.doesNotContain_ = builder.doesNotContain_;
     this.operation_ = builder.operations_;
     this.validType_ = builder.validType_;
+    this.validTypes_ = builder.validTypes_;
     this.operations_ = builder.operations_;
     this.minLength_ = builder.minLength_;
     this.maxLength_ = builder.maxLength_;
@@ -238,6 +239,15 @@ class ArrayCondition {
        */
       validType(type) {
         this.validType_ = type;
+        return this;
+      }
+
+      /**
+       * Specify the type of object the array should hold. 
+       * @param {Array<string>} type 
+       */
+      validTypes(types) {
+        this.validTypes_ = types;
         return this;
       }
 
@@ -877,9 +887,21 @@ class ErrorMessage {
 
     s2 = this.varName_ ? this.varName_ : 'Array';
 
-    if (Validate.ArrayHasInvalidTypes(arrCond.value_, arrCond.validType_)) {
-      s2 += ` contains items that are not ${arrCond.validType_} type .`;
-      return s1 + s2;
+    if (Validate.IsDefined(arrCond.validTypes_)) {
+      let validTypes = arrCond.validTypes_;
+      let invalidTypes = arrCond.value_.filter(x => validTypes.includes(x.type));
+
+      if (invalidTypes.length > 0) {
+        s2 += ` contains items that are not valid types. Valid types are: ${validTypes.join(', ')}.`;
+        return s1 + s2;
+      }
+    }
+
+    if (Validate.IsDefined(arrCond.validType_)) {
+      if (Validate.ArrayHasInvalidTypes(arrCond.value_, arrCond.validType_)) {
+        s2 += ` contains items that are not ${arrCond.validType_} type .`;
+        return s1 + s2;
+      }
     }
 
     if (Validate.IsDefined(arrCond.checkForErrors_)) {
