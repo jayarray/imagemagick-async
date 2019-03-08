@@ -376,30 +376,6 @@ function RenderLayer(layer, outputDir, format) {
   });
 }
 
-/**
- * @param {object} o
- * @param {string} outputPath
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderJsonObject(o, outputPath) {
-  return new Promise((resolve, rejects) => {
-    // TO DO
-    // return output path
-  });
-}
-
-/**
- * @param {string} source
- * @param {string} outputPath
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderFromFile(source, outputPath) {
-  return new Promise((resolve, rejects) => {
-    // TO DO
-    // return output path
-  });
-}
-
 //----------------------------------
 // RENDERER
 
