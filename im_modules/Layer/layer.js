@@ -125,18 +125,144 @@ class Layer extends ObjectInterface {
    * @override
    */
   Errors() {
+    let params = Layer.Parameters();
     let errors = [];
+    let prefix = 'LAYER_ERROR';
 
     // foundation
-    // overlays
-    // applied effects
-    // primitives
-    // offset
-    // id
-    // drawPrimitivesFirst
-    // gravity
+    let foundationErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Foundation')
+      .condition(
+        new Err.ObjectCondition.Builder(this.args.foundation)
+          .typeNames(params.foundation.types)
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
 
-    // CONT
+    if (foundationErr)
+      errors.push(foundationErr);
+
+
+    // overlays
+    let overlaysErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Overlays')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.overlays)
+          .validType(params.overlays.type)
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (overlaysErr)
+      errors.push(overlaysErr);
+
+    // applied effects
+    let appliedEffectsErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Applied effects')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.appliedEffects)
+          .validType(params.appliedEffects.type)
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (appliedEffectsErr)
+      errors.push(appliedEffectsErr);
+
+    // primitives
+    let primitivesErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Primitives')
+      .condition(
+        new Err.ArrayCondition.Builder(this.args.primitives)
+          .validType(params.primitives.type)
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (primitivesErr)
+      errors.push(primitivesErr);
+
+    // offset
+    if (Validate.IsDefined(this.args.offset)) {
+      let offsetErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('Offset')
+        .condition(
+          new Err.ObjectCondition.Builder(this.args.offset)
+            .typeName(params.offset.type)
+            .checkForErrors(true)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (offsetErr)
+        errors.push(offsetErr);
+    }
+
+    // id
+    if (Validate.IsDefined(this.args.id)) {
+      let idErr = Err.ErrorMessage.Builder
+        .prefix(prefix)
+        .varName('ID')
+        .condition(
+          new Err.StringCondition.Builder(this.args.id)
+            .isEmpty(false)
+            .isWhitespace(false)
+            .build()
+        )
+        .build()
+        .String();
+
+      if (idErr)
+        errors.push(idErr);
+    }
+
+
+    // drawPrimitivesFirst
+    let drawPrimitivesFirstErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Draw primitives first flag')
+      .condition(
+        new Err.BooleanCondition.Builder(this.args.drawPrimitivesFirst)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (drawPrimitivesFirstErr)
+      errors.push(drawPrimitivesFirstErr);
+
+    // gravity
+    let gravityErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Gravity')
+      .condition(
+        new Err.StringCondition.Builder(this.args.gravity)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .include(params.gravity.options)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (gravityErr)
+      errors.push(gravityErr);
+
+    return errors;
   }
 
   /**
