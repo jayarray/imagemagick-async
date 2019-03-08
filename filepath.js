@@ -372,6 +372,17 @@ class Filepath {
       .build()
       .String();
   }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static RenderDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.ImModulesDir())
+      .dir('Render')
+      .build()
+      .String();
+  }
 }
 
 //-------------------------------
