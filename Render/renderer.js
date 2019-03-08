@@ -130,6 +130,7 @@ function DrawPrimitivesSecond(source, primitives) {
   });
 }
 
+
 /**
  * Use when applying effects before drawing primitives!
  * @param {Layer} layer
@@ -454,6 +455,51 @@ class Renderer {
   Errors() {
     let errors = [];
     let prefix = 'RENDERER_ERROR';
+
+    let layerErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Layer')
+      .condition(
+        new Err.ObjectCondition.Builder(this.layer_)
+          .typeName('Layer')
+          .checkForErrors(true)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (layerErr)
+      errors.push(layerErr);
+
+    let formatErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Format')
+      .condition(
+        new Err.StringCondition.Builder(this.format_)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (formatErr)
+      errors.push(formatErr);
+
+    let outputPathErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Output path')
+      .condition(
+        new Err.StringCondition.Builder(this.outputPath_)
+          .isEmpty(false)
+          .isWhitespace(false)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (outputPathErr)
+      errors.push(outputPathErr);
 
     return errors;
   }
