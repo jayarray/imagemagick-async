@@ -39,14 +39,6 @@ class NoiseCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new NoiseCanvas(this);
       }
@@ -58,12 +50,7 @@ class NoiseCanvas extends CanvasBaseClass {
    * @override
    */
   Args() {
-    let args = ['-size', `${this.args.width}x${this.args.height}`, 'canvas:', '+noise', 'Random'];
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
-
-    return args;
+    return ['-size', `${this.args.width}x${this.args.height}`, 'canvas:', '+noise', 'Random'];
   }
 
   /**
@@ -104,25 +91,6 @@ class NoiseCanvas extends CanvasBaseClass {
     if (heightErr)
       errors.push(heightErr);
 
-    // Check optional args
-
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -140,10 +108,6 @@ class NoiseCanvas extends CanvasBaseClass {
         type: 'number',
         subtype: 'integer',
         min: 1
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

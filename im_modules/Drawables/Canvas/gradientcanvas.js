@@ -46,14 +46,6 @@ class GradientCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new GradientCanvas(this);
       }
@@ -65,12 +57,7 @@ class GradientCanvas extends CanvasBaseClass {
    * @override
    */
   Args() {
-    let args = ['-size', `${this.args.width}x${this.args.height}`].concat(this.args.gradient.Args());
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
-
-    return args;
+    return ['-size', `${this.args.width}x${this.args.height}`].concat(this.args.gradient.Args());
   }
 
   /**
@@ -126,23 +113,6 @@ class GradientCanvas extends CanvasBaseClass {
     if (gradientErr)
       errors.push(gradientErr);
 
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -163,10 +133,6 @@ class GradientCanvas extends CanvasBaseClass {
       },
       gradient: {
         type: 'Gradient'
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

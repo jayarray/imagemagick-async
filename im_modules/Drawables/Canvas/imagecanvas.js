@@ -46,14 +46,6 @@ class ImageCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new ImageCanvas(this);
       }
@@ -65,12 +57,7 @@ class ImageCanvas extends CanvasBaseClass {
    * @override 
    **/
   Args() {
-    let args = [this.args.source];
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
-
-    return args;
+    return [this.args.source];
   }
 
   /**
@@ -126,25 +113,6 @@ class ImageCanvas extends CanvasBaseClass {
     if (sourceErr)
       errors.push(sourceErr);
 
-    // Check optional args
-
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.args.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -165,10 +133,6 @@ class ImageCanvas extends CanvasBaseClass {
       },
       source: {
         type: 'string'
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

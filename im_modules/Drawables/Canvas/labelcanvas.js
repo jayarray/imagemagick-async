@@ -119,14 +119,6 @@ class LabelCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new LabelCanvas(this);
       }
@@ -177,9 +169,6 @@ class LabelCanvas extends CanvasBaseClass {
       args.push('-pointsize', this.args.fontSize);
 
     args.push(`label:${this.args.text}`);
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -396,23 +385,6 @@ class LabelCanvas extends CanvasBaseClass {
         errors.push(gravityErr);
     }
 
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -465,10 +437,6 @@ class LabelCanvas extends CanvasBaseClass {
       gravity: {
         type: 'string',
         options: GravityValues
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

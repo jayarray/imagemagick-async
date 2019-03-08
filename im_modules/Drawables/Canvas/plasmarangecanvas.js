@@ -55,14 +55,6 @@ class PlasmaRangeCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new PlasmaRangeCanvas(this);
       }
@@ -84,9 +76,6 @@ class PlasmaRangeCanvas extends CanvasBaseClass {
     }
 
     let args = ['-size', `${this.args.width}x${this.args.height}`, plasmaStr];
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -166,23 +155,6 @@ class PlasmaRangeCanvas extends CanvasBaseClass {
         errors.push(endColorErr);
     }
 
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -206,10 +178,6 @@ class PlasmaRangeCanvas extends CanvasBaseClass {
       },
       endColor: {
         type: 'Color'
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

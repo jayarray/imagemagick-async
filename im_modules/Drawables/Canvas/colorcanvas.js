@@ -47,14 +47,6 @@ class ColorCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new ColorCanvas(this);
       }
@@ -66,12 +58,7 @@ class ColorCanvas extends CanvasBaseClass {
    * @override
    */
   Args() {
-    let args = ['-size', `${this.args.width}x${this.args.height}`, `canvas:${this.args.color.String()}`];
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
-
-    return args;
+    return ['-size', `${this.args.width}x${this.args.height}`, `canvas:${this.args.color.String()}`];
   }
 
   /**
@@ -128,27 +115,6 @@ class ColorCanvas extends CanvasBaseClass {
 
     if (colorErr)
       errors.push(colorErr);
-
-    // Check optional args
-
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
-    return errors;
   }
 
   /**
@@ -168,10 +134,6 @@ class ColorCanvas extends CanvasBaseClass {
       },
       color: {
         type: 'Color'
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

@@ -56,14 +56,6 @@ class VoronoiCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new VoronoiCanvas(this);
       }
@@ -161,23 +153,6 @@ class VoronoiCanvas extends CanvasBaseClass {
         errors.push(softBlendErr);
     }
 
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -204,10 +179,6 @@ class VoronoiCanvas extends CanvasBaseClass {
       softBlend: {
         type: 'boolean',
         default: false
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }

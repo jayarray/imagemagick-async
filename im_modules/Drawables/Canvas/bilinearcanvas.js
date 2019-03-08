@@ -55,14 +55,6 @@ class BilinearCanvas extends CanvasBaseClass {
         return this;
       }
 
-      /**
-       * @param {Array<Primitive>} primitivesArr A list of Primitive types to draw onto the canvas (Optional)
-       */
-      primitives(primitivesArr) {
-        this.primitives = primitivesArr;
-        return this;
-      }
-
       build() {
         return new BilinearCanvas(this);
       }
@@ -79,9 +71,6 @@ class BilinearCanvas extends CanvasBaseClass {
 
     if (this.args.softBlend)
       args.push('-colorspace', 'sRGB');
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
@@ -159,23 +148,6 @@ class BilinearCanvas extends CanvasBaseClass {
         errors.push(softBlendErr);
     }
 
-    if (this.primitives) {
-      let primitivesErr = Err.ErrorMessage.Builder
-        .prefix(prefix)
-        .varName('Primitives')
-        .condition(
-          new Err.ArrayCondition.Builder(this.primitives)
-            .validType('Primitive')
-            .checkForErrors(true)
-            .build()
-        )
-        .build()
-        .String();
-
-      if (primitivesErr)
-        errors.push(primitivesErr);
-    }
-
     return errors;
   }
 
@@ -202,10 +174,6 @@ class BilinearCanvas extends CanvasBaseClass {
       softBlend: {
         type: 'boolean',
         default: false
-      },
-      primitives: {
-        type: 'Primitive',
-        isArray: true
       }
     };
   }
