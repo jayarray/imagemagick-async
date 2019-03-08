@@ -8,6 +8,7 @@ let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 let Consolidator = require(Path.join(Filepath.LayerDir(), 'consolidator.js'));
+let PreProcessor = require(Path.join(Filepath.RenderDir(), 'preprocessor.js'));
 
 //-----------------------------------
 // HELPER FUNCTIONS
@@ -47,48 +48,7 @@ function ComposeImages(source, filepathOffsetTuples, gravity, outputPath) {
 }
 
 /**
- * @param {Layer} layer 
- * @returns {Array} Returns an array args associated with the foundation.
- */
-function GetFoundationArgs(layer) {
-  let foundation = layer.args.foundation;
-  let cmd = foundation.command;
-  let args = foundation.Args();
-  let primitives = layer.args.primitives;
-
-  // Add primitive args
-  if (primitives.length > 0) {
-
-    // Get all primitive args
-    let primitiveArgs = [];
-    primitives.forEach(p => primitiveArgs = primitiveArgs.concat(p.Args()));
-
-    // Determine orderof args
-    if (layer.args.drawPrimitivesFirst)
-      args = primitiveArgs.concat(args);
-    else
-      args = args.concat(primitiveArgs);
-  }
-
-  // Append destination
-  args = args.concat(outputPath);
-
-  // Insert source (if applicable)
-  let isCanvas = foundation.type == 'Canvas';
-  let hasTwoSources = foundation.args.source1 && foundation.args.source2;
-
-  if (!isCanvas && !hasTwoSources) {
-    let source = foundation.args.source;
-    args = [source].concat(args);
-  }
-
-  // Insert command as first arg
-  args = [cmd].concat(args);
-
-  return args;
-}
-
-/**
+ * Use when drawing primitives first OR when no effects are applied.
  * @param {Layer} layer
  * @param {string} outputDir
  * @param {string} format
@@ -141,169 +101,278 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
 }
 
 /**
+ * @param {string} source 
+ * @param {Array<Primitive>} primitives 
+ * @returns {Promise} Returns a promise that resolves if successful.
+ */
+function DrawPrimitivesSecond(source, primitives) {
+  return new Promise((resolve, reject) => {
+    let cmd = 'convert';
+    let args = [];
+
+    // Add primitive args
+    let primitiveArgs = [];
+    primitives.forEach(x => primitiveArgs.concat(x.Args()));
+    args = args.concat(primitiveArgs);
+
+    // Append destination (same as source)
+    args = args.push(source);
+
+    // Render
+    LocalCommand.Execute(cmd, args).then(output => {
+      if (output.stderr) {
+        reject(output.stderr);
+        return;
+      }
+
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * Use when applying effects before drawing primitives!
  * @param {Layer} layer
  * @param {string} outputDir
  * @param {string} format
  * @returns {Promise<string>} Returns a Promise with the output path.
  */
-function RenderFoundationTempFileWithEffects(layer, outputDir, format) {
+function ApplyEffectsFirst(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
+    let preProcessedItems = PreProcessor.PreprocessDrawablesForRendering(layer, outputDir, format, true);
 
-    // Create temp directory
-    let tempDir = Path.join(outputDir, GUID.Create(GUID.DEFAULT_LENGTH));
+    let filepathList = [];
+    let dirpathList = [];
 
-    LinuxCommands.Mkdir.MakeDirectory(tempDir, LocalCommand).then(success => {
-      let effects = layer.args.appliedEffects;
-      let effectGroups = Consolidator.GroupConsolableEffects(effects);
-      let hasEffects = true;
+    // Create function to render effects in order.
+    let apply = (preProcessedArr) => {
+      return new Promise((resolve, reject) => {
+        if (preProcessedArr.length == 0) {
+          resolve();
+          return;
+        }
 
-      RenderFoundationTempFile(layer, outputDir, format, hasEffects).then(foundationOutputPath => {
+        let currObj = preProcessedArr[0];
+        let dirpath = currObj.dirpath;
+        dirpathList.push(dirpath);
 
-        // Create function 
-        let prevOutputPath = null;
+        // Create temp folder
+        LinuxCommands.Directory.Create(dirpath, LocalCommand).then(success => {
 
-        let apply = (effectGroups) => {
-          return new Promise((resolve, reject) => {
-            if (effectGroups.length == 0) {
-              resolve(prevOutputPath);
+          let group = currObj.group;
+          let foundation = group[0];
+          let prevOutputPath = currObj.prevOutputPath;
+
+          let cmd = foundation.command;
+          let args = [];
+
+          // Add foundation args
+          if (foundation.args.source1) {
+            if (prevOutputPath)
+              foundation.args.source1 = prevOutputPath;
+
+            args = foundation.Args();
+          }
+          else {
+            let source = null;
+
+            if (prevOutputPath)
+              source = prevOutputPath;
+            else
+              source = foundation.args.source;
+
+            args = [source].concat(foundation.Args());
+          }
+
+          // Add effect args
+          let effects = group.slice(1);
+
+          if (effects.length > 0) {
+            let effectArgs = [];
+            effects.forEach(x => effectArgs = effectArgs.concat(x.Args()));
+            args = args.concat(effectArgs);
+          }
+
+          // Append destination
+          let filepath = currObj.filepath;
+          args = args.push(filepath);
+          filepathList.push(filepath);
+
+          // Render image
+          LocalCommand.Execute(cmd, args).then(output => {
+            if (output.stderr) {
+              reject(output.stderr);
               return;
             }
 
-            if (!prevOutputPath)
-              prevOutputPath = foundationOutputPath;
-
-            let currGroup = effectGroups[0];
-
-            // Update source
-            // NOTE: Applied effects do not have the source (or source1) defined. It is dependent on the output path from the effect before it.
-
-            let mainEffect = currGroup[0];
-
-            if (mainEffect.args.source1)
-              mainEffect.args.source1 = prevOutputPath;
-            else
-              mainEffect.args.source = prevOutputPath;
-
-            // Render effects in sequence
-
-            let tempOutputPath = Path.join(tempDir, Guid.Filename(Guid.DEFAULT_LENGTH, format));
-
-            if (currGroup.length == 1) {
-              let cmd = mainEffect.command;
-              let args = mainEffect.Args();
-              let primitives = layer.args.primitives;
-
-              // Add any primitive args
-              if (primitives.length > 0) {
-
-                // Get all primitive args
-                let primitiveArgs = [];
-                primitives.forEach(p => primitiveArgs.concat(p.Args()));
-
-                // Determine orderof args
-                if (layer.args.drawPrimitivesFirst)
-                  args = primitiveArgs.concat(args);
-                else
-                  args = args.concat(primitiveArgs);
-              }
-
-              args.push(tempOutputPath);
-
-              // Render temp image
-              LocalCommand.Execute(cmd, args).then(output => {
-                if (output.stderr) {
-                  reject(output.stderr);
-                  return;
-                }
-
-                prevOutputPath = tempOutputPath;
-                resolve(apply(effectGroups.slice(1)));
-              }).catch(error => reject(error));
-            }
-            else {
-              let firstCommand = null;
-              let groupForNow = [];
-              let groupAppendedToHead = false;
-
-              for (let i = 0; i < currGroup.length; ++i) {
-                let currFxOrMod = currGroup[i];
-                let currCommand = currFxOrMod.Command();
-
-                if (i == 0) {
-                  firstCommand = currCommand;
-                  groupForNow.push(currFxOrMod);
-                }
-                else {
-                  if (i == currGroup.length - 1 && currCommand == firstCommand) {
-                    groupForNow.push(currFxOrMod);
-                  }
-                  else {
-                    if (currCommand != firstCommand) {
-                      groups = [currGroup.slice(i)].concat(effectGroups);
-                      groupAppendedToHead = true;
-                      groupForNow = currGroup.slice(0, i);
-                      break;
-                    }
-                    else {
-                      groupForNow.push(currFxOrMod);
-                    }
-                  }
-                }
-              }
-
-              let args = [prevOutputPath];
-              groupForNow.forEach(fxOrMod => args = args.concat(fxOrMod.Args()));
-              args.push(tempOutputPath);
-
-              LOCAL_COMMAND.Execute(firstCommand, args).then(output => {
-                if (output.stderr) {
-                  reject(output.stderr);
-                  return;
-                }
-
-                prevOutputPath = tempOutputPath;
-
-                if (groupAppendedToHead)
-                  resolve(apply(effectGroups));
-                else
-                  resolve(apply(effectGroups.slice(1)));
-              }).catch(error => reject(error));
-            }
-
-          });
-        };
-
-        // Render effects in order
-
-        apply(effectGroups).then(foundationOutputPath => {
-          let filename = LinuxCommands.Path.Filename(foundationOutputPath);
-          let newOutputPath = Path.join(outputDir, filename);
-
-          LinuxCommands.Move.Move(foundationOutputPath, newOutputPath, LocalCommand).then(success => {
-
-            // Clean up temp directory
-
-            LinuxCommands.Directory.Remove(tempDir, LocalCommand).then(success => {
-              resolve(newOutputPath);
-            }).catch(error => reject(error));
+            // Recurse
+            resolve(apply(preProcessedArr.slice(1)));
           }).catch(error => reject(error));
         }).catch(error => reject(error));
+      });
+    };
+
+    apply(preProcessedItems).then(success => {
+
+      // Clean up temp directories (except last one)
+      let theseDirpaths = dirpathList.slice(0, dirpathList.length - 1);
+      LinuxCommands.Remove.Directories(theseDirpaths, LocalCommand).then(success => {
+
+        // Return most recent render filepath
+        let lastPath = filepathList[filepathList.length - 1];
+        resolve(lastPath);
       }).catch(error => reject(error));
     }).catch(error => reject(error));
   });
 }
 
-function RenderFoundationTempFile(layer, outputDir, format, hasEffects) {
+
+/**
+ * Use when applying effects before drawing primitives!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function ApplyEffectsSecond(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
-    if (hasEffects)
-      resolve(RenderFoundationTempFileWithEffects(layer, outputDir, format));
-    else
-      resolve(RenderFoundationTempFileWithoutEffects(layer, outputDir, format));
+    let preProcessedItems = PreProcessor.PreprocessDrawablesForRendering(layer, outputDir, format, false);
+
+    let filepathList = [];
+    let dirpathList = [];
+
+    // Create function to render effects in order.
+    let apply = (preProcessedArr) => {
+      return new Promise((resolve, reject) => {
+        if (preProcessedArr.length == 0) {
+          resolve();
+          return;
+        }
+
+        let currObj = preProcessedArr[0];
+        let dirpath = currObj.dirpath;
+        dirpathList.push(dirpath);
+
+        // Create temp folder
+        LinuxCommands.Directory.Create(dirpath, LocalCommand).then(success => {
+
+          let group = currObj.group;
+          let foundation = group[0];
+          let prevOutputPath = currObj.prevOutputPath;
+
+          let cmd = foundation.command;
+          let args = [];
+
+          // Add foundation args
+          if (foundation.args.source1) {
+            if (prevOutputPath)
+              foundation.args.source1 = prevOutputPath;
+
+            args = foundation.Args();
+          }
+          else {
+            let source = null;
+
+            if (prevOutputPath)
+              source = prevOutputPath;
+            else
+              source = foundation.args.source;
+
+            args = [source].concat(foundation.Args());
+          }
+
+          // Add effect args
+          let effects = group.slice(1);
+
+          if (effects.length > 0) {
+            let effectArgs = [];
+            effects.forEach(x => effectArgs = effectArgs.concat(x.Args()));
+            args = args.concat(effectArgs);
+          }
+
+          // Append destination
+          let filepath = currObj.filepath;
+          args = args.push(filepath);
+          filepathList.push(filepath);
+
+          // Render image
+          LocalCommand.Execute(cmd, args).then(output => {
+            if (output.stderr) {
+              reject(output.stderr);
+              return;
+            }
+
+            // Recurse
+            resolve(apply(preProcessedArr.slice(1)));
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      });
+    };
+
+    apply(preProcessedItems).then(success => {
+
+      // Clean up temp directories (except last one)
+      let theseDirpaths = dirpathList.slice(0, dirpathList.length - 1);
+      LinuxCommands.Remove.Directories(theseDirpaths, LocalCommand).then(success => {
+
+        // Return most recent render filepath
+        let lastPath = filepathList[filepathList.length - 1];
+        resolve(lastPath);
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
   });
 }
 
-function RenderInSequence(layers) {
-  // TO DO
+/**
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderLayer(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let appliedEffects = layer.args.appliedEffects;
+
+    if (appliedEffects.length == 0) {
+      RenderFoundationTempFileWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
+        resolve(foundationTempOutputPath);
+      }).catch(error => reject(error));
+    }
+    else {
+      if (layer.args.drawPrimitivesFirst) {
+
+        // Render foundation with primitives
+        RenderFoundationTempFileWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
+
+          // Update source of first effect (so that pre-processor consolidates them correctly)
+          let firstEffect = appliedEffects[0];
+
+          if (firstEffect.args.source1)
+            firstEffect.args.source1 = foundationTempOutputPath;
+          else
+            firstEffect.args.source = foundationTempOutputPath;
+
+          // Apply effects
+          ApplyEffectsSecond(layer, outputDir, format).then(recentFilepath => {
+            resolve(recentFilepath);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }
+      else {
+        // Render foundation with applied effects
+        ApplyEffectsFirst(layer, outputDir, format).then(recentFilepath => {
+          let primitives = layer.args.primitives;
+
+          // Draw primitives
+          DrawPrimitivesSecond(recentFilepath, primitives).then(success => {
+
+            // Return path to rendered image
+            resolve(recentFilepath);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }
+    }
+  });
 }
 
 /**
@@ -397,127 +466,55 @@ class Renderer {
     return new Promise((resolve, reject) => {
 
       // Create temp directory
+
       let parentDir = LinuxCommands.Path.ParentDir(this.outputPath_);
       let tempDirPath = Path.join(parentDir, Guid.Create());
 
       LinuxCommands.Mkdir.MakeDirectory(tempDirPath, LocalCommand).then(success => {
 
         // Render foundation
+
         let layer = this.layer_;
         let format = this.format_;
-        let hasEffects = layer.args.appliedEffects.length > 0;
 
-        RenderFoundationTempFile(layer, tempDirPath, format, hasEffects).then(foundationTempOutputPath => {
+        RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
 
-          // Render overlays (if any)
-          let overlays = layer.args.overlays;
+          // Render all overlays in parallel
 
-          if (overlays.length == 0) {
+          let actions = [];
 
-            // Rename and move file to destination
-            LinuxCommands.Move.Move(foundationTempOutputPath, this.outputPath_, LocalCommand).then(success => {
+          overlays.forEach(oLayer => {
+            let a = RenderLayer(oLayer, tempDirPath, format);
+            actions.push(a);
+          });
+
+          Promise.all(actions).then(results => {
+
+            // Merge layers together and move to destination
+            let outputPaths = results;
+            let filepathOffsetTuples = [];
+
+            for (let i = 0; i < outputPaths.length; ++i) {
+              let currOverlay = overlays[i];
+              let currFoundation = currOverlay.args.foundation;
+              let currOffset = currFoundation.offset;
+              let currOutputPath = outputPaths[i];
+              let tuple = { filepath: currOutputPath, offset: currOffset };
+              filepathOffsetTuples.push(tuple);
+            }
+
+            let gravity = this.layer_.args.gravity;
+
+            ComposeImages(recentFilepath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
 
               // Clean up temp dir
               LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
                 resolve();
               }).catch(error => reject(`RENDERER_ERROR: ${error}`));
             }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-          }
-          else {
-
-            // Render all overlays in parallel
-            let actions = [];
-
-            overlays.forEach(oLayer => {
-              let oHasEffects = oLayer.args.appliedEffects.length > 0;
-              let a = RenderFoundationTempFile(oLayer, tempDirPath, format, oHasEffects);
-              actions.push(a);
-            });
-
-            Promise.all(actions).then(results => {
-
-              // Merge layers together and move to destination
-              let outputPaths = results;
-              let filepathOffsetTuples = [];
-
-              for (let i = 0; i < outputPaths.length; ++i) {
-                let currOverlay = overlays[i];
-                let currFoundation = currOverlay.args.foundation;
-                let currOffset = currFoundation.offset;
-                let currOutputPath = outputPaths[i];
-                let tuple = { filepath: currOutputPath, offset: currOffset };
-                filepathOffsetTuples.push(tuple);
-              }
-
-              let gravity = this.layer_.args.gravity;
-
-              ComposeImages(foundationTempOutputPath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
-
-                // Clean up temp dir
-                LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
-                  resolve();
-                }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-              }).catch();
-            }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-          }
+          }).catch(error => reject(`RENDERER_ERROR: ${error}`));
         }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-
-
-
-        //--------------------------------------
-        // OLD CODE
-
-
-        let tempFilepaths = []; // delete these after composing final image
-
-        let apply = (canvases) => {
-          return new Promise((resolve, reject) => {
-            if (canvases.length == 0) {
-              resolve(prevOutputPath);
-              return;
-            }
-
-            let currCanvas = canvases[0];
-
-            let action = null;
-            if (currCanvas.AppliedFxAndMods().length > 0)
-              action = currCanvas.RenderTempFileWithAppliedFxAndMods_(tempDirPath, this.format_);
-            else
-              action = currCanvas.RenderTempFile_(tempDirPath, this.format_);
-
-            action.then(filepath => {
-              tempFilepaths.push(filepath);
-              prevOutputPath = filepath;
-              resolve(apply(canvases.slice(1)));
-            }).catch(error => reject(error));
-          });
-        };
-
-        apply(canvasList).then(filepath => {
-          let src = tempFilepaths[0];
-          let filepathOffsetTuples = [];
-
-          for (let i = 1; i < tempFilepaths.length; ++i) {
-            let path = tempFilepaths[i];
-
-            let currCanvas = canvasList[i];
-            filepathOffsetTuples.push({ filepath: path, xOffset: currCanvas.xOffset_, yOffset: currCanvas.yOffset_ });
-          }
-
-          let gravity = 'Northwest';
-
-          // Render a composite image
-
-          ComposeImages(src, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
-
-            // Clean up temp directory
-
-            LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
-              resolve();
-            }).catch(error => reject(error));
-          }).catch(error => reject(error));
-        }).catch(error => reject(error));
-      }).catch(error => reject(error));
+      }).catch(error => reject(`RENDERER_ERROR: ${error}`));
     });
   }
 }
