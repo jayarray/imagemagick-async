@@ -136,32 +136,32 @@ function Analyze(layer) {
 //-----------------------------
 
 /**
- * @param {Array<Effect>} effects
- * @returns {Array<Effect>} Returns a list of Effect objects.
+ * @param {Array} items
+ * @returns {Array} Returns a list of Effect objects.
  */
-function GroupConsolableEffects(effects) {
+function GroupConsolidatables(items) {
   let groups = [];
   let currGroup = [];
 
-  for (let i = 0; i < effects.length; ++i) {
-    let currEffect = effects[i];
+  for (let i = 0; i < items.length; ++i) {
+    let curr = items[i];
 
     if (i == 0)
-      currGroup.push(currEffect);
+      currGroup.push(curr);
     else {
-      if (currEffect.IsConsolidatable())
-        currGroup.push(currEffect);
+      if (curr.IsConsolidatable())
+        currGroup.push(curr);
       else {
         // Add current group to groups list
         groups.push(currGroup);
 
         // Clear current group and add current effect
-        currGroup = [currEffect];
+        currGroup = [curr];
       }
     }
 
     // Push last group (if any)
-    if (i == effects.length - 1 && currGroup.length > 0)
+    if (i == items.length - 1 && currGroup.length > 0)
       groups.push(currGroup);
   }
 
@@ -172,5 +172,5 @@ function GroupConsolableEffects(effects) {
 // EXPORTS
 
 exports.Analyze = Analyze;
-exports.GroupConsolableEffects = GroupConsolableEffects;
+exports.GroupConsolidatables = GroupConsolidatables;
 exports.ToLayerFlatList = ToLayerFlatList;
