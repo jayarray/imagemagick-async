@@ -82,6 +82,7 @@ class Circle extends PrimitivesBaseClass {
    * @override
   */
   Args() {
+    let params = Circle.Parameters();
     let args = [];
 
     if (this.args.fillColor)
@@ -91,6 +92,8 @@ class Circle extends PrimitivesBaseClass {
 
     if (this.args.strokeColor)
       args.push('-stroke', this.args.strokeColor.String());
+    else
+      args.push('-stroke', params.strokeColor.default);
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
@@ -218,7 +221,8 @@ class Circle extends PrimitivesBaseClass {
         type: 'Coordinates'
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Color',
+        default: 'black'
       },
       strokeWidth: {
         type: 'number',

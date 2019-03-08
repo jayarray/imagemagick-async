@@ -74,10 +74,13 @@ class Line extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    let params = Line.Parameters();
     let args = [];
 
     if (this.args.color)
       args.push('-stroke', this.args.color.String());
+    else
+      args.push('-stroke', params.color.default);
 
     if (this.args.width)
       args.push('-strokewidth', this.args.width);
@@ -188,7 +191,8 @@ class Line extends PrimitivesBaseClass {
         type: 'Coordinates'
       },
       color: {
-        type: 'Color'
+        type: 'Color',
+        default: 'black'
       },
       width: {
         type: 'number',

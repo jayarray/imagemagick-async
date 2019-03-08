@@ -1,8 +1,8 @@
-let Path = require('path');
-let RootDir = Path.resolve('.');
-let Err = require(Path.join(RootDir, 'error.js'));
-let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let Validate = require(Path.join(RootDir, 'validate.js'));
+let Path_ = require('path');
+let RootDir = Path_.resolve('.');
+let Err = require(Path_.join(RootDir, 'error.js'));
+let Filepath = require(Path_.join(RootDir, 'filepath.js')).Filepath;
+let Validate = require(Path_.join(RootDir, 'validate.js'));
 let Coordinates = require(Path_.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let PrimitivesBaseClass = require(Path_.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 
@@ -104,6 +104,7 @@ class Path extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    let params = Path.Parameters();
     let args = [];
 
     if (this.args.fillColor)
@@ -113,6 +114,8 @@ class Path extends PrimitivesBaseClass {
 
     if (this.args.strokeColor)
       args.push('-stroke', this.args.strokeColor.String());
+    else
+      args.push('-stroke', params.strokeColor.default);
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
@@ -242,7 +245,8 @@ class Path extends PrimitivesBaseClass {
         min: 2
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Color',
+        default: 'black'
       },
       strokeWidth: {
         type: 'number',

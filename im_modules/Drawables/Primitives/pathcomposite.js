@@ -99,6 +99,7 @@ class PathComposite extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    let params = PathComposite.Parameters();
     let args = [];
 
     if (this.args.fillColor)
@@ -108,6 +109,8 @@ class PathComposite extends PrimitivesBaseClass {
 
     if (this.args.strokeColor)
       args.push('-stroke', this.args.strokeColor.String());
+    else
+      args.push('-stroke', params.strokeColor.default);
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
@@ -250,7 +253,8 @@ class PathComposite extends PrimitivesBaseClass {
         min: 1
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Color',
+        default: 'black'
       },
       strokeWidth: {
         type: 'number',

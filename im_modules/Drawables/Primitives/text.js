@@ -98,6 +98,7 @@ class Text extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    let params = Text.Parameters();
     let args = [];
 
     if (this.args.fillColor)
@@ -105,6 +106,8 @@ class Text extends PrimitivesBaseClass {
 
     if (this.args.strokeColor)
       args.push('-stroke', this.args.strokeColor.String());
+    else
+      args.push('-stroke', params.strokeColor.default);
 
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
@@ -285,7 +288,8 @@ class Text extends PrimitivesBaseClass {
         ]
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Color',
+        default: 'black'
       },
       strokeWidth: {
         type: 'number',
