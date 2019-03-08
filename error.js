@@ -292,6 +292,7 @@ class ObjectCondition {
     this.include_ = builder.include_;
     this.exclude_ = builder.exclude_;
     this.typeName_ = builder.typeName_;
+    this.typeNames_ = builder.typeNames_;
     this.checkForErrors_ = builder.checkForErrors_;
   }
 
@@ -335,6 +336,15 @@ class ObjectCondition {
        */
       typeName(name) {
         this.typeName_ = name;
+        return this;
+      }
+
+      /**
+       * Specify the valid types of the object. (Use with user-defined objects that have a property called 'type').
+       * @param {Array<string>} names
+       */
+      typeNames(names) {
+        this.typeNames_ = names;
         return this;
       }
 
@@ -1009,6 +1019,13 @@ class ErrorMessage {
     if (Validate.IsDefined(objCond.typeName_)) {
       if (objCond.value_.type != objCond.typeName_) {
         s2 += ` is not a ${objCond.typeName_} object.`;
+        return s1 + s2;
+      }
+    }
+
+    if (Validate.IsDefined(objCond.typeNames_)) {
+      if (!objCond.typeNames_.includes(objCond.value_.type)) {
+        s2 += ` is not a valid type. Valid types are: ${objCond.typeNames_.join(', ')}.`;
         return s1 + s2;
       }
     }
