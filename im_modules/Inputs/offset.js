@@ -113,4 +113,4 @@ class Offset extends InputsBaseClass {
 //--------------------------------
 // EXPORTS
 
-exports.Coordinates = Coordinates;
+exports.Offset = Offset;
