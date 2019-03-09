@@ -2,6 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let PathPrimitive = require(Path.join(Filepath.PrimitivesDir(), 'path.js')).Path;
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
@@ -83,11 +84,10 @@ class Star extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -102,32 +102,44 @@ class Star extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    // Compute offset center
+    let offsetCenter = Coordinates.Builder
+      .x(this.args.center.args.x + this.args.offset.args.x)
+      .y(this.args.center.args.y + this.args.offset.args.y)
+      .build();
+
+    // Compute offset vertex
+    let offsetVertex = Coordinates.Builder
+      .x(this.args.vertex.args.x + this.args.offset.args.x)
+      .y(this.args.vertex.args.y + this.args.offset.args.y)
+      .build();
+
     // Get all major vertices
     let majorDegrees = 360 / this.args.vertices;
-    let majorVertices = [this.args.vertex];
+    let majorVertices = [offsetVertex];
 
     for (let i = 0; i < this.args.vertices - 1; ++i) {
-      let rotatedPoint = HelperFunctions.GetRotatedPoint(this.args.center, this.args.vertex, majorDegrees * (i + 1));
+      let rotatedPoint = HelperFunctions.GetRotatedPoint(offsetCenter, offsetVertex, majorDegrees * (i + 1));
       majorVertices.push(rotatedPoint);
     }
 
     // Compute minor vertex
-    let slope = HelperFunctions.GetSlope(this.args.center, this.args.vertex);
-    let yIntercept = this.args.center.args.y - (this.args.center.args.x * slope);
+    let slope = HelperFunctions.GetSlope(offsetCenter, offsetVertex);
+    let yIntercept = offsetCenter.args.y - (offsetCenter.args.x * slope);
     let minorX = null;
     let minorY = null;
 
-    if (this.args.center.args.x == this.args.vertex.args.x) { // Vertical slope
-      minorX = this.args.center.args.x;
-      minorY = this.args.center.args.y < this.args.vertex.args.y ? this.args.center.args.y + this.args.bloat : this.args.center.args.y - this.args.bloat;
+    if (offsetCenter.args.x == offsetVertex.args.x) { // Vertical slope
+      minorX = offsetCenter.args.x;
+      minorY = offsetCenter.args.y < offsetVertex.args.y ? offsetCenter.args.y + this.args.bloat : offsetCenter.args.y - this.args.bloat;
     }
     else {
-      if (this.args.center.args.y == this.args.vertex.args.y) { // Horizontal slope
-        minorX = this.args.center.args.x > this.args.vertex.args.x ? this.args.center.args.x - this.args.bloat : this.args.center.args.x + this.args.bloat;
-        minorY = this.args.center.args.y;
+      if (offsetCenter.args.y == offsetVertex.args.y) { // Horizontal slope
+        minorX = offsetCenter.args.x > offsetVertex.args.x ? offsetCenter.args.x - this.args.bloat : offsetCenter.args.x + this.args.bloat;
+        minorY = offsetCenter.args.y;
       }
       else { // Diagonal slope
-        minorX = this.args.center.args.x < this.args.vertex.args.x ? this.args.center.args.x + this.args.bloat : this.args.center.args.x - this.args.bloat;
+        minorX = offsetCenter.args.x < offsetVertex.args.x ? offsetCenter.args.x + this.args.bloat : offsetCenter.args.x - this.args.bloat;
         minorY = (slope * minorX) + yIntercept;
       }
     }
@@ -140,11 +152,11 @@ class Star extends PrimitivesBaseClass {
       .y(parseInt(minorY))
       .build();
 
-    let rotatedMinorVertex = HelperFunctions.GetRotatedPoint(this.args.center, minorVertex, minorDegrees);
+    let rotatedMinorVertex = HelperFunctions.GetRotatedPoint(offsetCenter, minorVertex, minorDegrees);
     let minorVertices = [rotatedMinorVertex];
 
     for (let i = 0; i < this.args.vertices - 1; ++i) {
-      let rotatedPoint = HelperFunctions.GetRotatedPoint(this.args.center, rotatedMinorVertex, majorDegrees * (i + 1));
+      let rotatedPoint = HelperFunctions.GetRotatedPoint(offsetCenter, rotatedMinorVertex, majorDegrees * (i + 1));
       minorVertices.push(rotatedPoint);
     }
 
@@ -327,6 +339,9 @@ class Star extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

@@ -56,11 +56,10 @@ class Bezier extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -80,8 +79,8 @@ class Bezier extends PrimitivesBaseClass {
 
     this.args.points.forEach(p => {
       let pStr = Coordinates.Builder
-        .x(p.args.x + this.offset.x)
-        .y(p.args.y + this.offset.y)
+        .x(p.args.x + this.args.offset.args.x)
+        .y(p.args.y + this.args.offset.args.y)
         .build()
         .String();
 
@@ -221,6 +220,9 @@ class Bezier extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

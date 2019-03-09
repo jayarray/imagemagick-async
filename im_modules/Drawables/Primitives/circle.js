@@ -63,11 +63,10 @@ class Circle extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -99,13 +98,13 @@ class Circle extends PrimitivesBaseClass {
       args.push('-strokewidth', this.args.strokeWidth);
 
     let center = Coordinates.Builder()
-      .x(this.args.center.args.x + this.offset.x)
-      .y(this.args.center.args.y + this.offset.y)
+      .x(this.args.center.args.x + this.args.offset.args.x)
+      .y(this.args.center.args.y + this.args.offset.args.y)
       .build();
 
     let edge = Coordinates.Builder()
-      .x(this.args.edge.args.x + this.offset.x)
-      .y(this.args.edge.args.y + this.offset.y)
+      .x(this.args.edge.args.x + this.args.offset.args.x)
+      .y(this.args.edge.args.y + this.args.offset.args.y)
       .build();
 
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);
@@ -232,6 +231,9 @@ class Circle extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

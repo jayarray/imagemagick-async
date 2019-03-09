@@ -87,11 +87,10 @@ class Ellipse extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -123,8 +122,8 @@ class Ellipse extends PrimitivesBaseClass {
       args.push('-strokewidth', this.args.strokeWidth);
 
     let center = Coordinates.Builder()
-      .x(this.args.center.args.x + this.offset.x)
-      .y(this.args.center.args.y + this.offset.y)
+      .x(this.args.center.args.x + this.args.offset.args.x)
+      .y(this.args.center.args.y + this.args.offset.args.y)
       .build();
 
     let angleStart = this.args.angleStart || params.angleStart.default;
@@ -313,6 +312,9 @@ class Ellipse extends PrimitivesBaseClass {
       angleEnd: {
         type: 'number',
         default: 360
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

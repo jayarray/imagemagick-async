@@ -46,11 +46,10 @@ class Point extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -70,7 +69,10 @@ class Point extends PrimitivesBaseClass {
     if (this.args.color)
       args.push('-fill', this.args.color.String()); // Default color is black
 
-    args.push('-draw', `point ${this.args.x + this.offset.x},${this.args.y + this.offset.y}`);
+    let x = this.args.x + this.args.offset.args.x;
+    let y = this.args.y + this.args.offset.args.y;
+
+    args.push('-draw', `point ${x},${y}`);
     return args;
   }
 
@@ -148,6 +150,9 @@ class Point extends PrimitivesBaseClass {
       },
       color: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

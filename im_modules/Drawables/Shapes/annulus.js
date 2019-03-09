@@ -81,11 +81,10 @@ class Annulus extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -102,15 +101,21 @@ class Annulus extends PrimitivesBaseClass {
   Args() {
     let args = [];
 
+    // Compute offset center
+    let offsetCenter = Coordinates.Builder
+      .x(this.args.center.args.x + this.args.offset.args.x)
+      .y(this.args.center.args.y + this.args.offset.args.y)
+      .build();
+
     // Minor outline
 
     let minorEdge = Coordinates.Builder
-      .x(this.args.center.args.x + this.args.minorRadius)
-      .y(this.center.args.y)
+      .x(offsetCenter.args.x + this.args.minorRadius)
+      .y(offsetCenter.args.y)
       .build();
 
     let minorCircle = Circle.Builder
-      .center(this.args.center)
+      .center(offsetCenter)
       .edge(minorEdge)
       .strokeColor(this.args.strokeColor)
       .strokeWidth(this.args.strokeWidth)
@@ -119,12 +124,12 @@ class Annulus extends PrimitivesBaseClass {
     // Major outline
 
     let majorEdge = Coordinates.Builder
-      .x(this.args.center.args.x + this.args.majorRadius)
-      .y(this, args.center.args.y)
+      .x(offsetCenter.args.x + this.args.majorRadius)
+      .y(offsetCenter.args.y)
       .build();
 
     let majorCircle = Circle.Builder
-      .center(this.args.center)
+      .center(offsetCenter)
       .edge(majorEdge)
       .strokeColor(this.args.strokeColor)
       .strokeWidth(this.args.strokeWidth)
@@ -134,7 +139,7 @@ class Annulus extends PrimitivesBaseClass {
 
     if (this.args.fillColor) {
       let fillColorCircle = Circle.Builder
-        .center(this.args.center)
+        .center(offsetCenter)
         .edge(majorEdge)
         .strokeColor(this.args.strokeColor)
         .strokeWidth(this.args.strokeWidth)
@@ -147,7 +152,7 @@ class Annulus extends PrimitivesBaseClass {
     // Donut
 
     let ellipse = Ellipse.Builder
-      .center(this.args.center)
+      .center(offsetCenter)
       .width(this.args.majorRadius + this.args.minorRadius)
       .height(this.args.majorRadius + this.args.minorRadius)
       .strokeColor(this.args.color)
@@ -318,6 +323,9 @@ class Annulus extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

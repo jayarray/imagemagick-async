@@ -45,6 +45,14 @@ class CubicBezier extends LineSegmentBaseClass {
         return this;
       }
 
+      /**
+       * @param {Offset} offset
+       */
+      offset(offset) {
+        this.args.offset = offset;
+        return this;
+      }
+
       build() {
         return new CubicBezier(this);
       }
@@ -56,7 +64,12 @@ class CubicBezier extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    return `C ${this.args.control1.args.x},${this.args.control1.args.y} ${this.args.control2.args.x},${this.args.control2.args.y} ${this.args.endPoint.args.x},${this.args.endPoint.args.y_}`;
+    let c1X = this.args.control1.args.x + this.args.offset.args.x;
+    let c1Y = this.args.control1.args.y + this.args.offset.args.y;
+    let c2X = this.args.control2.args.x + this.args.offset.args.x;
+    let c2Y = this.args.control2.args.y + this.args.offset.args.y;
+    
+    return `C ${c1X},${c1Y} ${c2X},${c2Y} ${this.args.endPoint.String()}`;
   }
 
   /**
@@ -127,6 +140,9 @@ class CubicBezier extends LineSegmentBaseClass {
       },
       endPoint: {
         type: 'Coordinates'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

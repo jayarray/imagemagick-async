@@ -55,11 +55,10 @@ class Image extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -82,7 +81,10 @@ class Image extends PrimitivesBaseClass {
       height = this.args.height;
     }
 
-    return ['-draw', `image over ${this.corner.String()} ${width},${height} ${this.args.source}`];
+    let adjustedX = this.corner.args.x + this.args.offset.args.x;
+    let adjustedY = this.corner.args.y + this.args.offset.args.y;
+
+    return ['-draw', `image over ${adjustedX},${adjustedY} ${width},${height} ${this.args.source}`];
   }
 
   /**
@@ -184,6 +186,9 @@ class Image extends PrimitivesBaseClass {
         subtype: 'integer',
         min: 1,
         default: 0
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

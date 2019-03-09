@@ -56,8 +56,16 @@ class EllipticalArc extends LineSegmentBaseClass {
       /**
        * @param {Coordinates} coordinates Location of edge
        */
-      edge(edge) {
+      edge(coordinates) {
         this.args.edge = coordinates;
+        return this;
+      }
+
+      /**
+       * @param {Offset} offset
+       */
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -72,7 +80,15 @@ class EllipticalArc extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    return `A ${this.args.radius.args.x},${this.args.radius.args.y} ${this.args.angle ? this.args.angle : ARG_INFO.angle.default} ${this.args.largeFlag ? 1 : 0},${this.args.sweepFlag_ ? 1 : 0} ${this.args.edge.args.x},${this.args.edge.args.y}`;
+    let params = EllipticalArc.Parameters();
+
+    let rX = this.args.radius.args.x + this.args.offset.args.x;
+    let rY = this.args.radius.args.y + this.args.offset.args.y;
+    let angle = this.args.angle ? this.args.angle : params.angle.default;
+    let largeFlag = this.args.largeFlag ? 1 : 0;
+    let sweepFlag = this.args.sweepFlag ? 1 : 0;
+
+    return `A ${rX},${rY} ${angle} ${largeFlag},${sweepFlag} ${this.args.edge.String()}`;
   }
 
   /**
@@ -186,6 +202,9 @@ class EllipticalArc extends LineSegmentBaseClass {
       },
       edge: {
         type: 'Coordinates'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

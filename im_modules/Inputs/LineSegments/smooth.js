@@ -46,6 +46,14 @@ class Smooth extends LineSegmentBaseClass {
         return this;
       }
 
+      /**
+       * @param {Offset} offset
+       */
+      offset(offset) {
+        this.args.offset = offset;
+        return this;
+      }
+
       build() {
         return new Smooth(builder);
       }
@@ -61,7 +69,10 @@ class Smooth extends LineSegmentBaseClass {
     if (this.args.isQuadraticBezier)
       char = 'T';
 
-    return `${char} ${this.args.control.args.x},${this.args.control.args.y} ${this.args.endPoint.args.x},${this.args.endPoint.args.y}`;
+    let cX = this.args.control.args.x + this.args.offset.args.x;
+    let cY = this.args.control.args.y + this.args.offset.args.y;
+
+    return `${char} ${cX},${cY} ${this.args.endPoint.String()}`;
   }
 
   /**
@@ -138,6 +149,9 @@ class Smooth extends LineSegmentBaseClass {
       isQuadraticBezier: {
         type: 'boolean',
         default: false
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

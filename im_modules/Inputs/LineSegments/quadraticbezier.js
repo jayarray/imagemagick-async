@@ -37,6 +37,14 @@ class QuadraticBezier extends LineSegmentBaseClass {
         return this;
       }
 
+      /**
+       * @param {Offset} offset
+       */
+      offset(offset) {
+        this.args.offset = offset;
+        return this;
+      }
+
       build() {
         return new QuadraticBezier(this);
       }
@@ -48,7 +56,10 @@ class QuadraticBezier extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    return `Q ${this.args.control.args.x},${this.args.control.args.y} ${this.args.endPoint.args.x},${this.args.endPoint.args.y}`;
+    let cX = this.args.control.args.x + this.args.offset.args.x;
+    let cY = this.args.control.args.y + this.args.offset.args.y;
+
+    return `Q ${cX},${cY} ${this.args.endPoint.String()}`;
   }
 
   /**
@@ -101,6 +112,9 @@ class QuadraticBezier extends LineSegmentBaseClass {
       },
       endPoint: {
         type: 'Coordinates'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

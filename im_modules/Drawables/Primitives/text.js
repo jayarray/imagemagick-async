@@ -79,11 +79,10 @@ class Text extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -121,7 +120,7 @@ class Text extends PrimitivesBaseClass {
     if (this.args.gravity)
       args.push('-gravity', this.args.gravity);
 
-    args.push('-draw', `text ${this.offset.x},${this.offset.y} '${this.args.string}'`);
+    args.push('-draw', `text ${this.args.offset.args.x},${this.args.offset.args.y} '${this.args.string}'`);
     return args;
   }
 
@@ -298,6 +297,9 @@ class Text extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

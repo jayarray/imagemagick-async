@@ -37,6 +37,14 @@ class Line extends LineSegmentBaseClass {
         return this;
       }
 
+      /**
+       * @param {Offset} offset
+       */
+      offset(offset) {
+        this.args.offset = offset;
+        return this;
+      }
+
       build() {
         return new Line(this);
       }
@@ -48,7 +56,10 @@ class Line extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    return `L ${this.args.x},${this.args.y}`;
+    let x = this.args.x + this.args.offset.args.x;
+    let y = this.args.y + this.args.offset.args.y;
+    
+    return `L ${x},${y}`;
   }
 
   /**
@@ -99,6 +110,9 @@ class Line extends LineSegmentBaseClass {
       y: {
         type: 'number',
         subtype: 'integer'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

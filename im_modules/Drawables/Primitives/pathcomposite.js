@@ -72,11 +72,10 @@ class PathComposite extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -92,6 +91,11 @@ class PathComposite extends PrimitivesBaseClass {
    * @returns {string} Returns a space-delimited string representing all points in the path.
    */
   LineSegmentsToString() {
+    // Apply offset to all line segments
+    this.args.lineSegments.forEach(l => {
+      l.args.offset = this.args.offset;
+    });
+
     return this.args.lineSegments.map(x => x.String()).join(' ');
   }
 
@@ -267,6 +271,9 @@ class PathComposite extends PrimitivesBaseClass {
       isClosed: {
         type: 'boolean',
         default: false
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

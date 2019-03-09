@@ -2,6 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let HelperFunctions = require(Path.join(Filepath.ShapesDir(), 'helperfunctions.js'));
 let PathPrimitive = require(Path.join(Filepath.PrimitivesDir(), 'path.js')).Path;
 let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
@@ -72,11 +73,10 @@ class Polygon extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -91,13 +91,25 @@ class Polygon extends PrimitivesBaseClass {
    * @override
    */
   Args() {
+    // Compute offset center
+    let offsetCenter = Coordinates.Builder
+      .x(this.args.center.args.x + this.args.offset.args.x)
+      .y(this.args.center.args.y + this.args.offset.args.y)
+      .build();
+
+    // Compute offset vertex
+    let offsetVertex = Coordinates.Builder
+      .x(this.args.vertex.args.x + this.args.offset.args.x)
+      .y(this.args.vertex.args.y + this.args.offset.args.y)
+      .build();
+
     // Rotate points
     let degrees = 360 / this.args.sides;
-    let vertices = [this.args.vertex];
+    let vertices = [offsetVertex];
 
     for (let i = 0; i < this.args.sides - 1; ++i) {
       let currDegrees = degrees * (i + 1);
-      let rotatedPoint = HelperFunctions.GetRotatedPoint(this.args.center, this.args.vertex, currDegrees);
+      let rotatedPoint = HelperFunctions.GetRotatedPoint(offsetCenter, offsetVertex, currDegrees);
       vertices.push(rotatedPoint);
     }
 
@@ -250,6 +262,9 @@ class Polygon extends PrimitivesBaseClass {
       },
       fillColor: {
         type: 'Color'
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }

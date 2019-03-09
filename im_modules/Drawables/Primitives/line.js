@@ -55,11 +55,10 @@ class Line extends PrimitivesBaseClass {
       }
 
       /**
-       * @param {number} x 
-       * @param {number} y 
+       * @param {Offset} offset
        */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
+      offset(offset) {
+        this.args.offset = offset;
         return this;
       }
 
@@ -86,13 +85,13 @@ class Line extends PrimitivesBaseClass {
       args.push('-strokewidth', this.args.width);
 
     let start = Coordinates.Builder
-      .x(this.args.start.args.x + this.offset.x)
-      .y(this.args.start.args.y + this.offset.y)
+      .x(this.args.start.args.x + this.args.offset.args.x)
+      .y(this.args.start.args.y + this.args.offset.args.y)
       .build();
 
     let end = Coordinates.Builder
-      .x(this.args.end.args.x + this.offset.x)
-      .y(this.args.end.args.y + this.offset.y)
+      .x(this.args.end.args.x + this.args.offset.args.x)
+      .y(this.args.end.args.y + this.args.offset.args.y)
       .build();
 
     args.push('-draw', `line ${start.String()} ${end.String()}`);
@@ -198,6 +197,9 @@ class Line extends PrimitivesBaseClass {
         type: 'number',
         subtype: 'integer',
         min: 1
+      },
+      offset: {
+        type: 'Offset'
       }
     };
   }
