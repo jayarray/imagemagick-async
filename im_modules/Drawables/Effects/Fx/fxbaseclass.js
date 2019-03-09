@@ -10,7 +10,6 @@ class FxBaseClass extends EffectBaseClass {
     super({
       name: properties.name,
       args: properties.args,
-      offset: properties.offset,
       subtype: 'fx'
     });
 
