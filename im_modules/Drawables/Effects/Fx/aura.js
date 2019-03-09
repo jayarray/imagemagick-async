@@ -19,7 +19,6 @@ class Aura extends FxBaseClass {
       constructor() {
         this.name = 'Aura';
         this.args = {};
-        this.offset = null;
       }
 
       /**

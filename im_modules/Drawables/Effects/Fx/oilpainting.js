@@ -19,7 +19,6 @@ class OilPainting extends FxBaseClass {
       constructor() {
         this.name = 'OilPainting';
         this.args = {};
-        this.offset = null;
       }
 
       /**

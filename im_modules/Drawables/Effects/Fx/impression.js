@@ -19,7 +19,6 @@ class Impression extends FxBaseClass {
       constructor() {
         this.name = 'Impression';
         this.args = {};
-        this.offset = null;
       }
 
       /**

@@ -20,7 +20,6 @@ class Edge extends FxBaseClass {
       constructor() {
         this.name = 'Edge';
         this.args = {};
-        this.offset = null;
       }
 
       /**

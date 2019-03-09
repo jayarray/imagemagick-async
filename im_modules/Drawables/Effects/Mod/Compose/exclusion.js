@@ -20,7 +20,6 @@ class Exclusion extends ComposeBaseClass {
       constructor() {
         this.name = 'Exclusion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

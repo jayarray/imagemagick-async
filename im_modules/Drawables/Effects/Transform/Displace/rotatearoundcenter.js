@@ -20,7 +20,6 @@ class RotateAroundCenter extends DisplaceBaseClass {
       constructor() {
         this.name = 'RotateAroundCenter';
         this.args = {};
-        this.offset = null;
       }
 
       /**

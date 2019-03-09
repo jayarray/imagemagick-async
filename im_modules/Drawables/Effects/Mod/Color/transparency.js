@@ -20,7 +20,6 @@ class Transparency extends ColorBaseClass {
       constructor() {
         this.name = 'Transparency';
         this.args = {};
-        this.offset = null;
       }
 
       /**

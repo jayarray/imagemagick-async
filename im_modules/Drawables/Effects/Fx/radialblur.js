@@ -19,7 +19,6 @@ class RadialBlur extends FxBaseClass {
       constructor() {
         this.name = 'RadialBlur';
         this.args = {};
-        this.offset = null;
       }
 
       /**

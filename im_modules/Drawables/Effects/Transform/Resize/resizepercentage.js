@@ -20,7 +20,6 @@ class ResizePercentage extends ResizeBaseClass {
       constructor() {
         this.name = 'ResizePercentage';
         this.args = {};
-        this.offset = null;
       }
 
       /**

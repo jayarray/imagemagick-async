@@ -19,7 +19,6 @@ class Brightness extends ColorBaseClass {
       constructor() {
         this.name = 'Brightness';
         this.args = {};
-        this.offset = null;
       }
 
       /**

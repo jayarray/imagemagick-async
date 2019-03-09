@@ -20,7 +20,6 @@ class UnchangedPixels extends ComposeBaseClass {
       constructor() {
         this.name = 'UnchangedPixels';
         this.args = {};
-        this.offset = null;
       }
 
       /**

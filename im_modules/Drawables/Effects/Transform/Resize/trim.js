@@ -20,7 +20,6 @@ class Trim extends ResizeBaseClass {
       constructor() {
         this.name = 'Trim';
         this.args = {};
-        this.offset = null;
       }
 
       /**

@@ -20,7 +20,6 @@ class CutOut extends CutBaseClass {
       constructor() {
         this.name = 'CutOut';
         this.args = {};
-        this.offset = null;
       }
 
       /**

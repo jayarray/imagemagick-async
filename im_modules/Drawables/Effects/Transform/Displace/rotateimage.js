@@ -85,13 +85,7 @@ class RotateImage extends DisplaceBaseClass {
 
         let xOffset = Math.floor((hypotenuse - this.args.width) / 2);
         let yOffset = Math.floor((hypotenuse - this.args.height) / 2);
-
-        if (this.offset) {
-          this.offset.x -= xOffset;
-          this.offset.y -= yOffset;
-        }
-        else
-          this.offset = { x: -xOffset, y: -yOffset };
+        this.offset = { x: -xOffset, y: -yOffset };
 
         return new RotateImage(this);
       }

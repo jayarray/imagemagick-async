@@ -20,7 +20,6 @@ class Saturation extends ColorBaseClass {
       constructor() {
         this.name = 'Saturation';
         this.args = {};
-        this.offset = null;
       }
 
       /**

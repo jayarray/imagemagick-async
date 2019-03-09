@@ -20,7 +20,6 @@ class ArcDistortion extends DistortBaseClass {
       constructor() {
         this.name = 'ArcDistortion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

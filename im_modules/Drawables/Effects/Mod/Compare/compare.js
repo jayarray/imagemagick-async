@@ -20,7 +20,6 @@ class Compare extends CompareBaseClass {
       constructor() {
         this.name = 'Compare';
         this.args = {};
-        this.offset = null;
         this.command = 'compare';
       }
 

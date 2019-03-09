@@ -19,7 +19,6 @@ class Swirl extends FxBaseClass {
       constructor() {
         this.name = 'Swirl';
         this.args = {};
-        this.offset = null;
       }
 
       /**

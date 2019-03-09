@@ -19,7 +19,6 @@ class Shadow extends FxBaseClass {
       constructor() {
         this.name = 'Shadow';
         this.args = {};
-        this.offset = null;
       }
 
       /**

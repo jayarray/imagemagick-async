@@ -20,7 +20,6 @@ class Crop extends ResizeBaseClass {
       constructor() {
         this.name = 'Crop';
         this.args = {};
-        this.offset = null;
       }
 
       /**

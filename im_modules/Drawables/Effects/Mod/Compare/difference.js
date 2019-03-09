@@ -20,7 +20,6 @@ class Difference extends CompareBaseClass {
       constructor() {
         this.name = 'Difference';
         this.args = {};
-        this.offset = null;
         this.command = 'composite';
       }
 

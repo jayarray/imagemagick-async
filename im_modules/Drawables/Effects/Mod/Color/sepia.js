@@ -20,7 +20,6 @@ class Sepia extends ColorBaseClass {
       constructor() {
         this.name = 'Sepia';
         this.args = {};
-        this.offset = null;
       }
 
       /**

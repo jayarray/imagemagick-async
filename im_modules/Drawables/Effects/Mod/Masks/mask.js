@@ -20,7 +20,6 @@ class Mask extends MaskBaseClass {
       constructor() {
         this.name = 'Mask';
         this.args = {};
-        this.offset = null;
       }
 
       /**

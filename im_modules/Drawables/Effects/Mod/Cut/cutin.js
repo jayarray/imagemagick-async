@@ -20,7 +20,6 @@ class CutIn extends CutBaseClass {
       constructor() {
         this.name = 'CutIn';
         this.args = {};
-        this.offset = null;
       }
 
       /**

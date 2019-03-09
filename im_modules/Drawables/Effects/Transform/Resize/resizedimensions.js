@@ -20,7 +20,6 @@ class ResizeDimensions extends ResizeBaseClass {
       constructor() {
         this.name = 'ResizeDimensions';
         this.args = {};
-        this.offset = null;
       }
 
       /**

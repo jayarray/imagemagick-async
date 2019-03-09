@@ -20,7 +20,6 @@ class Flop extends ReflectBaseClass {
       constructor() {
         this.name = 'Flop';
         this.args = {};
-        this.offset = null;
       }
 
       /**

@@ -22,7 +22,6 @@ class Composite extends ComposeBaseClass {
       constructor() {
         this.name = 'Composite';
         this.args = {};
-        this.offset = null;
       }
 
       /**

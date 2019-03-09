@@ -21,7 +21,6 @@ class ChannelAdjust extends ColorBaseClass {
       constructor() {
         this.name = 'ChannelAdjust';
         this.args = {};
-        this.offset = null;
       }
 
       /**

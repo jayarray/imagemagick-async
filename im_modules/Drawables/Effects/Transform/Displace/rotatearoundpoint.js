@@ -20,7 +20,6 @@ class RotateAroundPoint extends DisplaceBaseClass {
       constructor() {
         this.name = 'RotateAroundPoint';
         this.args = {};
-        this.offset = null;
       }
 
       /**

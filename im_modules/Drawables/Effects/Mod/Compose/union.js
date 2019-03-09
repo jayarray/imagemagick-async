@@ -20,7 +20,6 @@ class Union extends ComposeBaseClass {
       constructor() {
         this.name = 'Union';
         this.args = {};
-        this.offset = null;
       }
 
       /**

@@ -20,7 +20,6 @@ class ThreePointDistortion extends DistortBaseClass {
       constructor() {
         this.name = 'ThreePointDistortion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

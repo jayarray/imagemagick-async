@@ -19,7 +19,6 @@ class ColoringBookSketch extends FxBaseClass {
       constructor() {
         this.name = 'ColoringBookSketch';
         this.args = {};
-        this.offset = null;
       }
 
       /**

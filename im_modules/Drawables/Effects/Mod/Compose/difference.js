@@ -20,7 +20,6 @@ class Difference extends ComposeBaseClass {
       constructor() {
         this.name = 'Difference';
         this.args = {};
-        this.offset = null;
       }
 
       /**

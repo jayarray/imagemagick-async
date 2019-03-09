@@ -20,7 +20,6 @@ class Add extends ComposeBaseClass {
       constructor() {
         this.name = 'Add';
         this.args = {};
-        this.offset = null;
       }
 
       /**

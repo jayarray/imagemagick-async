@@ -20,7 +20,6 @@ class Flip extends ReflectBaseClass {
       constructor() {
         this.name = 'Flip';
         this.args = {};
-        this.offset = null;
       }
 
       /**

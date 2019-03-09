@@ -20,7 +20,6 @@ class ResizeFillGivenArea extends ResizeBaseClass {
       constructor() {
         this.name = 'ResizeFillGivenArea';
         this.args = {};
-        this.offset = null;
       }
 
       /**

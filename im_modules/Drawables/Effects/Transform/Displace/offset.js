@@ -19,7 +19,6 @@ class Offset extends DisplaceBaseClass {
       constructor() {
         this.name = 'Offset';
         this.args = {};
-        this.offset = null;
       }
 
       /**

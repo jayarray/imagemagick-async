@@ -20,7 +20,6 @@ class MultiplyWhiteTransparency extends ComposeBaseClass {
       constructor() {
         this.name = 'MultiplyWhiteTransparency';
         this.args = {};
-        this.offset = null;
       }
 
       /**

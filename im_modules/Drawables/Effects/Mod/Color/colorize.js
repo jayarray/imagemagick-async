@@ -20,7 +20,6 @@ class Colorize extends ColorBaseClass {
       constructor() {
         this.name = 'Colorize';
         this.args = {};
-        this.offset = null;
       }
 
       /**

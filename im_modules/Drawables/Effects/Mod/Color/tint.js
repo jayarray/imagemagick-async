@@ -20,7 +20,6 @@ class Tint extends ColorBaseClass {
       constructor() {
         this.name = 'Tint';
         this.args = {};
-        this.offset = null;
       }
 
       /**

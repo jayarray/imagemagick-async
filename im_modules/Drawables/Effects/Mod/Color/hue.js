@@ -20,7 +20,6 @@ class Hue extends ColorBaseClass {
       constructor() {
         this.name = 'Hue';
         this.args = {};
-        this.offset = null;
       }
 
       /**

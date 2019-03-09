@@ -19,7 +19,6 @@ class AutoLevel extends ColorBaseClass {
       constructor() {
         this.name = 'AutoLevel';
         this.args = {};
-        this.offset = null;
       }
 
       /**

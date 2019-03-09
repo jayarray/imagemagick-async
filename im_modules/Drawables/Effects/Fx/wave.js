@@ -19,7 +19,6 @@ class Wave extends FxBaseClass {
       constructor() {
         this.name = 'Wave';
         this.args = {};
-        this.offset = null;
       }
 
       /**

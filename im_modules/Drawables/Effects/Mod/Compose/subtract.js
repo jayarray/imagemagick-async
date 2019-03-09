@@ -20,7 +20,6 @@ class Subtract extends ComposeBaseClass {
       constructor() {
         this.name = 'Subtract';
         this.args = {};
-        this.offset = null;
       }
 
       /**

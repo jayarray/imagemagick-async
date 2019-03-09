@@ -20,7 +20,6 @@ class WhiteMask extends MASK_BASECLASS {
       constructor() {
         this.name = 'WhiteMask';
         this.args = {};
-        this.offset = null;
       }
 
       /**

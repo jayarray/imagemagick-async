@@ -19,7 +19,6 @@ class Implode extends FxBaseClass {
       constructor() {
         this.name = 'Implode';
         this.args = {};
-        this.offset = null;
       }
 
       /**

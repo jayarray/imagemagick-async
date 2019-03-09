@@ -20,7 +20,6 @@ class GrayscaleFormat extends ColorBaseClass {
       constructor() {
         this.name = 'GrayscaleFormat';
         this.args = {};
-        this.offset = null;
       }
 
       /**

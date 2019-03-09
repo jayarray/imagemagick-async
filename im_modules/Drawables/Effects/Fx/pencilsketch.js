@@ -19,7 +19,6 @@ class PencilSketch extends FxBaseClass {
       constructor() {
         this.name = 'PencilSketch';
         this.args = {};
-        this.offset = null;
       }
 
       /**

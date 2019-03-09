@@ -20,7 +20,6 @@ class ColorMask extends MaskBaseClass {
       constructor() {
         this.name = 'ColorMask';
         this.args = {};
-        this.offset = null;
       }
 
       /**

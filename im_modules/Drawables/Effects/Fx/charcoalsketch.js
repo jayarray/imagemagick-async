@@ -19,7 +19,6 @@ class CharcoalSketch extends FxBaseClass {
       constructor() {
         this.name = 'CharcoalSketch';
         this.args = {};
-        this.offset = null;
       }
 
       /**

@@ -20,7 +20,6 @@ class Roll extends DisplaceBaseClass {
       constructor() {
         this.name = 'Roll';
         this.args = {};
-        this.offset = null;
 
         this.args.horizontal = 0;
         this.args.vertical = 0;

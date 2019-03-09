@@ -20,7 +20,6 @@ class Negate extends ColorBaseClass {
       constructor() {
         this.name = 'Negate';
         this.args = {};
-        this.offset = null;
       }
 
       /**

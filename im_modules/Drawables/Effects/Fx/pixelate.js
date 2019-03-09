@@ -19,7 +19,6 @@ class Pixelate extends FxBaseClass {
       constructor() {
         this.name = 'Pixelate';
         this.args = {};
-        this.offset = null;
       }
 
       /**

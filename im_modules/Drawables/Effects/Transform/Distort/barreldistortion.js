@@ -21,7 +21,6 @@ class BarrelDistortion extends DistortBaseClass {
       constructor() {
         this.name = 'BarrelDistortion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

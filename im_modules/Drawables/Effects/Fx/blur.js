@@ -19,7 +19,6 @@ class Blur extends FxBaseClass {
       constructor() {
         this.name = 'Blur';
         this.args = {};
-        this.offset = null;
       }
 
       /**

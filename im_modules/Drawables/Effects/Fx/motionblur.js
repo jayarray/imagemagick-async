@@ -19,7 +19,6 @@ class MotionBlur extends FxBaseClass {
       constructor() {
         this.name = 'MotionBlur';
         this.args = {};
-        this.offset = null;
       }
 
       /**

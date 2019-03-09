@@ -20,7 +20,6 @@ class Replace extends ColorBaseClass {
       constructor() {
         this.name = 'Replace';
         this.args = {};
-        this.offset = null;
       }
 
       /**

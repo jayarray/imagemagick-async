@@ -20,7 +20,6 @@ class PolarDistortion extends DistortBaseClass {
       constructor() {
         this.name = 'PolarDistortion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

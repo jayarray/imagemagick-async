@@ -21,7 +21,6 @@ class FourPointDistortion extends DistortBaseClass {
       constructor() {
         this.name = 'FourPointDistortion';
         this.args = {};
-        this.offset = null;
       }
 
       /**

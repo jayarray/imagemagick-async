@@ -20,7 +20,6 @@ class Intersection extends ComposeBaseClass {
       constructor() {
         this.name = 'Intersection';
         this.args = {};
-        this.offset = null;
       }
 
       /**

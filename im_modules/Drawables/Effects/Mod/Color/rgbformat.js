@@ -20,7 +20,6 @@ class RgbFormat extends ColorBaseClass {
       constructor() {
         this.name = 'RgbFormat';
         this.args = {};
-        this.offset = null;
       }
 
       /**
