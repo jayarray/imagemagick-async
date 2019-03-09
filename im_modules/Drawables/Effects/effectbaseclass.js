@@ -10,8 +10,7 @@ class EffectBaseClass extends DrawableBaseClass {
     super({
       type: 'Effect',
       name: properties.name,
-      args: properties.args,
-      offset: properties.offset
+      args: properties.args
     });
 
     this.subtype = properties.subtype;  // Store the type of effect (i.e. fx, mod, transform)
