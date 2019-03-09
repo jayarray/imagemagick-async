@@ -6,6 +6,7 @@ let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
+let Offset = require(Path.join(Filepath.InputsDir(), 'offset.js'));
 let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 let Consolidator = require(Path.join(Filepath.LayerDir(), 'consolidator.js'));
 let PreProcessor = require(Path.join(Filepath.RenderDir(), 'preprocessor.js'));
@@ -59,44 +60,70 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
     // Create temp file destination
     let outputPath = Path.join(outputDir, Guid.Filename(Guid.DEFAULT_LENGTH, format));
 
-    // Get args
     let foundation = layer.args.foundation;
     let cmd = foundation.command;
-    let args = foundation.Args();
-    let primitives = layer.args.primitives;
 
-    // Add any primitive args
-    if (primitives.length > 0) {
 
-      // Get all primitive args
-      let primitiveArgs = [];
-      primitives.forEach(p => primitiveArgs.concat(p.Args()));
+    if (cmd != 'convert') {
+      let args = foundation.Args();
+      args.push(outputPath);
 
-      // Determine orderof args
-      if (layer.args.drawPrimitivesFirst)
-        args = primitiveArgs.concat(args);
-      else
-        args = args.concat(primitiveArgs);
+      // Render foundation first
+      LocalCommand.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        // Draw primtives next
+        let primitives = layer.args.primitives;
+
+        DrawPrimitivesSecond(outputPath, primitives).then(success => {
+
+          // Return render filepath
+          resolve(outputPath);
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
     }
+    else {
+      let args = foundation.Args();
 
-    // Append destination
-    args = args.concat(outputPath);
-
-    // Insert source (if applicable)
-    if (foundation.type != 'Canvas') {
-      let source = foundation.args.source;
-      args = [source].concat(args);
-    }
-
-    // Render image
-    LocalCommand.Execute(cmd, args).then(output => {
-      if (output.stderr) {
-        reject(output.stderr);
-        return;
+      // Insert source to args (if applicable)
+      if (foundation.type != 'Canvas') {
+        let source = foundation.args.source;
+        args = [source].concat(args);
       }
 
-      resolve(outputPath);
-    }).catch(error => reject(error));
+      // Add any primitive args
+      let primitives = layer.args.primitives;
+
+      if (primitives.length > 0) {
+
+        // Get all primitive args
+        let primitiveArgs = [];
+        primitives.forEach(p => primitiveArgs.concat(p.Args()));
+
+        // Determine orderof args
+        if (layer.args.drawPrimitivesFirst)
+          args = primitiveArgs.concat(args);
+        else
+          args = args.concat(primitiveArgs);
+      }
+
+      // Append destination
+      args = args.push(outputPath);
+
+      // Render image
+      LocalCommand.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        // Return render filepath
+        resolve(outputPath);
+      }).catch(error => reject(error));
+    }
   });
 }
 
@@ -108,7 +135,7 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
 function DrawPrimitivesSecond(source, primitives) {
   return new Promise((resolve, reject) => {
     let cmd = 'convert';
-    let args = [];
+    let args = [source];
 
     // Add primitive args
     let primitiveArgs = [];
@@ -501,40 +528,80 @@ class Renderer {
 
         RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
 
-          // Render all overlays in parallel
+          // Check if there are any overlays to render.
+          let overlays = layer.args.overlays;
 
-          let actions = [];
+          if (overlays.length == 0) {
 
-          overlays.forEach(oLayer => {
-            let a = RenderLayer(oLayer, tempDirPath, format);
-            actions.push(a);
-          });
+            // Move file to destination
+            LinuxCommands.Move.Move(recentFilepath, this.outputPath_, LocalCommand).then(success => {
 
-          Promise.all(actions).then(results => {
-
-            // Merge layers together and move to destination
-            let outputPaths = results;
-            let filepathOffsetTuples = [];
-
-            for (let i = 0; i < outputPaths.length; ++i) {
-              let currOverlay = overlays[i];
-              let currFoundation = currOverlay.args.foundation;
-              let currOffset = currFoundation.offset;
-              let currOutputPath = outputPaths[i];
-              let tuple = { filepath: currOutputPath, offset: currOffset };
-              filepathOffsetTuples.push(tuple);
-            }
-
-            let gravity = this.layer_.args.gravity;
-
-            ComposeImages(recentFilepath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
-
-              // Clean up temp dir
+              // Clean up temp directory
               LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
-                resolve();
+
+                // Return render filepath
+                resolve(this.outputPath_);
               }).catch(error => reject(`RENDERER_ERROR: ${error}`));
             }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-          }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+          }
+          else {
+            // Render all overlays in parallel
+
+            let actions = [];
+
+            overlays.forEach(oLayer => {
+              let a = RenderLayer(oLayer, tempDirPath, format);
+              actions.push(a);
+            });
+
+            Promise.all(actions).then(results => {
+
+              // Merge layers together and move to destination
+              let outputPaths = results;
+              let filepathOffsetTuples = [];
+
+              for (let i = 0; i < outputPaths.length; ++i) {
+                let currOverlay = overlays[i];
+                let currOffset = currOverlay.args.offset;
+                let currOutputPath = outputPaths[i];
+                let tuple = { filepath: currOutputPath, offset: null };
+
+                // Check if recent render was from RotateImage module. (Its enlarged dimensions require offsetting!)
+
+                let currFoundation = currOverlay.args.foundation;
+                let renderedFromRotateImage = currFoundation.name == 'RotateImage';
+
+                if (renderedFromRotateImage) {
+                  let rotateImageOffsets = currFoundation.offset;
+
+                  let adjustedOffset = Offset.Builder
+                    .x(currOffset.args.x + rotateImageOffsets.x)
+                    .y(currOffset.args.y + rotateImageOffsets.y)
+                    .build();
+
+                  tuple.offset = adjustedOffset;
+                }
+                else {
+                  tuple.offset = currOffset;
+                }
+
+                filepathOffsetTuples.push(tuple);
+              }
+
+              let gravity = this.layer_.args.gravity;
+
+              // Render final image to destination
+              ComposeImages(recentFilepath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
+
+                // Clean up temp dir
+                LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
+
+                  // Return render filepath
+                  resolve(this.outputPath_);
+                }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+              }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+            }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+          }
         }).catch(error => reject(`RENDERER_ERROR: ${error}`));
       }).catch(error => reject(`RENDERER_ERROR: ${error}`));
     });
