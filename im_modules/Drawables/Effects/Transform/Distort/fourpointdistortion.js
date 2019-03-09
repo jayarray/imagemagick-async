@@ -47,16 +47,7 @@ class FourPointDistortion extends DistortBaseClass {
         this.args.controlSet2 = coordinatesArr;
         return this;
       }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
-        return this;
-      }
-
+      
       build() {
         return new FourPointDistortion(this);
       }

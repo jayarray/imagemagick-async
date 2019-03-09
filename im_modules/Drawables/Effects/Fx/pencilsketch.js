@@ -53,16 +53,7 @@ class PencilSketch extends FxBaseClass {
         this.args.angle = n;
         return this;
       }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
-        return this;
-      }
-
+      
       build() {
         return new PencilSketch(this);
       }

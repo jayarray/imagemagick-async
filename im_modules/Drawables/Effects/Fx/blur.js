@@ -54,15 +54,6 @@ class Blur extends FxBaseClass {
         return this;
       }
 
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
-        return this;
-      }
-
       build() {
         return new Blur(this);
       }

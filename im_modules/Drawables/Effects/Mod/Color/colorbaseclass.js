@@ -10,7 +10,6 @@ class ColorBaseClass extends ModBaseClass {
     super({
       name: properties.name,
       args: properties.args,
-      offset: properties.offset,
       command: 'convert'
     });
   }

@@ -37,16 +37,7 @@ class Swirl extends FxBaseClass {
         this.args.color = color;
         return this;
       }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
-        return this;
-      }
-
+      
       build() {
         return new Swirl(this);
       }

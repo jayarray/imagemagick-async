@@ -20,7 +20,6 @@ class Transverse extends ReflectBaseClass {
       constructor() {
         this.name = 'Transverse';
         this.args = {};
-        this.offset = null;
       }
 
       /**
@@ -28,15 +27,6 @@ class Transverse extends ReflectBaseClass {
        */
       source(str) {
         this.args.source = str;
-        return this;
-      }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
         return this;
       }
 

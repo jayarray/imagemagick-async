@@ -10,7 +10,6 @@ class CompareBaseClass extends ModBaseClass {
     super({
       name: properties.name,
       args: properties.args,
-      offset: properties.offset,
       command: properties.command
     });
   }

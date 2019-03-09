@@ -9,8 +9,7 @@ class DistortBaseClass extends TransformBaseClass {
   constructor(properties) {
     super({
       name: properties.name,
-      args: properties.args,
-      offset: properties.offset,
+      args: properties.args
     });
   }
 

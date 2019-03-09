@@ -40,16 +40,7 @@ class Composite extends ComposeBaseClass {
         this.args.gravity = str;
         return this;
       }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
-        return this;
-      }
-
+      
       build() {
         return new Composite(this);
       }

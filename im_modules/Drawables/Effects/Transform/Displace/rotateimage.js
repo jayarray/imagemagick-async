@@ -12,6 +12,7 @@ class RotateImage extends DisplaceBaseClass {
     super(builder);
 
     this.hypotenuse = builder.hypotenuse;
+    this.offset = builder.offset;
   }
 
   /**
@@ -22,9 +23,8 @@ class RotateImage extends DisplaceBaseClass {
       constructor() {
         this.name = 'RotateImage';
         this.args = {};
-        this.offset = null;
-
-        this.hypotenuse = null;
+        this.offset = null;     // {x: number, y: number}
+        this.hypotenuse = null; // number
       }
 
       /**
@@ -56,15 +56,6 @@ class RotateImage extends DisplaceBaseClass {
        */
       degrees(n) {
         this.args.degrees = n;
-        return this;
-      }
-
-      /**
-       * @param {number} x 
-       * @param {number} y 
-       */
-      offset(x, y) {
-        this.offset = { x: x, y: y };
         return this;
       }
 
