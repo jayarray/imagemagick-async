@@ -10,7 +10,6 @@ class DrawableBaseClass extends ObjectInterface {
     this.type = properties.type;
     this.name = properties.name;
     this.args = properties.args;
-    this.offset = properties.offset ? properties.offset : { x: 0, y: 0 };
   }
 
   /**
