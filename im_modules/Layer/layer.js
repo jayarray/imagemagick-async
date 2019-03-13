@@ -4,7 +4,7 @@ let Err = require(Path.join(RootDir, 'error.js'));
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Offset = require(Path.join(Filepath.InputsDir(), 'offset.js')).Offset;
-let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.js')).values;
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values;
 let ObjectInterface = require(Path.join(RootDir, 'objectinterface.js')).ObjectInterface;
 
 //-------------------------------------

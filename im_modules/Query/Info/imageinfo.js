@@ -1,7 +1,7 @@
 let Path = require('path');
 let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let InfoBaseClass = require(Path.join(Filepath.QueryInfo(), 'infobaseclass.js')).InfoBaseClass;
+let InfoBaseClass = require(Path.join(Filepath.QueryInfoDir(), 'infobaseclass.js')).InfoBaseClass;
 
 //------------------------------------
 

@@ -111,7 +111,7 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
       }
 
       // Append destination
-      args = args.push(outputPath);
+      args.push(outputPath);
 
       // Render image
       LocalCommand.Execute(cmd, args).then(output => {

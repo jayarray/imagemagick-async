@@ -5,7 +5,6 @@ let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let PathPrimitive = require(Path.join(Filepath.PrimitivesDir(), 'path.js')).Path;
-let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 let HelperFunctions = require(Path.join(Filepath.ShapesDir(), 'helperfunctions.js'));
 let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
 

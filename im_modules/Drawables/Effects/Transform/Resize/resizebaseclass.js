@@ -17,4 +17,4 @@ class ResizeBaseClass extends TransformBaseClass {
 //--------------------------------
 // EXPORTS
 
-exports.ReflectBaseClass = ReflectBaseClass;
+exports.ResizeBaseClass = ResizeBaseClass;

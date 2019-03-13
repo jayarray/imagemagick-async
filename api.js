@@ -309,11 +309,31 @@ Api.Inputs = {
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
 
+// Layer
+
+Api.Layer = {
+  Layer: require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer
+}
+
 
 // Query
 
 Api.Query = {
-  GetFileInfo: require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo
+  Info: {
+    GetFileInfo: require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo
+  },
+  List: {
+    ColorChannels: require(Path.join(Filepath.QueryListDir(), 'colorchannels.js')).ColorChannels,
+    Fonts: require(Path.join(Filepath.QueryListDir(), 'fonts.js')).Fonts,
+    Gravity: require(Path.join(Filepath.QueryListDir(), 'gravity.js')).Gravity
+  }
+}
+
+
+// Render
+
+Api.Render = {
+  Renderer: require(Path.join(Filepath.RenderDir(), 'renderer.js')).Renderer
 }
 
 

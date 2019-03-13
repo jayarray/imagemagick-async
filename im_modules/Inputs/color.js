@@ -336,7 +336,6 @@ function ParseHextString(hexStr) {
 class Color extends InputsBaseClass {
   constructor(builder) {
     super(builder);
-    this.format = builder.format;
   }
 
   /**
@@ -410,15 +409,16 @@ class Color extends InputsBaseClass {
    */
   Info() {
     let parsedInfo = null;
+    let format = this.args.format;
 
-    if (this.format == 'string') {
+    if (format == 'string') {
       parsedInfo = ParseHextString(this.args.hexString.toLowerCase());
     }
-    else if (this.format == 'integers') {
+    else if (format == 'integers') {
       let hexStr = RGBAIntegersToHexString(r, g, b, a);
       parsedInfo = ParseHextString(hexStr.toLowerCase());
     }
-    else if (this.format == 'percents') {
+    else if (format == 'percents') {
       let hexStr = RGBAPercentsToHexString(r, g, b, a);
       parsedInfo = ParseHextString(hexStr.toLowerCase());
     }
@@ -433,11 +433,13 @@ class Color extends InputsBaseClass {
     let info = this.Info();
     let str = '';
 
-    if (this.format == 'string')
+    let format = this.args.format;
+    
+    if (format == 'string')
       str = info.hex.string;
-    else if (this.format == 'integers')
+    else if (format == 'integers')
       str = info.numbers.string;
-    else if (this.format == 'percents')
+    else if (format == 'percents')
       str = info.percents.string;
 
     return str;

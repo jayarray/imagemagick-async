@@ -7,7 +7,7 @@ let MaskBaseClass = require(Path.join(Filepath.ModMasksDir(), 'maskbaseclass.js'
 
 //------------------------------
 
-class WhiteMask extends MASK_BASECLASS {
+class WhiteMask extends MaskBaseClass {
   constructor(builder) {
     super(builder);
   }

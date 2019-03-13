@@ -27,4 +27,4 @@ class EffectBaseClass extends DrawableBaseClass {
 //---------------------------
 // EXPORTS
 
-exports.EffectBase = EffectBaseClass;
+exports.EffectBaseClass = EffectBaseClass;

@@ -378,7 +378,7 @@ class Filepath {
    */
   static RenderDir() {
     return Filepath.Builder
-      .partialPath(Filepath.ImModulesDir())
+      .partialPath(Filepath.RootDir())
       .dir('Render')
       .build()
       .String();

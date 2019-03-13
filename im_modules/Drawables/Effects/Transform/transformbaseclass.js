@@ -20,4 +20,4 @@ class TransformBaseClass extends EffectBaseClass {
 //--------------------------------
 // EXPORTS
 
-exports.ModBaseClass = ModBaseClass;
+exports.TransformBaseClass = TransformBaseClass;

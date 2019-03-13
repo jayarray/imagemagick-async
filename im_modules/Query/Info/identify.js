@@ -2,9 +2,9 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let ImageInfo = require(Path.join(Filepath.QueryInfo(), 'imageinfo.js')).ImageInfo;
-let GifInfo = require(Path.join(Filepath.QueryInfo(), 'gifinfo.js')).GifInfo;
-let Guid = require(PATH.join(Filepath.LayerDir(), 'guid.js'));
+let ImageInfo = require(Path.join(Filepath.QueryInfoDir(), 'imageinfo.js')).ImageInfo;
+let GifInfo = require(Path.join(Filepath.QueryInfoDir(), 'gifinfo.js')).GifInfo;
+let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 
 let LinuxCommands = require('linux-commands-async');
 let LocalCommand = require('linux-commands-async').Command.LOCAL;

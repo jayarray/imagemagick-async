@@ -35,7 +35,7 @@ class ColorCanvas extends CanvasBaseClass {
        * @param {number} n Height in pixels.
        */
       height(n) {
-        this.args.height = height;
+        this.args.height = n;
         return this;
       }
 

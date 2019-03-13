@@ -1,7 +1,7 @@
 let Path = require('path');
 let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let InputsBaseClass = require(PATH.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
+let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.js')).InputsBaseClass;
 
 //------------------------------
 

@@ -3,7 +3,7 @@ let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.js')).values;
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values;
 let ComposeBaseClass = require(Path.join(Filepath.ModComposeDir(), 'composebaseclass.js')).ComposeBaseClass;
 
 

@@ -78,16 +78,6 @@ class BarrelDistortion extends DistortBaseClass {
     return new Builder();
   }
 
-  constructor(src, a, b, c, d, center) {
-    super();
-    this.src_ = src;
-    this.a_ = a;
-    this.b_ = b;
-    this.c_ = c;
-    this.d_ = d;
-    this.center_ = center;
-  }
-
   /**
    * @override
    */
