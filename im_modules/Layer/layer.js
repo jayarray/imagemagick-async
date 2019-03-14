@@ -52,6 +52,16 @@ class Layer extends ObjectInterface {
        */
       overlay(layer) {
         this.args.overlays.push(layer);
+        return this;
+      }
+
+      /**
+       * Add many layers on top of the others.
+       * @param {Array<Layer>} layersArr
+       */
+      overlays(layersArr) {
+        this.args.overlays = this.args.overlays.concat(layersArr);
+        return this;
       }
 
       /**
@@ -63,11 +73,28 @@ class Layer extends ObjectInterface {
       }
 
       /**
+       * @param {Array<Effect>} effectsArr
+       */
+      applyManyEffects(effectsArr) {
+        this.args.appliedEffects = this.args.appliedEffects.concat(effectsArr);
+        return this;
+      }
+
+      /**
        * Draw a Primitive type on the foundation layer.
        * @param {Primitive} primitive 
        */
       draw(primitive) {
         this.args.primitives.push(primitive);
+        return this;
+      }
+
+      /**
+       * Draw a list of Primitive types on the foundation layer.
+       * @param {Array<Primitive>} primitivesArr
+       */
+      drawMany(primitivesArr) {
+        this.args.primitives = this.args.primitives.concat(primitivesArr);
         return this;
       }
 
