@@ -323,7 +323,7 @@ function ApplyEffectsSecond(layer, outputDir, format) {
 
           // Append destination
           let filepath = currObj.filepath;
-          args = args.push(filepath);
+          args.push(filepath);
           filepathList.push(filepath);
 
           // Render image
@@ -494,13 +494,30 @@ function RenderSpecialCommandWithEffects(layer, outputDir, format) {
 
 
 /**
- * Use when rendering Special command!
+ * Use when rendering Special sequence!
  * @param {Layer} layer
  * @param {string} outputDir
  * @param {string} format
  * @returns {Promise<string>} Returns a Promise with the output path.
  */
-function RenderSpecialSequence(layer, outputDir, format) {
+function RenderSpecialSequenceWithoutEffects(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let tempOutputPath = Path.join(outputDir, filename);
+
+    // TO DO
+    // No sequences yet.
+  });
+}
+
+/**
+ * Use when rendering Special sequence!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderSpecialSequenceWithEffects(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
     let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
     let tempOutputPath = Path.join(outputDir, filename);
@@ -523,8 +540,6 @@ function RenderSpecialLayer(layer, outputDir, format) {
     let subtype = foundation.subtype;
     let appliedEffects = layer.args.appliedEffects;
 
-    let action = null;
-
     if (subtype == 'command') {
       if (appliedEffects.length == 0) { // NO EFFECTS
         RenderSpecialCommandWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
@@ -532,45 +547,23 @@ function RenderSpecialLayer(layer, outputDir, format) {
         }).catch(error => reject(error));
       }
       else { // EFFECTS APPLIED
-        if (layer.args.drawPrimitivesFirst) {
-          // Render special command first
-          RenderSpecialCommandWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
-
-            // Draw primitives next (if any)
-            let primitives = layer.args.primitives;
-
-            if (primitives.length == 0) {
-              resolve(foundationTempOutputPath);
-            }
-            else {
-              DrawPrimitivesSecond(foundationTempOutputPath, primitives).then(recentFilepath => {
-
-                // Apply effects (if any)
-                RenderSpecialCommandWithEffects(layer, outputDir, format).then(latestFilepath => { // CONT
-                  resolve(latestFilepath);
-                }).catch(error => reject(error));
-              }).catch(error => reject(error));
-            }
-          }).catch(error => reject(error));
-        }
-        else {
-
-        }
+        RenderSpecialCommandWithEffects(layer, outputDir, format).then(recentFilepath => {
+          resolve(recentFilepath);
+        }).catch(error => reject(error));
       }
-
     }
     else if (subtype == 'sequence') {
       if (appliedEffects.length == 0) {
-        action = RenderSpecialSequenceWithoutEffects(layer, outputDir, format);  // TO DO: Create function
+        RenderSpecialSequenceWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => { // TO DO: Create function
+          resolve(foundationTempOutputPath);
+        }).catch(error => reject(error));
       }
       else {
-        action = RenderSpecialCommandWithEffects(layer, outputDir, format); // TO DO: create function
+        RenderSpecialSequenceWithEffects(layer, outputDir, format).then(foundationTempOutputPath => { // TO DO: Create function
+          resolve(foundationTempOutputPath);
+        }).catch(error => reject(error));
       }
     }
-
-    action.then(recentFilepath => {
-      resolve(recentFilepath);
-    }).catch(error => reject(error));
   });
 }
 
