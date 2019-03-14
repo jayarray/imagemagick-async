@@ -193,7 +193,7 @@ Api.Drawables = {
   },
   Effects: {
     Fx: {
-      Aura: require(Path.join(Filepath.FxDir(), 'aura.js')).Aura,
+      Aura: require(Path.join(Filepath.SpecialCommandDir(), 'aura.js')).Aura,
       Blur: require(Path.join(Filepath.FxDir(), 'blur.js')).Blur,
       CharcoalSketch: require(Path.join(Filepath.FxDir(), 'charcoalsketch.js')).CharcoalSketch,
       ColoringBookSketch: require(Path.join(Filepath.FxDir(), 'coloringbooksketch.js')).ColoringBookSketch,
