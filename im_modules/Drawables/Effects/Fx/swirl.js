@@ -33,7 +33,7 @@ class Swirl extends FxBaseClass {
        * @param {number} n Number of degrees to swirl. Positive values mean clockwise swirl. Negative values mean counter-clockwise swirl.
        */
       degrees(n) {
-        this.args.color = color;
+        this.args.degrees = n;
         return this;
       }
       
