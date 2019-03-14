@@ -156,6 +156,39 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
+  static SpecialDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.DrawablesDir())
+      .dir('Special')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static SpecialCommandDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.SpecialDir())
+      .dir('Command')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static SpecialSequenceDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.SpecialDir())
+      .dir('Sequence')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
   static EffectsDir() {
     return Filepath.Builder
       .partialPath(Filepath.DrawablesDir())
