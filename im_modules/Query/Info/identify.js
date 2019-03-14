@@ -618,33 +618,7 @@ class ImageInfoDecomissioned {
   }
 
   AllPixels(tempDir) {
-
-  }
-
-  /**
-   * Create an ImageInfo object.
-   * @param {string} src Source
-   * @returns {Promise<ImageInfo>} Returns a promise. If it resolves, it returns an object. Otherwise, it returns an error.
-   */
-  static Create(src) {
-    let error = Validate.IsStringInput(src);
-    if (error)
-      return Promise.reject(`Failed to get image info: source is ${error}`);
-
-    return new Promise((resolve, reject) => {
-      Format(src).then(format => {
-        if (format == 'gif') {
-          GetGifInfo(src).then(info => {
-            resolve(new ImageInfo(src, info, true));
-          }).catch(error => `Failed to get image info: ${error}`);
-        }
-        else {
-          GetImageInfo(src).then(info => {
-            resolve(new ImageInfo(src, info, false));
-          }).catch(error => `Failed to get image info: ${error}`);
-        }
-      });
-    });
+    // TO DO (???)
   }
 }
 
