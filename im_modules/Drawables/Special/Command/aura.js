@@ -2,15 +2,13 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseClass;
+let CommandBaseClass = require(Path.join(Filepath.SpecialCommandDir(), 'commandbaseclass.js')).CommandBaseClass;
 
 //---------------------------------
 
-class Aura extends FxBaseClass {
+class Aura extends CommandBaseClass {
   constructor(builder) {
     super(builder);
-
-    this.usesImageStack = true;
   }
 
   /**
@@ -75,9 +73,7 @@ class Aura extends FxBaseClass {
   /**
    * @override 
    */
-  Args() {
-    let args = ['\\(', '+clone', '-channel', 'A', '-blur', `${this.args.blurRadius}x${this.args.blurSigma}`];
-
+  Command() {
     let adjustedOpacity = 100 - this.args.opacity;
 
     if (adjustedOpacity >= 1)
@@ -85,9 +81,11 @@ class Aura extends FxBaseClass {
     else
       adjustedOpacity = Math.max(adjustedOpacity, 0.1);
 
-    args.push('-level', `0,${adjustedOpacity}%`, '+channel', '+level-colors', this.args.color.String(), '\\)', '-compose', 'DstOver', '-composite');
+    let cmdStr = `convert ${this.args.source}`;
+    cmdStr += ` \\( +clone -channel A -blur ${this.args.blurRadius}x${this.args.blurSigma} -level 0,${adjustedOpacity}% +channel +level-colors '${this.args.color.String()}' \\)`;
+    cmdStr += ' -compose DstOver -composite';
 
-    return args;
+    return cmdStr;
   }
 
   /**
@@ -175,13 +173,6 @@ class Aura extends FxBaseClass {
       errors.push(blurSigmaErr);
 
     return errors;
-  }
-
-  /**
-   * @override
-   */
-  static IsConsolidatable() {
-    return false;
   }
 
   /**
