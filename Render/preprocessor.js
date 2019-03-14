@@ -38,7 +38,7 @@ function GetTempFilepath(currDirPath, format) {
  */
 function PreprocessDrawablesForRendering(layer, outputDir, format, includeFoundation) {
   let foundation = layer.args.foundation;
-  let appliedEffects = layer.args.appliedeffects;
+  let appliedEffects = layer.args.appliedEffects;
 
   let consolidatedGroups = null;
   if (includeFoundation)
