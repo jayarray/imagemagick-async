@@ -9,6 +9,8 @@ let FxBaseClass = require(Path.join(Filepath.FxDir(), 'fxbaseclass.js')).FxBaseC
 class Aura extends FxBaseClass {
   constructor(builder) {
     super(builder);
+
+    this.usesImageStack = true;
   }
 
   /**
