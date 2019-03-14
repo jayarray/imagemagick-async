@@ -10,6 +10,9 @@ let Offset = require(Path.join(Filepath.InputsDir(), 'offset.js'));
 let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 let Consolidator = require(Path.join(Filepath.LayerDir(), 'consolidator.js'));
 let PreProcessor = require(Path.join(Filepath.RenderDir(), 'preprocessor.js'));
+let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
+let ImageCanvas = require(Path.join(Filepath.CanvasDir(), 'imagecanvas.js')).ImageCanvas;
+let Identify = require(Path.join(Filepath.QueryInfoDir(), 'identify.js'));
 
 //-----------------------------------
 // HELPER FUNCTIONS
@@ -352,23 +355,26 @@ function ApplyEffectsSecond(layer, outputDir, format) {
 }
 
 /**
+ * Use when rendering a normal layer!
  * @param {Layer} layer
  * @param {string} outputDir
  * @param {string} format
  * @returns {Promise<string>} Returns a Promise with the output path.
  */
-function RenderLayer(layer, outputDir, format) {
+function RenderNormalLayer(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
     let appliedEffects = layer.args.appliedEffects;
 
-    if (appliedEffects.length == 0) {
+    if (appliedEffects == 0) {
+      // Render foundation only
       RenderFoundationTempFileWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
         resolve(foundationTempOutputPath);
       }).catch(error => reject(error));
     }
     else {
-      if (layer.args.drawPrimitivesFirst) {
+      let drawPrimitivesFirst = layer.args.drawPrimitivesFirst;
 
+      if (drawPrimitivesFirst) {
         // Render foundation with primitives
         RenderFoundationTempFileWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
 
@@ -391,15 +397,203 @@ function RenderLayer(layer, outputDir, format) {
         ApplyEffectsFirst(layer, outputDir, format).then(recentFilepath => {
           let primitives = layer.args.primitives;
 
-          // Draw primitives
-          DrawPrimitivesSecond(recentFilepath, primitives).then(success => {
-
-            // Return path to rendered image
+          if (primitives.length == 0) {
             resolve(recentFilepath);
-          }).catch(error => reject(error));
+          }
+          else {
+            // Draw primitives
+            DrawPrimitivesSecond(recentFilepath, primitives).then(success => {
+
+              // Return path to rendered image
+              resolve(recentFilepath);
+            }).catch(error => reject(error));
+          }
         }).catch(error => reject(error));
       }
     }
+  });
+}
+
+/**
+ * Use when rendering Special command!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderSpecialCommandWithoutEffects(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let cmd = layer.args.foundation.Command();
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let tempOutputPath = Path.join(outputDir, filename);
+    let cmdStr = `${cmd} ${tempOutputPath}`;
+
+    LocalCommand.Execute(cmdStr, []).then(output => {
+      if (output.stderr) {
+        reject(output.stderr);
+        return;
+      }
+
+      // Get recent render info
+      Identify.GetInfo(tempOutputPath).then(info => {
+        let dimensions = info.Dimensions();
+
+        let imgCanvas = ImageCanvas.Builder
+          .width(dimensions.width)
+          .height(dimensions.height)
+          .source(tempOutputPath)
+          .build();
+
+        layer.args.foundation = imgCanvas;
+
+        // Render layer with modified foundation
+        resolve(RenderFoundationTempFileWithoutEffects(layer, outputDir, format));
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * Use when rendering Special command!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderSpecialCommandWithEffects(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let cmd = layer.args.foundation.Command();
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let tempOutputPath = Path.join(outputDir, filename);
+    let cmdStr = `${cmd} ${tempOutputPath}`;
+
+    LocalCommand.Execute(cmdStr, []).then(output => {
+      if (output.stderr) {
+        reject(output.stderr);
+        return;
+      }
+
+      // Get recent render info
+      Identify.GetInfo(tempOutputPath).then(info => {
+        let dimensions = info.Dimensions();
+
+        let imgCanvas = ImageCanvas.Builder
+          .width(dimensions.width)
+          .height(dimensions.height)
+          .source(tempOutputPath)
+          .build();
+
+        layer.args.foundation = imgCanvas;
+
+        // Render layer with modified foundation
+        resolve(RenderNormalLayer(layer, outputDir, format));
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * Use when rendering Special command!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderSpecialSequence(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let tempOutputPath = Path.join(outputDir, filename);
+
+    // TO DO
+    // No sequences yet.
+  });
+}
+
+/**
+ * Use when rendering Special command!
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderSpecialLayer(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let foundation = layer.args.foundation;
+    let subtype = foundation.subtype;
+    let appliedEffects = layer.args.appliedEffects;
+
+    let action = null;
+
+    if (subtype == 'command') {
+      if (appliedEffects.length == 0) { // NO EFFECTS
+        RenderSpecialCommandWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
+          resolve(foundationTempOutputPath);
+        }).catch(error => reject(error));
+      }
+      else { // EFFECTS APPLIED
+        if (layer.args.drawPrimitivesFirst) {
+          // Render special command first
+          RenderSpecialCommandWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
+
+            // Draw primitives next (if any)
+            let primitives = layer.args.primitives;
+
+            if (primitives.length == 0) {
+              resolve(foundationTempOutputPath);
+            }
+            else {
+              DrawPrimitivesSecond(foundationTempOutputPath, primitives).then(recentFilepath => {
+
+                // Apply effects (if any)
+                RenderSpecialCommandWithEffects(layer, outputDir, format).then(latestFilepath => { // CONT
+                  resolve(latestFilepath);
+                }).catch(error => reject(error));
+              }).catch(error => reject(error));
+            }
+          }).catch(error => reject(error));
+        }
+        else {
+
+        }
+      }
+
+    }
+    else if (subtype == 'sequence') {
+      if (appliedEffects.length == 0) {
+        action = RenderSpecialSequenceWithoutEffects(layer, outputDir, format);  // TO DO: Create function
+      }
+      else {
+        action = RenderSpecialCommandWithEffects(layer, outputDir, format); // TO DO: create function
+      }
+    }
+
+    action.then(recentFilepath => {
+      resolve(recentFilepath);
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * @param {Layer} layer
+ * @param {string} outputDir
+ * @param {string} format
+ * @returns {Promise<string>} Returns a Promise with the output path.
+ */
+function RenderLayer(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let foundation = layer.args.foundation;
+
+    let action = null;
+
+    if (foundation.type == 'Special')
+      action = RenderSpecialLayer(layer, outputDir, format);
+    else
+      action = RenderNormalLayer(layer, outputDir, format);
+
+    action.then(tempOutputPath => {
+      resolve(tempOutputPath);
+    }).catch(error => reject(error));
   });
 }
 
