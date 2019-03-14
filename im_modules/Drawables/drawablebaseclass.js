@@ -10,7 +10,6 @@ class DrawableBaseClass extends ObjectInterface {
     this.type = properties.type;
     this.name = properties.name;
     this.args = properties.args; 
-    this.usesImageStack = false;  // true if command uses parentheses and other IM stack operations. (Change in subclass if needed)
   }
 
   /**
