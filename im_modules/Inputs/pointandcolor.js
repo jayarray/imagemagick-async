@@ -50,7 +50,7 @@ class PointAndColor extends InputsBaseClass {
    */
   String() {
     let colorStr = this.args.color.String();
-    return `${this.args.point.args.x},${this.point.args.y} ${colorStr}`;
+    return `${this.args.point.args.x},${this.args.point.args.y} ${colorStr}`;
   }
 
   /**
