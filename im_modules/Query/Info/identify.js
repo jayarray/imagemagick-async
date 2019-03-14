@@ -1,6 +1,7 @@
 let Path = require('path');
 let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
+let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let ImageInfo = require(Path.join(Filepath.QueryInfoDir(), 'imageinfo.js')).ImageInfo;
 let GifInfo = require(Path.join(Filepath.QueryInfoDir(), 'gifinfo.js')).GifInfo;
@@ -33,11 +34,10 @@ function ParseGeometry(geometryStr) {
       args.push(str);
       str = '';
     }
-  }
 
-  // Push any remaining string to args list
-  if (str != '')
-    args.push(str);
+    if (i == geometryStr.length - 1 && str.length != 0)
+      args.push(str);
+  }
 
   return {
     width: parseInt(args[0]),
@@ -159,6 +159,7 @@ function ParseImageInfo(infoStr) {
   let geometry = ParseGeometry(geometryStr);
   object.width = geometry.width;
   object.height = geometry.height;
+  object.geometry = geometry;
 
   // Color space
   line = GetLineContaining(lines, 'Colorspace:').string;
@@ -235,10 +236,6 @@ function ParseImageInfo(infoStr) {
  * @returns {Promise<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
 function GetImageInfo(src) {
-  let error = Validate.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to get image info: source is ${error}`);
-
   return new Promise((resolve, reject) => {
     LocalCommand.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
       if (output.stderr) {
@@ -322,10 +319,6 @@ function ParseGifInfo(infoStr) {
  * @returns {Promise<{frameCount: number, path: string, images: Array<{filename: string, format: string, width: number, height: number, colorspace: string, depth: string, size: string, path:string, statistics: {red: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, blue: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, green: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, alpha: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }, overall: {min: {number: number, percent: number}, max: {number: number, percent: number}, mean: {number: number, percent: number}, std: {number: number, percent: number}, kurtosis: number, skewness: number, entropy: number }}>}>}} Returns a Promise. If it resolves it returns an object. Otherwise, it returns an error.
  */
 function GetGifInfo(src) {
-  let error = Validate.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to get GIF info: source is ${error}`);
-
   return new Promise((resolve, reject) => {
     GifFrameCount(src).then(frameCount => {
       LocalCommand.Execute('identify', ['-verbose', `info:${src}`]).then(output => {
@@ -364,10 +357,6 @@ function GetGifInfo(src) {
  * @returns {Promise<string>} Returns a promise. If it resolves, it returns a lowercase string representing the format type. Otherwise, it returns an error.
  */
 function Format(src) {
-  let error = Validate.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to identify format: source is ${error}`);
-
   return new Promise((resolve, reject) => {
     LocalCommand.Execute('identify', ['-format', '%m', src]).then(output => {
       if (output.stderr) {
@@ -391,10 +380,6 @@ function Format(src) {
 //------------------------------------
 
 function GetInfo(src) {
-  let error = Validate.IsStringInput(src);
-  if (error)
-    return Promise.reject(`Failed to get info: source is ${error}`);
-
   return new Promise((resolve, reject) => {
     Format(src).then(format => {
       if (format == 'gif') {
