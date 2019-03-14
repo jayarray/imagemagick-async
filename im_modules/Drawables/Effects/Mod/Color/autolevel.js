@@ -71,7 +71,7 @@ class AutoLevel extends ColorBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

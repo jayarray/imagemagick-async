@@ -17,7 +17,7 @@ class MaskBaseClass extends ModBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 }

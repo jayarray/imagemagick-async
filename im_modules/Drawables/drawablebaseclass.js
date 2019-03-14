@@ -22,14 +22,14 @@ class DrawableBaseClass extends ObjectInterface {
   /**
    * @returns {boolean} Returns true if the drawable object can be rendered on it's own. False otherwise.
    */
-  static IsLayer() {
+  IsLayer() {
     // override
   }
 
   /**
    * @returns {boolean} Returns true if the drawable object can be consolidated with other. False otherwise.
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     // override
   }
 }

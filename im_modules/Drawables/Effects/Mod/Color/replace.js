@@ -148,7 +148,7 @@ class Replace extends ColorBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

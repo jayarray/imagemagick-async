@@ -119,7 +119,7 @@ class ResizeFillGivenArea extends ResizeBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

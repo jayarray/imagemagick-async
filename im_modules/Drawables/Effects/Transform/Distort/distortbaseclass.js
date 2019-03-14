@@ -16,7 +16,7 @@ class DistortBaseClass extends TransformBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 }

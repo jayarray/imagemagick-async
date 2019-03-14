@@ -141,7 +141,7 @@ class MotionBlur extends FxBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

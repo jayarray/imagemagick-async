@@ -19,7 +19,7 @@ class EffectBaseClass extends DrawableBaseClass {
   /**
    * @override
    */
-  static IsLayer() {
+  IsLayer() {
     return true;
   }
 }

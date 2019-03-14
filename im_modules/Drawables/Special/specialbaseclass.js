@@ -26,14 +26,14 @@ class SpecialBaseClass extends ObjectInterface {
   /**
    * @returns {boolean} Always returns false. (None of the special drawables can be combined with other things).
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 
   /**
    * @returns {boolean} Always returns true. (All special drawables are their own layer).
    */
-  static IsLayer() {
+  IsLayer() {
     return true;
   }
 }

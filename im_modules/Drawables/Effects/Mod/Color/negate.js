@@ -73,7 +73,7 @@ class Negate extends ColorBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

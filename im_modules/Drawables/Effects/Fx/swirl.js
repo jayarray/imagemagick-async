@@ -93,7 +93,7 @@ class Swirl extends FxBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

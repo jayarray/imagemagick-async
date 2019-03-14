@@ -115,7 +115,7 @@ class Impression extends FxBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

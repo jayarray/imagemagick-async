@@ -94,7 +94,7 @@ class RadialBlur extends FxBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

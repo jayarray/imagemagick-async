@@ -16,7 +16,7 @@ class ReflectBaseClass extends TransformBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 }

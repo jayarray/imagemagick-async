@@ -117,7 +117,7 @@ class RotateAroundPoint extends DisplaceBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

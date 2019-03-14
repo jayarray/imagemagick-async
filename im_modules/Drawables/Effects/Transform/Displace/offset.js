@@ -118,7 +118,7 @@ class Offset extends DisplaceBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

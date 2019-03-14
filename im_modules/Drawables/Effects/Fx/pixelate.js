@@ -158,7 +158,7 @@ class Pixelate extends FxBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 

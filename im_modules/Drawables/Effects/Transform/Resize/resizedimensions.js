@@ -119,7 +119,7 @@ class ResizeDimensions extends ResizeBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

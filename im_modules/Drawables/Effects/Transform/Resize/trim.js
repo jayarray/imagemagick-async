@@ -128,7 +128,7 @@ class Trim extends ResizeBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 

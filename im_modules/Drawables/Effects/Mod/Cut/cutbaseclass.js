@@ -17,7 +17,7 @@ class CutBaseClass extends ModBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 }

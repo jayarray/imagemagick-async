@@ -181,7 +181,7 @@ class Crop extends ResizeBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 

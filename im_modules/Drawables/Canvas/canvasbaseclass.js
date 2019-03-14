@@ -20,14 +20,14 @@ class CanvasBaseClass extends DrawableBaseClass {
   /**
    * @override
    */
-  static IsLayer() {
+  IsLayer() {
     return true;
   }
 
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 }

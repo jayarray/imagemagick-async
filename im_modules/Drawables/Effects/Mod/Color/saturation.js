@@ -97,7 +97,7 @@ class Saturation extends ColorBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

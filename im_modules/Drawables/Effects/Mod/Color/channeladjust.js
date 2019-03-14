@@ -177,7 +177,7 @@ class ChannelAdjust extends ColorBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 

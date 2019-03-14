@@ -17,7 +17,7 @@ class ComposeBaseClass extends ModBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return false;
   }
 }

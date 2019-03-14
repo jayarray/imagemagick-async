@@ -96,7 +96,7 @@ class ResizePercentage extends ResizeBaseClass {
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 

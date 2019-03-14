@@ -17,14 +17,14 @@ class PrimitivesBaseClass extends DrawableBaseClass {
   /**
    * @override
    */
-  static IsLayer() {
+  IsLayer() {
     return false;
   }
 
   /**
    * @override
    */
-  static IsConsolidatable() {
+  IsConsolidatable() {
     return true;
   }
 }
