@@ -9,7 +9,8 @@ class DrawableBaseClass extends ObjectInterface {
     super({ category: 'drawable' });
     this.type = properties.type;
     this.name = properties.name;
-    this.args = properties.args;
+    this.args = properties.args; 
+    this.usesImageStack = false;  // true if command uses parentheses and other IM stack operations. (Change in subclass if needed)
   }
 
   /**
