@@ -310,12 +310,6 @@ Api.Inputs = {
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
 
-// Layer
-
-Api.Layer = {
-  Layer: require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer
-}
-
 
 // Query
 
@@ -331,12 +325,28 @@ Api.Query = {
 }
 
 
+// Layer
+
+Api.Layer = {
+  Layer: require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer
+}
+
+
 // Render
 
 Api.Render = {
   Renderer: require(Path.join(Filepath.RenderDir(), 'renderer.js')).Renderer
 }
 
+// Special
+
+Api.Special = {
+  Chain: {
+    RenderItem: require(Path.join(Filepath.SpecialChainDir(), 'item.js')).RenderItem,
+    CommandStringItem: require(Path.join(Filepath.SpecialChainDir(), 'item.js')).CommandStringItem,
+    Chain: require(Path.join(Filepath.SpecialChainDir(), 'chain.js')).RenderItem
+  }
+}
 
 //-------------------------------------
 // EXPORTS
