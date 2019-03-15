@@ -111,9 +111,4 @@ class Difference extends ComposeBaseClass {
 //-------------------------
 // EXPORTS
 
-exports.Create = Difference.Create;
-exports.Name = 'Difference';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.Difference = Difference;
