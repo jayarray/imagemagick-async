@@ -11,38 +11,6 @@ class Chain {
         this.items = [];
         this.tempDirPath = null;
         this.outputPath = null;
-
-        this.currItem = {
-          type: null,
-          obj: null,
-          outputPath: null
-        };
-      }
-
-      /**
-       * Reset the current item. (If current item exists, it will push current item to list and reset.)
-       */
-      push() {
-        if (this.currItem == null) {
-          this.currItem = {
-            type: null,
-            obj: null,
-            outputPath: null
-          };
-        }
-        else {
-          // Add to list
-          this.items.push(this.currItem);
-
-          // Reset item
-          this.currItem = {
-            type: null,
-            obj: null,
-            outputPath: null
-          };
-        }
-
-        return this;
       }
 
       /**
@@ -56,33 +24,9 @@ class Chain {
 
       /**
        * SECOND
-       * @param {string} s Image magick command string
+       * @param {Item} item 
        */
-      commandString(s) {
-        this.currItem.type = 'string';
-        this.currItem.obj = s;
-        this.items.push(item);
-        return this;
-      }
-
-      /**
-       * SECOND
-      * @param {Special} c Special command object  // REMOVE (???)
-      */
-      specialCommand(c) {
-        this.currItem.type = 'command';
-        this.currItem.obj = c;
-        this.items.push(item);
-        return this;
-      }
-
-      /**
-       * SECOND
-       * @param {Layer} layer
-       */
-      render(layer) {
-        this.currItem.type = 'render';
-        this.currItem.obj = layer;
+      add(item) {
         this.items.push(item);
         return this;
       }
