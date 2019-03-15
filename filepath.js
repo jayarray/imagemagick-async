@@ -167,6 +167,17 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
+  static SpecialChainDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.SpecialDir())
+      .dir('Chain')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
   static SpecialCommandDir() {
     return Filepath.Builder
       .partialPath(Filepath.SpecialDir())
