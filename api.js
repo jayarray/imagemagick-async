@@ -205,6 +205,7 @@ Api.Drawables = {
       PencilSketch: require(Path.join(Filepath.FxDir(), 'pencilsketch.js')).PencilSketch,
       Pixelate: require(Path.join(Filepath.FxDir(), 'pixelate.js')).Pixelate,
       RadialBlur: require(Path.join(Filepath.FxDir(), 'radialblur.js')).RadialBlur,
+      ShadeAndHighlight: require(Path.join(Filepath.SpecialChainDir(), 'shadeandhighlight.js')).ShadeAndHighlight,
       Shadow: require(Path.join(Filepath.FxDir(), 'shadow.js')).Shadow,
       Swirl: require(Path.join(Filepath.FxDir(), 'swirl.js')).Swirl,
       Wave: require(Path.join(Filepath.FxDir(), 'wave.js')).Wave
