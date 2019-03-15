@@ -232,6 +232,7 @@ Api.Drawables = {
       },
       Compose: {
         Add: require(Path.join(Filepath.ModComposeDir(), 'add.js')).Add,
+        Append: require(Path.join(Filepath.ModComposeDir(), 'append.js')).Append,
         ChangedPixels: require(Path.join(Filepath.ModComposeDir(), 'changedpixels.js')).ChangedPixels,
         Composite: require(Path.join(Filepath.ModComposeDir(), 'composite.js')).Composite,
         Difference: require(Path.join(Filepath.ModComposeDir(), 'difference.js')).Difference,
