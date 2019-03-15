@@ -2,7 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let LinuxCommands = require('linux-commands-async');
-let FontsQuery = require(Path.join(Filepath.ListDir(), 'fonts.js')).Fonts;
+let FontsQuery = require(Path.join(Filepath.QueryListDir(), 'fonts.js')).Fonts;
 
 //-------------------------------------------------------------------------------------
 
@@ -11,7 +11,8 @@ console.log('\nUpdating fonts...');
 let filepath = Path.join(Filepath.ConstantsDir(), 'fonts.json');
 
 FontsQuery().then(arr => {
-  let o = { values: arr };
+  let fontNamesArr = arr.map(x => x.name);
+  let o = { values: fontNamesArr };
   let jsonStr = JSON.stringify(o);
 
   LinuxCommands.File.Create(filepath, jsonStr, LinuxCommands.Command.LOCAL).then(success => {

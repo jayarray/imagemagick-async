@@ -2,7 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let LinuxCommands = require('linux-commands-async');
-let GravityQuery = require(Path.join(Filepath.ListDir(), 'gravity.js')).Gravity;
+let GravityQuery = require(Path.join(Filepath.QueryListDir(), 'gravity.js')).Gravity;
 
 //-------------------------------------------------------------------------------------
 //

@@ -2,7 +2,7 @@ let Path = require('path');
 let RootDir = Path.resolve('.');
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let LinuxCommands = require('linux-commands-async');
-let ColorChannelsQuery = require(Path.join(Filepath.ListDir(), 'colorchannels.js')).ColorChannels;
+let ColorChannelsQuery = require(Path.join(Filepath.QueryListDir(), 'colorchannels.js')).ColorChannels;
 
 //-----------------------------------
 
