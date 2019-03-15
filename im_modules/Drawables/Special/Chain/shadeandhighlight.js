@@ -4,6 +4,7 @@ let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let ChainBaseClass = require(Path.join(Filepath.SpecialChainDir(), 'chainbaseclass.js')).ChainBaseClass;
 let Chain = require(Path.join(Filepath.SpecialChainDir(), 'chain.js')).Chain;
+let Item = require(Path.join(Filepath.SpecialChainDir(), 'item.js'));
 let Mask = require(Path.join(Filepath.ModMasksDir(), 'mask.js')).Mask;
 let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
 let Impression = require(Path.join(Filepath.FxDir(), 'impression.js')).Impression;
@@ -86,10 +87,12 @@ class ShadeAndHighlight extends ChainBaseClass {
     let tempFilename1 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
     let tempOutputPath1 = Path.join(tempDirPath, tempFilename1);
 
-    chainBuilder = chainBuilder
-      .id('elevateShade')
-      .render(elevateLayer)
-      .push();
+    let renderItem1 = Item.RenderItem.Builder
+      .setOutputPath(tempOutputPath1)
+      .setLayer(elevateLayer)
+      .build();
+
+    chainBuilder = chainBuilder.add(renderItem1);
 
 
     // (2) Create shaded image using 90x90 (light source IS directly above image)
@@ -107,10 +110,12 @@ class ShadeAndHighlight extends ChainBaseClass {
     let tempFilename2 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
     let tempOutputPath2 = Path.join(tempDirPath, tempFilename2);
 
-    chainBuilder = chainBuilder
-      .id('directLight')
-      .render(directLightLayer)
-      .push();
+    let renderItem2 = Item.RenderItem.Builder
+      .setOutputPath(tempOutputPath2)
+      .setLayer(directLightLayer)
+      .build();
+
+    chainBuilder = chainBuilder.add(renderItem2);
 
 
     // 3) Combine (1) and (2) (in that order) to create a hollow "shaded shape"
@@ -119,14 +124,16 @@ class ShadeAndHighlight extends ChainBaseClass {
     let tempOutputPath3 = Path.join(tempDirPath, tempFilename3);
     let cmdStr = `convert ${tempOutputPath1} \\( ${tempOutputPath2} -normalize -negate \\) -alpha Off -compose CopyOpacity -composite ${tempOutputPath3}`;
 
-    chainBuilder = chainBuilder
-      .id('shaded')
-      .commandString(cmdStr)
-      .push();
+    let cmdStrItem = Item.CommandStringItem.Builder
+      .setOutputPath(tempOutputPath3)
+      .setCommand(cmdStr)
+      .build();
 
-    // Set the final destination
+    chainBuilder = chainBuilder.add(cmdStrItem);
     chainBuilder = chainBuilder.setOutputPath(tempOutputPath3);
 
+    // Return object
+    
     let chainObj = chainBuilder.build();
     return chainObj;
   }
