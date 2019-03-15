@@ -246,7 +246,7 @@ Api.Drawables = {
       },
       Cut: {
         CutIn: require(Path.join(Filepath.ModCutDir(), 'cutin.js')).CutIn,
-        CutOut: require(Path.join(Filepath.ModCutDir(), 'cutout.js')).CutOut,
+        CutOut: require(Path.join(Filepath.ModCutDir(), 'cutout.js')).CutOut
       },
       Masks: {
         BlackMask: require(Path.join(Filepath.ModMasksDir(), 'blackmask.js')).BlackMask,
