@@ -18,7 +18,7 @@ class Impression extends FxBaseClass {
     class Builder {
       constructor() {
         this.name = 'Impression';
-        this.args = {};
+        this.args = { blur: 0 };
       }
 
       /**
@@ -45,6 +45,14 @@ class Impression extends FxBaseClass {
         return this;
       }
 
+      /**
+       * @param {number} n 
+       */
+      blur(n) {
+        this.args.blur = n;
+        return this;
+      }
+
       build() {
         return new Impression(this);
       }
@@ -56,6 +64,12 @@ class Impression extends FxBaseClass {
    * @override
    */
   Args() {
+    let params = Impression.Parameters();
+    let args = ['-shade'];
+
+    if (this.args.blur >= params.blur.min)
+      args.push('-blur', `0x${this.args.blur}`);
+
     return ['-shade', `${this.args.direction}x${this.args.elevation}`];
   }
 
@@ -132,6 +146,10 @@ class Impression extends FxBaseClass {
       },
       elevation: {
         type: 'number',
+      },
+      blur: {
+        type: 'number',
+        min: 1
       }
     };
   }
