@@ -1,8 +1,13 @@
+let Path = require('path');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
+
 let LinuxCommands = require('linux-commands-async');
 let LocalCommand = LinuxCommands.Command.LOCAL;
 
-let Path = require('path');
-let RootDir = Path.resolve('.');
 let Err = require(Path.join(RootDir, 'error.js'));
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;

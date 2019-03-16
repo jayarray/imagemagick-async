@@ -1,4 +1,11 @@
-let Validate = require('./validate.js');
+let Path = require('path');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
+
+let Validate = require(Path.join(RootDir, 'validate.js'));
 
 //------------------------------
 

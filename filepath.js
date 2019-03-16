@@ -1,4 +1,9 @@
 let Path = require('path');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir_ = PathParts.slice(0, index + 1).join(Path.sep);
 
 //--------------------------------
 
@@ -73,7 +78,18 @@ class Filepath {
    * @returns {string} Returns the path to the project directory.
    */
   static RootDir() {
-    return Path.resolve('.');
+    return RootDir_;
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
+  static PrivateDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.RootDir())
+      .dir('private')
+      .build()
+      .String();
   }
 
   /**

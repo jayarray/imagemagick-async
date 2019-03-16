@@ -1,4 +1,11 @@
 let Path = require('path');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
+
+let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 
 //--------------------------------------------
 
@@ -9,7 +16,7 @@ let succeeded = 0;
 
 // Color channels
 try {
-  let x = require(Path.join(__dirname, 'update_color_channels.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_color_channels.js'));
   succeeded += 1;
 }
 catch (err) {
@@ -19,7 +26,7 @@ catch (err) {
 
 // Dispose
 try {
-  let x = require(Path.join(__dirname, 'update_dispose.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_dispose.js'));
   succeeded += 1;
 }
 catch (err) {
@@ -29,7 +36,7 @@ catch (err) {
 
 // Fonts
 try {
-  let x = require(Path.join(__dirname, 'update_fonts.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_fonts.js'));
   succeeded += 1;
 }
 catch (err) {
@@ -39,7 +46,7 @@ catch (err) {
 
 // Gradient direction
 try {
-  let x = require(Path.join(__dirname, 'update_gradient_direction.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_gradient_direction.js'));
   succeeded += 1;
 }
 catch (err) {
@@ -49,7 +56,7 @@ catch (err) {
 
 // Gradient extent
 try {
-  let x = require(Path.join(__dirname, 'update_gradient_extent.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_gradient_extent.js'));
   succeeded += 1;
 }
 catch (err) {
@@ -59,7 +66,7 @@ catch (err) {
 
 // Gravity
 try {
-  let x = require(Path.join(__dirname, 'update_gravity.js'));
+  let x = require(Path.join(Filepath.PrivateDir(), 'update_gravity.js'));
   succeeded += 1;
 }
 catch (err) {

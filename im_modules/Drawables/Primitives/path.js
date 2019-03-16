@@ -1,5 +1,10 @@
 let Path_ = require('path');
-let RootDir = Path_.resolve('.');
+let ProjectDir = Path_.resolve('.');
+
+let PathParts = ProjectDir.split(Path_.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path_.sep);
+
 let Err = require(Path_.join(RootDir, 'error.js'));
 let Filepath = require(Path_.join(RootDir, 'filepath.js')).Filepath;
 let Validate = require(Path_.join(RootDir, 'validate.js'));

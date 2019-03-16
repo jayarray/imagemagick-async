@@ -1,5 +1,10 @@
 let Path = require('path');
-let RootDir = Path.resolve('.');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
+
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let AnimationBaseClass = require(Path.join(Filepath.AnimationDir(), 'animationbaseclass.js')).AnimationBaseClass;
@@ -139,9 +144,9 @@ class Gif extends AnimationBaseClass {
         .varName('Loop')
         .condition(
           new Err.NumberCondition.Builder(this.args.loop)
-          .isInteger(true)
-          .min(params.loop.min)
-          .build()
+            .isInteger(true)
+            .min(params.loop.min)
+            .build()
         )
         .build()
         .String();

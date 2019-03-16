@@ -1,5 +1,10 @@
 let Path = require('path');
-let RootDir = Path.resolve('.');
+let ProjectDir = Path.resolve('.');
+
+let PathParts = ProjectDir.split(Path.sep);
+let index = PathParts.indexOf('imagemagick-async');
+let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
+
 let ObjectInterface = require(Path.join(RootDir, 'objectinterface.js')).ObjectInterface;
 
 //--------------------------------------
