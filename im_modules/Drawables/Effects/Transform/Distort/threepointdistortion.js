@@ -171,9 +171,4 @@ class ThreePointDistortion extends DistortBaseClass {
 //-----------------------------
 // EXPORTS
 
-exports.Create = ThreePointDistortion.Create;
-exports.Name = 'ThreePointDistortion';
-exports.Layer = true;
-exports.Consolidate = false;
-exports.Dependencies = null;
-exports.ComponentType = 'drawable';
+exports.ThreePointDistortion = ThreePointDistortion;
