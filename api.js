@@ -11,56 +11,132 @@ let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 // Helper functions
 
 /**
- * Check if an object is a node.
+ * Check if an object is a module.
  * @param {object} moduleItem 
- * @returns {boolean} Returns true if it is just another object that is part of the API structure. Otherwise, the object is a module that can be built.
+ * @returns {boolean} Returns true if it is a module that is part of the API structure. False otherwise.
  */
-function IsNode(moduleItem) {
+function IsModule(moduleItem) {
   // Check if item has a build function
   try {
     let x = moduleItem.Builder.build();
-    return false;
-  }
-  catch (err) {
     return true;
   }
+  catch (err) {
+    return false;
+  }
 }
-
 
 /**
- * @param {object} rootNode
- * @param {string} moduleName
- * @returns {object} Returns the specified module located within the root node's structure.
+ * Get info about modules as a dictionary. Keys are API paths, and values are objects with properties.
+ * @param {string} rootName 
+ * @param {object} rootNode  // Should be an object containing imports OR contain other objects. 
+ * @returns {Array<{name: string, path: string, import: object, category: string, type: string, subtype: string, parameters: Array}>}
  */
-function GetImModule(rootNode, moduleName) {
-  let imModule = null;
-  let nodeNames = Object.keys(rootNode);
-  let needToBeChecked = nodeNames.map(name => rootNode[name]);
+function GetModulesDict(rootName, rootNode) {
+  // Get all node info objects
+
+  let rootInfo = {
+    name: rootName,
+    node: rootNode,
+    parent: null,
+    isModule: false
+  };
+
+  let needToBeChecked = [rootInfo];
+  let nodeInfoArr = [];
 
   while (needToBeChecked.length != 0) {
-    let curr = needToBeChecked[i];
+    let currInfo = needToBeChecked[0];
+    let childrenNames = Object.keys(currInfo.node);
+    let childrenInfoArr = [];
 
-    if (IsNode(curr)) {
-      let childrenNames = Object.keys(curr);
+    childrenNames.forEach(name => {
+      let childInfo = {
+        name: name,
+        node: currInfo.node[name],
+        parent: currInfo.node,
+        isModule: false
+      };
 
-      if (childrenNames.length > 0) {
-        let children = childrenNames.map(name => curr[name]);
-        needToBeChecked.push(children);
-      }
-    }
-    else {
-      if (curr.name == moduleName) {
-        imModule = curr;
-        break;
-      }
-    }
+      if (IsModule(childInfo.node))
+        childInfo.isModule = true;
 
-    // Remove currently checked item
-    needToBeChecked = needToBeChecked.slice(1);
+      childrenInfoArr.push(childInfo);
+    });
+
+    // Update lists
+
+    nodeInfoArr.push(currInfo); // Push already checked node
+    needToBeChecked = needToBeChecked.concat(childrenInfoArr); // Append children infos
+    needToBeChecked = needToBeChecked.slice(1); // Remove current info
   }
 
-  return imModule;
+  // Add modules (only) to path dict
+  let pathDict = {};
+  let moduleInfoArr = nodeInfoArr.filter(x => x.isModule == true);
+
+  moduleInfoArr.forEach(moduleInfo => {
+    // Get module API path
+    let pathParts = [];
+
+    let getPath = function (info) {
+      let parent = info.parent;
+
+      if (parent == null) {
+        return;
+      }
+
+      pathParts.push(parent.name);  // Push parent name to parts
+      getPath(parent.parent);  // Recurse
+    };
+
+    // Get path parts, reverse them, delimit with '.'
+    getPath(moduleInfo);
+    let pathParts = pathParts.reverse();
+    let pathStr = pathParts.join('.');
+
+    // Add to path dict
+
+    let tempObj = moduleInfo.node.Builder.build();
+
+    pathDict[pathStr] = {
+      name: moduleInfo.name,
+      import: moduleInfo.node,
+      path: pathStr,
+      category: tempObj.category,
+      type: tempObj.type,
+      subtype: tempObj.subtype,
+      parameters: tempObj.Parameters()
+    };
+  });
+
+  return pathDict;
 }
+
+//----------------------------------------
+// MODULE DICTS
+
+/**
+ * Get a dictionary containing the drawables and input modules.
+ * @param {object} api 
+ * @returns {object} Returns a dictionary.
+ */
+function GetModuleDictionary(api) {
+  let completeDict = {};
+
+  // Drawables dict
+  let drawablesDict = GetModulesDict('Drawables', api.Drawables);
+  let drawKeys = Object.keys(drawablesDict);
+  drawKeys.forEach(key => completeDict[key] = drawablesDict[key]);
+
+  // Inputs dict
+  let inputsDict = GetModulesDict('Inputs', api.Inputs);
+  let inputsKeys = Object.keys(inputsDict);
+  inputsKeys.forEach(key => completeDict[key] = inputsDict[key]);
+
+  return completeDict;
+}
+
 
 //------------------------------------------
 // Object Builder
@@ -68,26 +144,17 @@ function GetImModule(rootNode, moduleName) {
 class ObjectBuilder {
   constructor(api) {
     this.api = api;
-    this.objectName = null;
     this.args = [];
-    this.nodeNames = [];
+    this.path = null;
+    this.moduleDict = GetModuleDictionary(api);
   }
 
   /**
-   * Declare the name of the object you wish to build.
+   * Specify the API path for the object you want to build. The path should be period-delimited. EXAMPLE: "Drawables.Primitives.Bezier" . (You only need to pass in args after this function call).
    * @param {string} str 
    */
-  name(str) {
-    this.objectName = str;
-    return this;
-  }
-
-  /**
-   * Use this when specifying the path to a module inside the API object. Example: in('Drawables').in('Canvas') searches in api.Drawables.Canvas and any other child nodes in this path. If no node names are specified, the entire API structure will be searched. (Optional)
-   * @param {string} nodeName 
-   */
-  in(nodeName) {
-    this.nodeNames.push(nodeName);
+  apiPath(str) {
+    this.path = str;
     return this;
   }
 
@@ -106,33 +173,21 @@ class ObjectBuilder {
   }
 
   build() {
-    let imModule = null;
+    let imModule = this.moduleDict[this.path];
 
-    // Acquire specified im module
-    if (this.nodeNames.length > 0) {
-      let node = this.api;
+    if (!imModule)
+      return null;
 
-      for (let i = 0; i < this.nodeNames.length; ++i) {
-        let currNodeName = this.nodeNames[i];
-        node = node[currNodeName];
-      }
+    // Build and return object
 
-      if (IsNode(node))
-        imModule = GetImModule(node, this.name);
-    }
-    else
-      imModule = GetImModule(this.api, this.name);
+    let currBuilder = imModule.Builder;
 
-    if (imModule) {
-      // Build and return object
-      let currBuilder = imModule.Builder;
-      this.args.forEach(a => currBuilder = currBuilder[a.name](a.value));
+    this.args.forEach(a => {
+      currBuilder = currBuilder[a.name](a.value);
+    });
 
-      let o = currBuilder.build();
-      return o;
-    }
-
-    return null;
+    let o = currBuilder.build();
+    return o;
   }
 }
 
@@ -354,7 +409,7 @@ Api.Special = {
   }
 }
 
-//-------------------------------------
-// EXPORTS
-
 exports.Api = Api;
+
+exports.ModuleDictionary = GetModuleDictionary(Api);
+
