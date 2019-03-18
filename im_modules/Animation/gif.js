@@ -86,27 +86,29 @@ class Gif extends AnimationBaseClass {
    * @override
    */
   Args() {
+    let params = Gif.Parameters();
+
     let args = ['delay'];
 
     // Add delay
     if (this.args.delay)
       args.push(this.args.delay);
     else
-      args.push(DELAY_DEFAULT);
+      args.push(params.delay.default);
 
     // Add dispose
     args.push('-dispose');
     if (this.args.dispose)
       args.push(this.args.dispose);
     else
-      args.push(DISPOSE_DEFAULT);
+      args.push(params.dispose.default);
 
     // Add loop
     args.push('-loop');
     if (this.args.loop)
       args.push(this.args.loop);
     else
-      args.push(LOOP_DEFAULT);
+      args.push(params.loop.default);
 
     // Add filepaths
     args = args.concat(this.args.filepaths).concat(this.args.outputPath);
