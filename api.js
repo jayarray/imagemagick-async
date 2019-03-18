@@ -54,7 +54,7 @@ function GetModulesDict(rootName, rootNode) {
       let childInfo = {
         name: name,
         node: currInfo.node[name],
-        parent: currInfo.node,
+        parent: currInfo,
         isModule: false
       };
 
@@ -77,36 +77,44 @@ function GetModulesDict(rootName, rootNode) {
 
   moduleInfoArr.forEach(moduleInfo => {
     // Get module API path
-    let pathParts = [];
+    let pathParts = [moduleInfo.name];
 
     let getPath = function (info) {
-      let parent = info.parent;
+      try {
+        let parent = info.parent;
 
-      if (parent == null) {
+        if (!parent) {
+          pathParts.push(info.name);
+          return;
+        }
+
+        pathParts.push(parent.name);  // Push parent name to parts
+        getPath(parent.parent);  // Recurse
+      }
+      catch (err) {
         return;
       }
-
-      pathParts.push(parent.name);  // Push parent name to parts
-      getPath(parent.parent);  // Recurse
     };
 
     // Get path parts, reverse them, delimit with '.'
     getPath(moduleInfo);
-    let pathParts = pathParts.reverse();
+    pathParts = pathParts.reverse();
     let pathStr = pathParts.join('.');
 
     // Add to path dict
 
-    let tempObj = moduleInfo.node.Builder.build();
+    let tempObj = moduleInfo.node;
+    let parameters = tempObj.Parameters();
+    let obj = tempObj.Builder.build()
 
     pathDict[pathStr] = {
       name: moduleInfo.name,
       import: moduleInfo.node,
       path: pathStr,
-      category: tempObj.category,
-      type: tempObj.type,
-      subtype: tempObj.subtype,
-      parameters: tempObj.Parameters()
+      category: obj.category,
+      type: obj.type,
+      subtype: obj.subtype,
+      parameters: parameters
     };
   });
 
@@ -321,7 +329,7 @@ Api.Drawables = {
         Offset: require(Path.join(Filepath.TransformDisplaceDir(), 'offset.js')).Offset,
         Roll: require(Path.join(Filepath.TransformDisplaceDir(), 'roll.js')).Roll,
         RotateAroundCenter: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundcenter.js')).RotateAroundCenter,
-        RotateAroundPoint: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundcenter.js')).RotateAroundPoint,
+        RotateAroundPoint: require(Path.join(Filepath.TransformDisplaceDir(), 'rotatearoundpoint.js')).RotateAroundPoint,
         RotateImage: require(Path.join(Filepath.TransformDisplaceDir(), 'rotateimage.js')).RotateImage
       },
       Distort: {
