@@ -714,6 +714,7 @@ class Renderer {
         this.layer_ = null;
         this.format_ = 'png';
         this.outputPath_ = null;
+        this.isAnimation_ = false;
       }
 
       /**
@@ -722,6 +723,17 @@ class Renderer {
        */
       layer(layer) {
         this.layer_ = layer;
+        this.isAnimation_ = false;
+        return this;
+      }
+
+      /**
+       * Specify an animation type to render.
+       * @param {Animation} a
+       */
+      animation(a) {
+        this.animation_ = a;
+        this.isAnimation_ = true;
         return this;
       }
 
@@ -808,97 +820,115 @@ class Renderer {
    */
   Render() {
     return new Promise((resolve, reject) => {
+      if (this.isAnimation_) {  // ANIMATION
+        let name = this.animation_.name;
 
-      // Create temp directory
+        if (name == 'Gif') {
+          let cmd = this.animation_.command;
+          let args = this.animation_.Args().concat(this.outputPath_);
 
-      let parentDir = LinuxCommands.Path.ParentDir(this.outputPath_);
-      let tempDirPath = Path.join(parentDir, Guid.Create());
+          LocalCommand.Execute(cmd, args).then(output => {
+            if (output.stderr) {
+              reject(output.stderr);
+              return;
+            }
 
-      LinuxCommands.Mkdir.MakeDirectory(tempDirPath, LocalCommand).then(success => {
+            resolve();
+          }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+        }
+      }
+      else {  // IMAGE
+        // Create temp directory
 
-        // Render foundation
+        let parentDir = LinuxCommands.Path.ParentDir(this.outputPath_);
+        let tempDirPath = Path.join(parentDir, Guid.Create());
 
-        let layer = this.layer_;
-        let format = this.format_;
+        LinuxCommands.Mkdir.MakeDirectory(tempDirPath, LocalCommand).then(success => {
 
-        RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
+          // Render foundation
 
-          // Check if there are any overlays to render.
-          let overlays = layer.args.overlays;
+          let layer = this.layer_;
+          let format = this.format_;
 
-          if (overlays.length == 0) {
+          RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
 
-            // Move file to destination
-            LinuxCommands.Move.Move(recentFilepath, this.outputPath_, LocalCommand).then(success => {
+            // Check if there are any overlays to render.
+            let overlays = layer.args.overlays;
 
-              // Clean up temp directory
-              LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
+            if (overlays.length == 0) {
 
-                // Return render filepath
-                resolve(this.outputPath_);
-              }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-            }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-          }
-          else {
-            // Render all overlays in parallel
+              // Move file to destination
+              LinuxCommands.Move.Move(recentFilepath, this.outputPath_, LocalCommand).then(success => {
 
-            let actions = [];
-
-            overlays.forEach(oLayer => {
-              let a = RenderLayer(oLayer, tempDirPath, format);
-              actions.push(a);
-            });
-
-            Promise.all(actions).then(results => {
-
-              // Merge layers together and move to destination
-              let outputPaths = results;
-              let filepathOffsetTuples = [];
-
-              for (let i = 0; i < outputPaths.length; ++i) {
-                let currOverlay = overlays[i];
-                let currOffset = currOverlay.args.offset;
-                let currOutputPath = outputPaths[i];
-                let tuple = { filepath: currOutputPath, offset: null };
-
-                // Check if recent render was from RotateImage module. (Its enlarged dimensions require offsetting!)
-
-                let currFoundation = currOverlay.args.foundation;
-                let renderedFromRotateImage = currFoundation.name == 'RotateImage';
-
-                if (renderedFromRotateImage) {
-                  let rotateImageOffsets = currFoundation.offset;
-
-                  let adjustedOffset = Offset.Builder
-                    .x(currOffset.args.x + rotateImageOffsets.x)
-                    .y(currOffset.args.y + rotateImageOffsets.y)
-                    .build();
-
-                  tuple.offset = adjustedOffset;
-                }
-                else {
-                  tuple.offset = currOffset;
-                }
-
-                filepathOffsetTuples.push(tuple);
-              }
-
-              let gravity = this.layer_.args.gravity;
-
-              // Render final image to destination
-              ComposeImages(recentFilepath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
-
-                // Clean up temp dir
+                // Clean up temp directory
                 LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
 
                   // Return render filepath
                   resolve(this.outputPath_);
                 }).catch(error => reject(`RENDERER_ERROR: ${error}`));
               }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-            }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-          }
+            }
+            else {
+              // Render all overlays in parallel
+
+              let actions = [];
+
+              overlays.forEach(oLayer => {
+                let a = RenderLayer(oLayer, tempDirPath, format);
+                actions.push(a);
+              });
+
+              Promise.all(actions).then(results => {
+
+                // Merge layers together and move to destination
+                let outputPaths = results;
+                let filepathOffsetTuples = [];
+
+                for (let i = 0; i < outputPaths.length; ++i) {
+                  let currOverlay = overlays[i];
+                  let currOffset = currOverlay.args.offset;
+                  let currOutputPath = outputPaths[i];
+                  let tuple = { filepath: currOutputPath, offset: null };
+
+                  // Check if recent render was from RotateImage module. (Its enlarged dimensions require offsetting!)
+
+                  let currFoundation = currOverlay.args.foundation;
+                  let renderedFromRotateImage = currFoundation.name == 'RotateImage';
+
+                  if (renderedFromRotateImage) {
+                    let rotateImageOffsets = currFoundation.offset;
+
+                    let adjustedOffset = Offset.Builder
+                      .x(currOffset.args.x + rotateImageOffsets.x)
+                      .y(currOffset.args.y + rotateImageOffsets.y)
+                      .build();
+
+                    tuple.offset = adjustedOffset;
+                  }
+                  else {
+                    tuple.offset = currOffset;
+                  }
+
+                  filepathOffsetTuples.push(tuple);
+                }
+
+                let gravity = this.layer_.args.gravity;
+
+                // Render final image to destination
+                ComposeImages(recentFilepath, filepathOffsetTuples, gravity, this.outputPath_).then(success => {
+
+                  // Clean up temp dir
+                  LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
+
+                    // Return render filepath
+                    resolve(this.outputPath_);
+                  }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+                }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+              }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+            }
+          }).catch(error => reject(`RENDERER_ERROR: ${error}`));
         }).catch(error => reject(`RENDERER_ERROR: ${error}`));
-      }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+      }
     });
   }
 }
