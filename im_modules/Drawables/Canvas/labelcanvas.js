@@ -412,7 +412,7 @@ class LabelCanvas extends CanvasBaseClass {
         type: 'string'
       },
       font: {
-        type: string
+        type: 'string'
       },
       fontSize: {
         type: 'number',
