@@ -17,7 +17,7 @@ let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 function IsModule(moduleItem) {
   // Check if item has a build function
   try {
-    let x = moduleItem.Builder.build();
+    let x = moduleItem.Builder;
     return true;
   }
   catch (err) {
