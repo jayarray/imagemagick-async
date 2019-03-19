@@ -1,7 +1,6 @@
 let Path = require('path');
-let ProjectDir = Path.resolve('.');
 
-let PathParts = ProjectDir.split(Path.sep);
+let PathParts = __dirname.split(Path.sep);
 let index = PathParts.indexOf('imagemagick-async');
 let RootDir_ = PathParts.slice(0, index + 1).join(Path.sep);
 
