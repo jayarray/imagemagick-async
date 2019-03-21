@@ -141,6 +141,11 @@ function GetModuleDictionary(api) {
   let inputsKeys = Object.keys(inputsDict);
   inputsKeys.forEach(key => completeDict[key] = inputsDict[key]);
 
+  // Layer dict
+  let layerDict = GetModulesDict('Layer', api.Layer);
+  let layerKeys = Object.keys(layerDict);
+  layerKeys.forEach(key => completeDict[key] = layerDict[key]);
+
   return completeDict;
 }
 
