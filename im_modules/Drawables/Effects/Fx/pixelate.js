@@ -172,23 +172,27 @@ class Pixelate extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       aggressiveness: {
         type: 'number',
         subtype: 'integer',
         min: 1,
-        max: 100
+        max: 100,
+        required: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       }
     };
   }

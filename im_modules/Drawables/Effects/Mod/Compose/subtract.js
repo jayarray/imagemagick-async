@@ -41,7 +41,7 @@ class Subtract extends ComposeBaseClass {
         this.args.source2 = str;
         return this;
       }
-      
+
       build() {
         return new Subtract(this);
       }
@@ -103,10 +103,12 @@ class Subtract extends ComposeBaseClass {
   static Parameters() {
     return {
       source1: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       source2: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
     };
   }

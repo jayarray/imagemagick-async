@@ -87,7 +87,8 @@ class RgbFormat extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       }
     };
   }

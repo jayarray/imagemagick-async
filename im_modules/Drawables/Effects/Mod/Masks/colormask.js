@@ -104,10 +104,12 @@ class ColorMask extends MaskBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       }
     }
   }

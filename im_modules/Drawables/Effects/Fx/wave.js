@@ -128,13 +128,16 @@ class Wave extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       amplitude: {
-        type: 'number'
+        type: 'number',
+        required: true
       },
       frequency: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

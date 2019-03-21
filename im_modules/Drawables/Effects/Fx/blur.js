@@ -160,21 +160,25 @@ class Blur extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       radius: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       },
       sigma: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       },
       hasTransparency: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: true
       }
     };
   }

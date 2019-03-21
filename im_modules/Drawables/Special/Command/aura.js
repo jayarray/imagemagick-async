@@ -185,25 +185,30 @@ class Aura extends CommandBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       opacity: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       },
       blurRadius: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       },
       blurSigma: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       }
     };
   }

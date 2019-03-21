@@ -248,27 +248,34 @@ class Polygon extends PrimitivesBaseClass {
       sides: {
         type: 'number',
         subtype: 'integer',
-        min: 3
+        min: 3,
+        required: true
       },
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       vertex: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

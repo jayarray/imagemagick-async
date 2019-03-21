@@ -106,11 +106,13 @@ class Append extends ComposeBaseClass {
       filepaths: {
         type: 'string',
         isArray: true,
-        min: 2
+        min: 2,
+        required: true
       },
       isVertical: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: true
       },
     };
   }

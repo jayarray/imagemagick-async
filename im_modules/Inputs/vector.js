@@ -106,10 +106,12 @@ class Vector extends InputsBaseClass {
   static Parameters() {
     return {
       start: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       end: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       }
     };
   }

@@ -126,13 +126,16 @@ class FillMask extends MaskBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       blackReplacement: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       whiteReplacement: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       }
     }
   }

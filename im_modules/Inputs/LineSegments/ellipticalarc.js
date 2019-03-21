@@ -190,25 +190,31 @@ class EllipticalArc extends LineSegmentBaseClass {
   static Parameters() {
     return {
       radius: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       angle: {
         type: 'number',
-        default: 0
+        default: 0,
+        required: true
       },
       largeFlag: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: false
       },
       sweepFlag: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: false
       },
       edge: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

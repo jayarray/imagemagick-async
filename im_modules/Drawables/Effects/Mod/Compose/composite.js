@@ -43,7 +43,7 @@ class Composite extends ComposeBaseClass {
         this.args.gravity = str;
         return this;
       }
-      
+
       build() {
         return new Composite(this);
       }
@@ -143,11 +143,13 @@ class Composite extends ComposeBaseClass {
       filepaths: {
         type: 'string',
         isArray: true,
-        min: 2
+        min: 2,
+        required: true
       },
       gravity: {
         type: 'string',
-        options: GravityValues
+        options: GravityValues,
+        required: true
       }
     };
   }

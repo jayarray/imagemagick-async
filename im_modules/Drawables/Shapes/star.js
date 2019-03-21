@@ -319,32 +319,40 @@ class Star extends PrimitivesBaseClass {
       vertices: {
         type: 'number',
         subtype: 'integer',
-        min: 4
+        min: 4,
+        required: true
       },
       center: {
-        type: 'Coordinates'
+        type: 'Integers.Coordinates',
+        required: true
       },
       vertex: {
-        type: 'Coordinates'
+        type: 'Integers.Coordinates',
+        required: true
       },
       bloat: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: false
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Integers.Color',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Integers.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

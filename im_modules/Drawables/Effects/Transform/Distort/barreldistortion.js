@@ -205,19 +205,24 @@ class BarrelDistortion extends DistortBaseClass {
         type: 'string'
       },
       a: {
-        type: 'number'
+        type: 'number',
+        required: true
       },
       b: {
-        type: 'number'
+        type: 'number',
+        required: true
       },
       c: {
-        type: 'number'
+        type: 'number',
+        required: true
       },
       d: {
-        type: 'number'
+        type: 'number',
+        required: false
       },
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: false
       }
     };
   }

@@ -80,7 +80,8 @@ class Mask extends MaskBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       }
     }
   }

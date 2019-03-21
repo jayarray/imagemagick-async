@@ -152,16 +152,20 @@ class ThreePointDistortion extends DistortBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       centerVector: {
-        type: 'Vector'
+        type: 'Inputs.Vector',
+        required: true
       },
       xAxisVector: {
-        type: 'Vector'
+        type: 'Inputs.Vector',
+        required: true
       },
       yAxisVector: {
-        type: 'Vector'
+        type: 'Inputs.Vector',
+        required: true
       }
     };
   }

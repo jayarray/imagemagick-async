@@ -145,17 +145,20 @@ class Smooth extends LineSegmentBaseClass {
   static Parameters() {
     return {
       control: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       endPoint: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       isQuadraticBezier: {
         type: 'boolean',
         default: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

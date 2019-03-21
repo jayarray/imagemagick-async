@@ -107,6 +107,9 @@ class Shadow extends FxBaseClass {
       .build()
       .String();
 
+    if (colorErr)
+      errors.push(colorErr);
+
 
     let percentOpacityErr = Err.ErrorMessage.Builder
       .prefix(prefix)
@@ -153,19 +156,23 @@ class Shadow extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       percentOpacity: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       },
       sigma: {
         type: 'number',
-        min: 0
+        min: 0,
+        required: true
       }
     };
   }

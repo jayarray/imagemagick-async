@@ -133,15 +133,18 @@ class Tint extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       percent: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       }
     };
   }

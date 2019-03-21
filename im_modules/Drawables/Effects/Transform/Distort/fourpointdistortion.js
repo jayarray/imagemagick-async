@@ -50,7 +50,7 @@ class FourPointDistortion extends DistortBaseClass {
         this.args.controlSet2 = coordinatesArr;
         return this;
       }
-      
+
       build() {
         return new FourPointDistortion(this);
       }
@@ -145,12 +145,14 @@ class FourPointDistortion extends DistortBaseClass {
       constrolSet1: {
         type: 'Coordinates',
         isArray: true,
-        min: 4
+        min: 4,
+        required: true
       },
       constrolSet2: {
         type: 'Coordinates',
         isArray: true,
-        min: 4
+        min: 4,
+        required: true
       }
     };
   }

@@ -108,10 +108,12 @@ class RotateAroundCenter extends DisplaceBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       degrees: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

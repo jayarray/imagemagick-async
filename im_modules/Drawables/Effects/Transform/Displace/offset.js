@@ -132,13 +132,16 @@ class Offset extends DisplaceBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       start: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       end: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       }
     };
   }

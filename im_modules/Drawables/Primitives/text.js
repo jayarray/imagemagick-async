@@ -8,6 +8,7 @@ let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let Validate = require(Path.join(RootDir, 'validate.js'));
 let PrimitivesBaseClass = require(Path.join(Filepath.PrimitivesDir(), 'primitivesbaseclass.js')).PrimitivesBaseClass;
+let GravityValues = require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values;
 
 //-------------------------------------
 
@@ -267,43 +268,41 @@ class Text extends PrimitivesBaseClass {
   static Parameters() {
     return {
       string: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       font: {
-        type: 'string'
+        type: 'string',
+        required: false
       },
       pointSize: {
         type: 'number',
-        min: 1
+        min: 1,
+        required: false
       },
       gravity: {
         type: 'string',
-        options: [
-          'Center',
-          'East',
-          'North',
-          'NorthEast',
-          'NorthWest',
-          'South',
-          'SouthEast',
-          'SouthWest',
-          'West'
-        ]
+        options: GravityValues,
+        required: false
       },
       strokeColor: {
-        type: 'Color',
-        default: 'black'
+        type: 'Inputs.Color',
+        default: 'black',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

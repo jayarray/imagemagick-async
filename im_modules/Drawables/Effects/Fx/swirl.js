@@ -40,7 +40,7 @@ class Swirl extends FxBaseClass {
         this.args.degrees = n;
         return this;
       }
-      
+
       build() {
         return new Swirl(this);
       }
@@ -107,10 +107,12 @@ class Swirl extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       degrees: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

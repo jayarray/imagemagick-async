@@ -195,23 +195,28 @@ class Crop extends ResizeBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       corner: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       removeVirtualCanvas: {
-        type: 'boolean'
+        type: 'boolean',
+        required: true
       }
     };
   }

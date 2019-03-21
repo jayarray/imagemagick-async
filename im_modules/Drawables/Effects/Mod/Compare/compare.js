@@ -155,16 +155,20 @@ class Compare extends CompareBaseClass {
   static Parameters() {
     return {
       source1: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       source2: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       highlightColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       lowlightColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       }
     };
   }

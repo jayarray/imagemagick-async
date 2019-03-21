@@ -133,17 +133,20 @@ class ResizeDimensions extends ResizeBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       }
     };
   }

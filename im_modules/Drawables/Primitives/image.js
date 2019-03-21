@@ -174,25 +174,30 @@ class Image extends PrimitivesBaseClass {
   static Parameters() {
     return {
       src: {
-        type: 'string'
+        type: 'string',
+        rewuired: true
       },
       corner: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        rewuired: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
         min: 1,
-        default: 0
+        default: 0,
+        rewuired: false
       },
       height: {
         type: 'number',
         subtype: 'integer',
         min: 1,
-        default: 0
+        default: 0,
+        rewuired: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

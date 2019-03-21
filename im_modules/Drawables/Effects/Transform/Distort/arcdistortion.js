@@ -101,10 +101,12 @@ class ArcDistortion extends DistortBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       degrees: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

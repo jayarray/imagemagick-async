@@ -146,17 +146,21 @@ class Point extends PrimitivesBaseClass {
     return {
       x: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: true
       },
       y: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

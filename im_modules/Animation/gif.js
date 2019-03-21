@@ -7,6 +7,7 @@ let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let AnimationBaseClass = require(Path.join(Filepath.AnimationDir(), 'animationbaseclass.js')).AnimationBaseClass;
+let DisposeValues = require(Path.join(Filepath.ConstantsDir(), 'dispose.json')).values;
 
 //--------------------------------------
 // GIF
@@ -201,27 +202,32 @@ class Gif extends AnimationBaseClass {
       filepaths: {
         type: 'string',
         isArray: true,
-        min: 2
+        min: 2,
+        required: true
       },
       loop: {
         type: 'number',
         subtype: 'integer',
         min: 0,
-        default: 0  // infinite loop
+        default: 0,  // infinite loop
+        required: false
       },
       delay: {
         type: 'number',
         min: 0,
-        default: 1 // In 1/100th of a second
+        default: 1, // In 1/100th of a second
+        required: false
       },
       dispose: {
         type: 'string',
         default: 'Undefined',
-        options: ['Undefined', 'None', 'Previous', 'Background']
+        options: DisposeValues,
+        required: false
       },
       outputPath: {
         type: 'string',
-        default: ''
+        default: '',
+        required: true
       }
     };
   }

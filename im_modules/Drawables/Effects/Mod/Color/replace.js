@@ -162,18 +162,22 @@ class Replace extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       targetColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       desiredColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       fuzz: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       }
     };
   }

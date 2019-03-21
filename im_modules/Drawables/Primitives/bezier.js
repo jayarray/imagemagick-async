@@ -208,25 +208,30 @@ class Bezier extends PrimitivesBaseClass {
   static Parameters() {
     return {
       points: {
-        type: 'Coordinates',
+        type: 'Inputs.Coordinates',
         isArray: true,
-        min: 3
+        min: 3,
+        required: true
       },
       strokeColor: {
-        type: 'Color',
-        default: 'black'
+        type: 'Inputs.Color',
+        default: 'black',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
         min: 1,
-        default: 1
+        default: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

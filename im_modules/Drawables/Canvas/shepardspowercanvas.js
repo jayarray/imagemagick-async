@@ -184,25 +184,30 @@ class ShepardsPowerCanvas extends CanvasBaseClass {
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       pointsAndColors: {
-        type: 'PointAndColor',
+        type: 'Inputs.PointAndColor',
         isArray: true,
-        min: 1
+        min: 1,
+        required: true
       },
       power: {
         type: 'number',
-        min: 0
+        min: 0,
+        required: true
       },
       softBlend: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: false
       }
     };
   }

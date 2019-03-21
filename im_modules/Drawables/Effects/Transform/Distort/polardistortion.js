@@ -216,26 +216,32 @@ class PolarDistortion extends DistortBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: false
       },
       radiusMin: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: false
       },
       radiusMax: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: false
       },
       startAngle: {
-        type: 'number'
+        type: 'number',
+        required: false
       },
       endAngle: {
-        type: 'number'
+        type: 'number',
+        required: false
       }
     };
   }

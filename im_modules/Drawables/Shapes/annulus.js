@@ -302,34 +302,42 @@ class Annulus extends PrimitivesBaseClass {
   static Parameters() {
     return {
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       minorRadius: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       majorRadius: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       strokeColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

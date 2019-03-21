@@ -103,10 +103,12 @@ class PointAndColor extends InputsBaseClass {
   static Parameters() {
     return {
       point: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       color: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       }
     };
   }

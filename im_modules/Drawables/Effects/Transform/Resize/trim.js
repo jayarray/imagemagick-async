@@ -142,14 +142,17 @@ class Trim extends ResizeBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       borderColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       fuzz: {
         type: 'number',
-        min: 0
+        min: 0,
+        required: true
       }
     };
   }

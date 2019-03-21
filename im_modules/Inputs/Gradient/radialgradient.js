@@ -285,33 +285,41 @@ class RadialGradient extends GradientBaseClass {
   static Parameters() {
     return {
       startColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       endColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: false
       },
       radialWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       radialHeight: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       angle: {
-        type: 'number'
+        type: 'number',
+        required: false
       },
       boundinBox: {
-        type: 'BoundingBox'
+        type: 'Inputs.Gradient.BoundingBox',
+        required: false
       },
       extent: {
         type: 'string',
-        options: ExtentValues
+        options: ExtentValues,
+        required: false
       }
     };
   }

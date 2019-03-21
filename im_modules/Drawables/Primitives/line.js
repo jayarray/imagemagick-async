@@ -188,22 +188,27 @@ class Line extends PrimitivesBaseClass {
   static Parameters() {
     return {
       start: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       end: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       color: {
-        type: 'Color',
-        default: 'black'
+        type: 'Inputs.Color',
+        default: 'black',
+        required: false
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

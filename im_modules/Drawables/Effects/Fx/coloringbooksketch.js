@@ -114,11 +114,13 @@ class ColoringBookSketch extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       isHeavilyShaded: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: true
       }
     };
   }

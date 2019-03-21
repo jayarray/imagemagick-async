@@ -62,7 +62,7 @@ class Line extends LineSegmentBaseClass {
   String() {
     let x = this.args.x + this.args.offset.args.x;
     let y = this.args.y + this.args.offset.args.y;
-    
+
     return `L ${x},${y}`;
   }
 
@@ -109,14 +109,17 @@ class Line extends LineSegmentBaseClass {
     return {
       x: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: true
       },
       y: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: true
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

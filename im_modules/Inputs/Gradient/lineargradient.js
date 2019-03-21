@@ -252,24 +252,30 @@ class LinearGradient extends GradientBaseClass {
   static Parameters() {
     return {
       startColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       endColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: true
       },
       vector: {
-        type: 'Vector'
+        type: 'Inputs.Vector',
+        required: false
       },
       boundingBox: {
-        type: 'BoundingBox'
+        type: 'Inputs.Gradient.BoundingBox',
+        required: false
       },
       direction: {
         type: 'string',
-        options: DirectionValues
+        options: DirectionValues,
+        required: false
       },
       extent: {
         type: 'string',
-        options: ExtentValues
+        options: ExtentValues,
+        required: false
       }
     };
   }

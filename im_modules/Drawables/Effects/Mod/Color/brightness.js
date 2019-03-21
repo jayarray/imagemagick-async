@@ -110,13 +110,15 @@ class Brightness extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       value: {
         type: 'number',
         subtype: 'integer',
         min: 0,
-        max: 200
+        max: 200,
+        required: true
       }
     };
   }

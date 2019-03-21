@@ -400,47 +400,59 @@ class LabelCanvas extends CanvasBaseClass {
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       text: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       font: {
-        type: 'string'
+        type: 'string',
+        required: false
       },
       fontSize: {
         type: 'number',
-        min: 1
+        min: 1,
+        required: false
       },
       kerning: {
         type: 'number',
-        min: -3
+        min: -3,
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'number',
-        min: 1
+        min: 1,
+        required: false
       },
       strokeColor: {
-        typer: 'Color'
+        typer: 'Inputs.Color',
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       underColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       backgroundColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       gravity: {
         type: 'string',
-        options: GravityValues
+        options: GravityValues,
+        required: false
       }
     };
   }

@@ -111,12 +111,14 @@ class Saturation extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       value: {
         type: 'number',
         min: 0,
-        max: 200
+        max: 200,
+        required: true
       }
     };
   }

@@ -109,12 +109,14 @@ class Implode extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       factor: {
         type: 'number',
         min: -1,
-        max: 1
+        max: 1,
+        required: true
       }
     };
   }

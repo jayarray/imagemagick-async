@@ -285,40 +285,49 @@ class Ellipse extends PrimitivesBaseClass {
   static Parameters() {
     return {
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       strokeColor: {
-        type: 'Color',
-        default: 'black'
+        type: 'Inputs.Color',
+        default: 'black',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       angleStart: {
         type: 'number',
-        default: 0
+        default: 0,
+        required: false
       },
       angleEnd: {
         type: 'number',
-        default: 360
+        default: 360,
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

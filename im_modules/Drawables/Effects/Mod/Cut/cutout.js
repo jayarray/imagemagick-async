@@ -103,10 +103,12 @@ class CutOut extends CutBaseClass {
   static Parameters() {
     return {
       source1: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       source2: {
-        type: 'string'
+        type: 'string',
+        required: true
       }
     }
   }

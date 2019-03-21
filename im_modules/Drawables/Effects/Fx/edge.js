@@ -110,12 +110,14 @@ class Edge extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       edgeValue: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       }
     };
   }

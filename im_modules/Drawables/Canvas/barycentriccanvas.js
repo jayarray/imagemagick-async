@@ -165,21 +165,25 @@ class BarycentricCanvas extends CanvasBaseClass {
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       pointsAndColors: {
-        type: 'PointAndColor',
+        type: 'Inputs.PointAndColor',
         isArray: true,
-        length: 3
+        length: 3,
+        required: true
       },
       softBlend: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: false
       }
     };
   }

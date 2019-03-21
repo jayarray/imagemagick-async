@@ -303,36 +303,44 @@ class Layer extends ObjectInterface {
     return {
       foundation: {
         category: 'drawable',
-        types: ['Canvas', 'Effect']
+        types: ['Drawables.Canvases', 'Drawables.Effects'],
+        required: true
       },
       overlays: {
         category: 'drawable',
-        type: 'Layer',
-        isArray: true
+        type: 'Layer.Layer',
+        isArray: true,
+        required: false
       },
       appliedEffects: {
         category: 'drawable',
-        type: 'Effect',
-        isArray: true
+        type: 'Drawables.Effects',
+        isArray: true,
+        required: false
       },
       primitives: {
         category: 'drawable',
-        type: 'Primitive',
-        isArray: true
+        type: 'Drawables.Primitives',
+        isArray: true,
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       },
       id: {
-        type: 'string'
+        type: 'string',
+        required: false
       },
       drawPrimitivesFirst: {
         type: 'boolean',
-        default: true
+        default: true,
+        required: false
       },
       gravity: {
         type: 'string',
-        options: GravityValues
+        options: GravityValues,
+        required: false
       }
     };
   }

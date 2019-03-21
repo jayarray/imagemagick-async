@@ -72,7 +72,7 @@ class CubicBezier extends LineSegmentBaseClass {
     let c1Y = this.args.control1.args.y + this.args.offset.args.y;
     let c2X = this.args.control2.args.x + this.args.offset.args.x;
     let c2Y = this.args.control2.args.y + this.args.offset.args.y;
-    
+
     return `C ${c1X},${c1Y} ${c2X},${c2Y} ${this.args.endPoint.String()}`;
   }
 
@@ -137,16 +137,20 @@ class CubicBezier extends LineSegmentBaseClass {
   static Parameters() {
     return {
       control1: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       control2: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       endPoint: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

@@ -42,14 +42,6 @@ class Transparency extends ColorBaseClass {
         return this;
       }
 
-      /**
-       * @param {Color} color The desired tint color. Adds tint of color to mid-range colors. Pure colors such as black, red, yellow, white will not be affected.
-       */
-      color(color) {
-        this.args.color = color;
-        return this;
-      }
-
       build() {
         return new Transparency(this);
       }
@@ -120,12 +112,14 @@ class Transparency extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       percent: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       }
     };
   }

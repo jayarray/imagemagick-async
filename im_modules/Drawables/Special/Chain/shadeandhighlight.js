@@ -137,7 +137,7 @@ class ShadeAndHighlight extends ChainBaseClass {
     chainBuilder = chainBuilder.setOutputPath(tempOutputPath3);
 
     // Return object
-    
+
     let chainObj = chainBuilder.build();
     return chainObj;
   }
@@ -201,13 +201,16 @@ class ShadeAndHighlight extends ChainBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       direction: {
         type: 'number',
+        required: true
       },
       elevation: {
         type: 'number',
+        required: true
       }
     };
   }

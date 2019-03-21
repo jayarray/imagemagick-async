@@ -154,15 +154,18 @@ class Roll extends DisplaceBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       horizontal: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: false
       },
       vertical: {
         type: 'number',
-        subtype: 'integer'
+        subtype: 'integer',
+        required: false
       }
     };
   }

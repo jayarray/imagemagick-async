@@ -131,13 +131,16 @@ class RotateAroundPoint extends DisplaceBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       point: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       degrees: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

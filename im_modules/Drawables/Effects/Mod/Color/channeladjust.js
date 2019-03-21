@@ -191,17 +191,20 @@ class ChannelAdjust extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       channel: {
         type: 'string',
-        options: ColorChannels
+        options: ColorChannels,
+        required: true
       },
       value: {
         type: 'number',
         subtype: 'integer',
         min: 0,
-        max: 255
+        max: 255,
+        required: true
       }
     };
   }

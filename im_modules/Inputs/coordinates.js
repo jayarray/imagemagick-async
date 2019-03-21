@@ -104,12 +104,14 @@ class Coordinates extends InputsBaseClass {
       x: {
         type: 'number',
         subtype: 'integer',
-        default: 0
+        default: 0,
+        required: true
       },
       y: {
         type: 'number',
         subtype: 'integer',
-        default: 0
+        default: 0,
+        required: true
       }
     }
   }

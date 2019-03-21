@@ -127,6 +127,20 @@ class Impression extends FxBaseClass {
     if (elevationErr)
       errors.push(elevationErr);
 
+    let blurErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Blur')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.elevation)
+          .min(params.blur.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (blurErr)
+      errors.push(blurErr);
+
     return errors;
   }
 
@@ -143,17 +157,21 @@ class Impression extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       direction: {
         type: 'number',
+        required: true
       },
       elevation: {
         type: 'number',
+        required: true
       },
       blur: {
         type: 'number',
-        min: 1
+        min: 1,
+        required: false
       }
     };
   }

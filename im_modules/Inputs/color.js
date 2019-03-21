@@ -438,7 +438,7 @@ class Color extends InputsBaseClass {
     let str = '';
 
     let format = this.args.format;
-    
+
     if (format == 'string')
       str = info.hex.string;
     else if (format == 'integers')
@@ -669,30 +669,36 @@ class Color extends InputsBaseClass {
     return {
       format: {
         type: 'string',
-        options: ['string', 'integers', 'percents']
+        options: ['string', 'integers', 'percents'],
+        required: true
       },
       red: {
         type: 'number',
         min: RGB_MIN,
-        default: 0
+        default: 0,
+        required: false
       },
       green: {
         type: 'number',
         min: RGB_MIN,
-        default: 0
+        default: 0,
+        required: false
       },
       blue: {
         type: 'number',
         min: RGB_MIN,
-        default: 0
+        default: 0,
+        required: false
       },
       alpha: {
         type: 'number',
         min: RGB_MIN,
-        default: 0
+        default: 0,
+        required: false
       },
       hextString: {
-        type: 'string'
+        type: 'string',
+        required: false
       }
     };
   }

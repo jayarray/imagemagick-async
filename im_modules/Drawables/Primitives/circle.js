@@ -218,26 +218,32 @@ class Circle extends PrimitivesBaseClass {
   static Parameters() {
     return {
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       edge: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       strokeColor: {
         type: 'Color',
-        default: 'black'
+        default: 'black',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
         min: 1,
-        default: 1
+        default: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

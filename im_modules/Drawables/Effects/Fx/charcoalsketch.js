@@ -109,17 +109,14 @@ class CharcoalSketch extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
-      },
-      radius: {
-        type: 'number',
-        subtype: 'integer',
-        min: 0
+        type: 'string',
+        required: true
       },
       charcoalValue: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       }
     };
   }

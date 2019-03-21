@@ -155,20 +155,24 @@ class MotionBlur extends FxBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       radius: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       },
       sigma: {
         type: 'number',
         subtype: 'integer',
-        min: 0
+        min: 0,
+        required: true
       },
       angle: {
-        type: 'number'
+        type: 'number',
+        required: true
       }
     };
   }

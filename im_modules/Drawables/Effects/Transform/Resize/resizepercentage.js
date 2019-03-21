@@ -110,11 +110,13 @@ class ResizePercentage extends ResizeBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       percent: {
         type: 'number',
-        min: 0
+        min: 0,
+        required: true
       }
     };
   }

@@ -83,39 +83,39 @@ class BoundingBox extends InputsBaseClass {
       )
       .build()
       .String();
-    
+
     if (centerErr)
       errors.push(centerErr);
 
     let widthErr = Err.ErrorMessage.Builder
-			.prefix(prefix)
-			.varName('Width')
-			.condition(
-				new Err.NumberCondition.Builder(this.args.width)
-					.isInteger(true)
-					.min(params.width.min)
-					.build()
-			)
-			.build()
-			.String();
+      .prefix(prefix)
+      .varName('Width')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.width)
+          .isInteger(true)
+          .min(params.width.min)
+          .build()
+      )
+      .build()
+      .String();
 
-		if (widthErr)
-			errors.push(widthErr);
-			
-		let heightErr = Err.ErrorMessage.Builder
-			.prefix(prefix)
-			.varName('Height')
-			.condition(
-				new Err.NumberCondition.Builder(this.args.height)
-					.isInteger(true)
-					.min(params.height.min)
-					.build()
-			)
-			.build()
-			.String();
+    if (widthErr)
+      errors.push(widthErr);
 
-		if (heightErr)
-			errors.push(heightErr);
+    let heightErr = Err.ErrorMessage.Builder
+      .prefix(prefix)
+      .varName('Height')
+      .condition(
+        new Err.NumberCondition.Builder(this.args.height)
+          .isInteger(true)
+          .min(params.height.min)
+          .build()
+      )
+      .build()
+      .String();
+
+    if (heightErr)
+      errors.push(heightErr);
 
     return errors;
   }
@@ -126,17 +126,20 @@ class BoundingBox extends InputsBaseClass {
   static Parameters() {
     return {
       center: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       width: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       },
       height: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: true
       }
     };
   }

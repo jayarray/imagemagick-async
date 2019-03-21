@@ -253,31 +253,38 @@ class PathComposite extends PrimitivesBaseClass {
   static Parameters() {
     return {
       start: {
-        type: 'Coordinates'
+        type: 'Inputs.Coordinates',
+        required: true
       },
       lineSegments: {
-        type: 'LineSegment',
+        type: 'Inputs.LineSegments',
         isArray: true,
-        min: 1
+        min: 1,
+        required: true
       },
       strokeColor: {
-        type: 'Color',
-        default: 'black'
+        type: 'Inputs.Color',
+        default: 'black',
+        required: false
       },
       strokeWidth: {
         type: 'number',
         subtype: 'integer',
-        min: 1
+        min: 1,
+        required: false
       },
       fillColor: {
-        type: 'Color'
+        type: 'Inputs.Color',
+        required: false
       },
       isClosed: {
         type: 'boolean',
-        default: false
+        default: false,
+        required: false
       },
       offset: {
-        type: 'Offset'
+        type: 'Inputs.Offset',
+        required: false
       }
     };
   }

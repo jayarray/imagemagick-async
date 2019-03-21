@@ -133,15 +133,18 @@ class Colorize extends ColorBaseClass {
   static Parameters() {
     return {
       source: {
-        type: 'string'
+        type: 'string',
+        required: true
       },
       fillColor: {
-        type: 'Color'
+        type: 'Color',
+        required: true
       },
       percent: {
         type: 'number',
         min: 0,
-        max: 100
+        max: 100,
+        required: true
       }
     };
   }
