@@ -824,7 +824,7 @@ class Renderer {
 
         if (name == 'Gif') {
           let cmd = this.animation_.command;
-          let args = this.animation_.Args().concat(this.outputPath_);
+          let args = this.animation_.Args();
 
           LocalCommand.Execute(cmd, args).then(output => {
             if (output.stderr) {
