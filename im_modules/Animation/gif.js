@@ -66,6 +66,15 @@ class Gif extends AnimationBaseClass {
         return this;
       }
 
+      /**
+       * The destination for the newly created GIF.
+       * @param {string} str
+       */
+      outputPath(str) {
+        this.args.outputPath = str;
+        return this;
+      }
+
       build() {
         return new Gif(this);
       }
@@ -102,7 +111,7 @@ class Gif extends AnimationBaseClass {
       args.push(params.loop.default);
 
     // Add filepaths
-    args = args.concat(this.args.filepaths);
+    args = args.concat(this.args.filepaths).concat(this.args.outputPath);
   }
 
   /**
@@ -214,6 +223,11 @@ class Gif extends AnimationBaseClass {
         default: 'Undefined',
         options: DisposeValues,
         required: false
+      },
+      outputPath: {
+        type: 'string',
+        default: '',
+        required: true
       }
     };
   }
