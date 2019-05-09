@@ -98,7 +98,9 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
       // Insert source to args (if applicable)
       if (foundation.type != 'Canvas') {
         let source = foundation.args.source;
-        args = [source].concat(args);
+
+        if (source)
+          args = [source].concat(args);
       }
 
       // Add any primitive args
@@ -369,7 +371,7 @@ function RenderNormalLayer(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
     let appliedEffects = layer.args.appliedEffects;
 
-    if (appliedEffects == 0) {
+    if (appliedEffects.length == 0) {
       // Render foundation only
       RenderFoundationTempFileWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
         resolve(foundationTempOutputPath);
