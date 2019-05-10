@@ -112,6 +112,8 @@ class Gif extends AnimationBaseClass {
 
     // Add filepaths
     args = args.concat(this.args.filepaths).concat(this.args.outputPath);
+
+    return args;
   }
 
   /**
