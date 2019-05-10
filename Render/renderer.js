@@ -707,6 +707,7 @@ class Renderer {
     this.layer_ = builder.layer_;
     this.format_ = builder.format_;
     this.outputPath_ = builder.outputPath_;
+    this.isAnimation_ = builder.isAnimation_;
   }
 
   static get Builder() {
