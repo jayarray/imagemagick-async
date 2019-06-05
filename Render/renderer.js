@@ -673,6 +673,11 @@ function RenderSpecialLayer(layer, outputDir, format) {
         }).catch(error => reject(error));
       }
     }
+    else if (subtype == 'procedure') {
+      foundation.Render().then(success => {
+        resolve();
+      }).catch(error => reject(error));
+    }
   });
 }
 
