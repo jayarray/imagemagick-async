@@ -277,6 +277,7 @@ Api.Drawables = {
       PencilSketch: require(Path.join(Filepath.FxDir(), 'pencilsketch.js')).PencilSketch,
       Pixelate: require(Path.join(Filepath.FxDir(), 'pixelate.js')).Pixelate,
       RadialBlur: require(Path.join(Filepath.FxDir(), 'radialblur.js')).RadialBlur,
+      ShapeAbstraction: require(Path.join(Filepath.SpecialProcedureDir(), 'shapeabstraction.js')).ShapeAbstraction,
       ShadeAndHighlight: require(Path.join(Filepath.SpecialChainDir(), 'shadeandhighlight.js')).ShadeAndHighlight,
       Shadow: require(Path.join(Filepath.FxDir(), 'shadow.js')).Shadow,
       Swirl: require(Path.join(Filepath.FxDir(), 'swirl.js')).Swirl,
@@ -380,6 +381,8 @@ Api.Inputs = {
   Coordinates: require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates,
   Offset: require(Path.join(Filepath.InputsDir(), 'offset.js')).Offset,
   PointAndColor: require(Path.join(Filepath.InputsDir(), 'pointandcolor.js')).PointAndColor,
+  Spot: require(Path.join(Filepath.InputsDir(), 'spot.js')).Spot,
+  SpotShapes: require(Path.join(Filepath.InputsDir(), 'spot.js')).SHAPES,
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
 
