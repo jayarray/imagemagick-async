@@ -215,6 +215,17 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
+  static SpecialProcedureDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.SpecialDir())
+      .dir('Procedure')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
   static EffectsDir() {
     return Filepath.Builder
       .partialPath(Filepath.DrawablesDir())
