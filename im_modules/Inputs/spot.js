@@ -12,9 +12,9 @@ let InputsBaseClass = require(Path.join(Filepath.InputsDir(), 'inputsbaseclass.j
 // CONSTANTS
 
 let SHAPES = {
-  circle: 'c',
-  diamond: 'd',
-  square: 's'
+  circle: 'circle',
+  diamond: 'diamond',
+  square: 'square'
 };
 
 //-------------------------------
