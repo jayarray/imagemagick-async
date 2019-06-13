@@ -179,7 +179,7 @@ class Spot extends InputsBaseClass {
       shape: {
         type: 'string',
         default: SHAPES.circle,
-        options: [SHAPE.circle, SHAPE.diamond, SHAPES.square],
+        options: [SHAPES.circle, SHAPES.diamond, SHAPES.square],
         required: false
       },
       padding: {
