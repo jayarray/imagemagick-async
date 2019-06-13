@@ -250,7 +250,7 @@ class ShapeAbstraction extends ProcedureBaseClass {
       /**
        * @param {number} n 
        */
-      egde(n) {
+      edge(n) {
         this.args.edge = n;
         return this;
       }
