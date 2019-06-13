@@ -226,7 +226,8 @@ Api.Constants = {
   Fonts: require(Path.join(Filepath.ConstantsDir(), 'fonts.json')).values,
   GradientDirection: require(Path.join(Filepath.ConstantsDir(), 'gradient_direction.json')).values,
   GradientExtent: require(Path.join(Filepath.ConstantsDir(), 'gradient_extent.json')).values,
-  Gravity: require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values
+  Gravity: require(Path.join(Filepath.ConstantsDir(), 'gravity.json')).values,
+  SpotShapes: require(Path.join(Filepath.ConstantsDir(), 'spot_shapes.json')).values
 };
 
 
@@ -382,7 +383,6 @@ Api.Inputs = {
   Offset: require(Path.join(Filepath.InputsDir(), 'offset.js')).Offset,
   PointAndColor: require(Path.join(Filepath.InputsDir(), 'pointandcolor.js')).PointAndColor,
   Spot: require(Path.join(Filepath.InputsDir(), 'spot.js')).Spot,
-  SpotShapes: require(Path.join(Filepath.InputsDir(), 'spot.js')).SHAPES,
   Vector: require(Path.join(Filepath.InputsDir(), 'vector.js')).Vector
 };
 
