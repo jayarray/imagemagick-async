@@ -226,6 +226,17 @@ class Filepath {
   /**
    * @returns {string} Returns a path to this directory.
    */
+  static SpecialImageStackDir() {
+    return Filepath.Builder
+      .partialPath(Filepath.SpecialDir())
+      .dir('ImageStack')
+      .build()
+      .String();
+  }
+
+  /**
+   * @returns {string} Returns a path to this directory.
+   */
   static EffectsDir() {
     return Filepath.Builder
       .partialPath(Filepath.DrawablesDir())
