@@ -17,6 +17,13 @@ class CommandBaseClass extends SpecialBaseClass {
       subtype: 'command'
     });
   }
+
+  /**
+   * @returns {string} Returns a string containing the command for the render.
+   */
+  Command() {
+    // Override
+  }
 }
 
 //------------------------------
