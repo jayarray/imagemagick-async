@@ -10,27 +10,31 @@ let LinuxCommands = require('linux-commands-async');
 
 //--------------------------------------
 
-class SpecialCommandRenderer extends SpecialRendererBaseClass {
+class SpecialSequenceRenderer extends SpecialRendererBaseClass {
   constructor() {
   }
 
-  /**
-   * @override
-   */
   Render(layer, outputDir, format) {
     return new Promise((resolve, reject) => {
       let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
       let outputPath = Path.join(outputDir, filename);
-      let cmd = `${layer.args.foundation.Command()} ${outputPath}`;
 
-      LinuxCommands.Command.LOCAL.Execute(cmd, []).then(output => {
-        if (output.stderr) {
-          reject(`Failed to render special command: ${output.stderr}`);
-          return;
-        }
+      let foundation = layer.args.foundation;
+      let desiredDest = foundation.args.dest;
 
-        resolve(outputPath);
-      }).catch(error => reject(`Failed to render special command: ${error}`));
+      // Temporarily change the output path
+      foundation.args.dest = outputPath;
+
+      foundation.Render().then(success => {
+
+        // Restore dest
+        foundation.args.dest = desiredDest;
+
+        // Move file to desired dest
+        LinuxCommands.Move.Move(outputPath, desiredDest, LinuxCommands.Command.LOCAL).then(success => {
+          resolve(desiredDest);
+        }).catch(error => `Failed to move special sequence render: ${error}`);
+      }).catch(error => `Failed to render special sequence render: ${error}`);
     });
   }
 }
@@ -38,4 +42,4 @@ class SpecialCommandRenderer extends SpecialRendererBaseClass {
 //------------------------------
 // EXPORTS
 
-exports.SpecialCommandRenderer = SpecialCommandRenderer;
+exports.SpecialSequenceRenderer = SpecialSequenceRenderer;

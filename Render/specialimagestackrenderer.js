@@ -14,6 +14,9 @@ class SpecialImageStackRenderer extends SpecialRendererBaseClass {
   constructor() {
   }
 
+  /**
+   * @override
+   */
   Render(layer, outputDir, format) {
     return new Promise((resolve, reject) => {
       let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);

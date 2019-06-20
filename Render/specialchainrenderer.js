@@ -113,6 +113,9 @@ class SpecialChainRenderer extends SpecialRendererBaseClass {
   constructor() {
   }
 
+  /**
+   * @override
+   */
   Render(layer, outputDir, format) {
     return new Promise((resolve, reject) => {
       RenderChain(layer, outputDir, format).then(filepath => {
