@@ -4,6 +4,11 @@ let index = PathParts.indexOf('imagemagick-async');
 let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 
+let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
+let Layer = require(Filepath.LayerDir(), 'layer.js').Layer;
+let ImageCanvas = require(Filepath.CanvasDir(), 'imagecanvas.js').ImageCanvas;
+let GetInfo = require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo;
+let OrdinaryRenderer = require(Filepath.RenderDir(), 'ordinaryrenderer.js').OrdinaryRenderer;
 let SpecialChainRenderer = require(Filepath.RenderDir(), 'specialchainrenderer.js').SpecialChainRenderer;
 let SpecialCommandRenderer = require(Filepath.RenderDir(), 'specialcommandrenderer.js').SpecialCommandRenderer;
 let SpecialProcedureRenderer = require(Filepath.RenderDir(), 'specialprocedurerenderer.js').SpecialProcedureRenderer;
@@ -38,7 +43,53 @@ class SpecialRenderer {
       }
 
       specialRenderer.Render().then(tempFilepath => {
-        resolve(tempFilepath);
+
+        // Get dimensions
+
+        GetInfo(temp).then(infoObj => {
+          let info = infoObj.info;
+          let w = info.dimensions.width;
+          let h = info.dimensions.height;
+
+          // Process rendered image as an image canvas
+
+          let imgCanvas = ImageCanvas.Builder
+            .source(tempFilepath)
+            .width(w)
+            .height(h)
+            .build();
+
+          let originalArgs = layer.args;
+
+          let tempLayer = Layer.Builder
+            .foundation(imgCanvas)
+            .overlays(originalArgs.overlays)
+            .applyManyEffects(originalArgs.appliedEffects)
+            .drawMany(originalArgs.primitives)
+            .offset(originalArgs.offset)
+            .gravity(originalArgs.gravity)
+            .id(originalArgs.id);
+
+          if (originalArgs.drawPrimitivesFirst)
+            tempLayer = tempLayer.drawPrimitivesFirst();
+          else
+            tempLayer = tempLayer.applyEffectsFirst();
+
+          tempLayer = tempLayer.build();
+
+          let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+          let outputPath = Path.join(outputDir, filename);
+
+          let ordRenderer = OrdinaryRenderer.Builder
+            .layer(tempLayer)
+            .format(format)
+            .outputPath(outputh)
+            .build();
+
+          ordRenderer.Render(filepath => {
+            resolve(filepath);
+          }).catch(error => reject(`Special renderer failed: ${error}`));
+        }).catch(error => reject(`Special renderer failed: ${error}`));
       }).catch(error => reject(error));
     });
   }
