@@ -8,6 +8,7 @@ let SpecialChainRenderer = require(Filepath.RenderDir(), 'specialchainrenderer.j
 let SpecialCommandRenderer = require(Filepath.RenderDir(), 'specialcommandrenderer.js').SpecialCommandRenderer;
 let SpecialProcedureRenderer = require(Filepath.RenderDir(), 'specialprocedurerenderer.js').SpecialProcedureRenderer;
 let SpecialSequenceRenderer = require(Filepath.RenderDir(), 'specialsequencerenderer.js').SpecialSequenceRenderer;
+let SpecialImageStackRenderer = require(Filepath.RenderDir(), 'specialimagestackrenderer.js').SpecialImageStackRenderer;
 
 //--------------------------------------
 
@@ -29,6 +30,8 @@ class SpecialRenderer {
         specialRenderer = SpecialProcedureRenderer(layer, outputDir, format);
       else if (subtype == 'sequence')
         specialRenderer = SpecialSequenceRenderer(layer, outputDir, format);
+      else if (subtype == 'stack')
+        specialRenderer = SpecialImageStackRenderer(layer, outputDir, format);
       else {
         reject(`Failed to render: unknown special type "${subtype}".`);
         return;
