@@ -83,7 +83,7 @@ class SpecialRenderer {
           let ordRenderer = OrdinaryRenderer.Builder
             .layer(tempLayer)
             .format(format)
-            .outputPath(outputh)
+            .outputPath(outputPath)
             .build();
 
           ordRenderer.Render(filepath => {
