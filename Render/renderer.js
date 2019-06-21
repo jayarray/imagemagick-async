@@ -18,6 +18,9 @@ let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
 let ImageCanvas = require(Path.join(Filepath.CanvasDir(), 'imagecanvas.js')).ImageCanvas;
 let Identify = require(Path.join(Filepath.QueryInfoDir(), 'identify.js'));
 
+let OrdinaryRenderer = require(Filepath.RenderDir(), 'ordinaryrenderer.js').OrdinaryRenderer;
+let SpecialRenderer = require(Filepath.RenderDir(), 'specialrenderer.js').SpecialRenderer;
+
 //-----------------------------------
 // HELPER FUNCTIONS
 
@@ -54,6 +57,8 @@ function ComposeImages(source, filepathOffsetTuples, gravity, outputPath) {
     }).catch(error => `Failed to compose images: ${error}`);
   });
 }
+
+//-------------------------------
 
 /**
  * Use when drawing primitives first OR when no effects are applied.
@@ -367,7 +372,7 @@ function ApplyEffectsSecond(layer, outputDir, format) {
  * @param {string} format
  * @returns {Promise<string>} Returns a Promise with the output path.
  */
-function RenderNormalLayer(layer, outputDir, format) {
+function RenderOrdinaryLayer(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
     let appliedEffects = layer.args.appliedEffects;
 
@@ -420,118 +425,8 @@ function RenderNormalLayer(layer, outputDir, format) {
   });
 }
 
-/**
- * Use when rendering Special command!
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderSpecialCommandWithoutEffects(layer, outputDir, format) {
-  return new Promise((resolve, reject) => {
-    let cmd = layer.args.foundation.Command();
-    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
-    let tempOutputPath = Path.join(outputDir, filename);
-    let cmdStr = `${cmd} ${tempOutputPath}`;
-
-    LocalCommand.Execute(cmdStr, []).then(output => {
-      if (output.stderr) {
-        reject(output.stderr);
-        return;
-      }
-
-      // Get recent render info
-      Identify.GetInfo(tempOutputPath).then(info => {
-        let dimensions = info.Dimensions();
-
-        let imgCanvas = ImageCanvas.Builder
-          .width(dimensions.width)
-          .height(dimensions.height)
-          .source(tempOutputPath)
-          .build();
-
-        layer.args.foundation = imgCanvas;
-
-        // Render layer with modified foundation
-        resolve(RenderFoundationTempFileWithoutEffects(layer, outputDir, format));
-      }).catch(error => reject(error));
-    }).catch(error => reject(error));
-  });
-}
-
-/**
- * Use when rendering Special command!
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderSpecialCommandWithEffects(layer, outputDir, format) {
-  return new Promise((resolve, reject) => {
-    let cmd = layer.args.foundation.Command();
-    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
-    let tempOutputPath = Path.join(outputDir, filename);
-    let cmdStr = `${cmd} ${tempOutputPath}`;
-
-    LocalCommand.Execute(cmdStr, []).then(output => {
-      if (output.stderr) {
-        reject(output.stderr);
-        return;
-      }
-
-      // Get recent render info
-      Identify.GetInfo(tempOutputPath).then(info => {
-        let dimensions = info.Dimensions();
-
-        let imgCanvas = ImageCanvas.Builder
-          .width(dimensions.width)
-          .height(dimensions.height)
-          .source(tempOutputPath)
-          .build();
-
-        layer.args.foundation = imgCanvas;
-
-        // Render layer with modified foundation
-        resolve(RenderNormalLayer(layer, outputDir, format));
-      }).catch(error => reject(error));
-    }).catch(error => reject(error));
-  });
-}
-
-
-/**
- * Use when rendering Special sequence!
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderSpecialSequenceWithoutEffects(layer, outputDir, format) {
-  return new Promise((resolve, reject) => {
-    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
-    let tempOutputPath = Path.join(outputDir, filename);
-
-    // TO DO
-    // No sequences yet.
-  });
-}
-
-/**
- * Use when rendering Special sequence!
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderSpecialSequenceWithEffects(layer, outputDir, format) {
-  return new Promise((resolve, reject) => {
-    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
-    let tempOutputPath = Path.join(outputDir, filename);
-
-    // TO DO
-    // No sequences yet.
-  });
-}
+//---------------------------------------------
+// SPECIAL CHAIN
 
 /**
  * Use when executing chain!
@@ -563,7 +458,7 @@ function ExecuteChain(chainItems, tempDirPath, format) {
     else if (currItem.type == 'render') {  // RENDER
       let layer = currItem.obj;
 
-      RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
+      RenderOrdinaryLayer(layer, tempDirPath, format).then(recentFilepath => {
 
         // Move them back to intended location. (Previous function renames them by nature)
         LinuxCommands.Move.Move(recentFilepath, currItem.outputPath, LocalCommand).then(success => {
@@ -608,13 +503,13 @@ function RenderChain(layer, outputDir, format) {
 
           layer.args.foundation = imgCanvas;
 
-          RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
+          RenderOrdinaryLayer(layer, tempDirPath, format).then(recentFilepath => {
 
             // Move file to output dir
             let filename = LinuxCommands.Path.Filename(outputPath);
             let newPath = Path.join(outputDir, filename);
 
-            LinuxCommands.Move.Move(outputPath, newPath, LocalCommand).then(success => {
+            LinuxCommands.Move.Move(recentFilepath, newPath, LocalCommand).then(success => {
 
               // Clean up temp dir
               LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
@@ -630,76 +525,141 @@ function RenderChain(layer, outputDir, format) {
   });
 }
 
+//---------------------------------
+// SPECIAL COMMAND
 
 /**
- * Use when rendering Special command!
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderSpecialLayer(layer, outputDir, format) {
+   * @override
+   */
+function RenderCommand(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
-    let foundation = layer.args.foundation;
-    let subtype = foundation.subtype;
-    let appliedEffects = layer.args.appliedEffects;
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let outputPath = Path.join(outputDir, filename);
+    let cmd = `${layer.args.foundation.Command()} ${outputPath}`;
 
-    if (subtype == 'command') {
-      if (appliedEffects.length == 0) { // NO EFFECTS
-        RenderSpecialCommandWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => {
-          resolve(foundationTempOutputPath);
-        }).catch(error => reject(error));
+    LinuxCommands.Command.LOCAL.Execute(cmd, []).then(output => {
+      if (output.stderr) {
+        reject(`Failed to render special command: ${output.stderr}`);
+        return;
       }
-      else { // EFFECTS APPLIED
-        RenderSpecialCommandWithEffects(layer, outputDir, format).then(recentFilepath => {
-          resolve(recentFilepath);
-        }).catch(error => reject(error));
-      }
-    }
-    else if (subtype == 'chain') {
-      RenderChain(layer, outputDir, format).then(foundationTempOutputPath => {
-        resolve(foundationTempOutputPath);
-      }).catch(error => reject(error));
-    }
-    else if (subtype == 'sequence') {
-      if (appliedEffects.length == 0) {
-        RenderSpecialSequenceWithoutEffects(layer, outputDir, format).then(foundationTempOutputPath => { // TO DO: Create function
-          resolve(foundationTempOutputPath);
-        }).catch(error => reject(error));
-      }
-      else {
-        RenderSpecialSequenceWithEffects(layer, outputDir, format).then(foundationTempOutputPath => { // TO DO: Create function
-          resolve(foundationTempOutputPath);
-        }).catch(error => reject(error));
-      }
-    }
-    else if (subtype == 'procedure') {
-      foundation.Render().then(success => {
-        resolve();
-      }).catch(error => reject(error));
-    }
+
+      resolve(outputPath);
+    }).catch(error => reject(`Failed to render special command: ${error}`));
   });
 }
 
+//---------------------------------
+// SPECIAL IMAGE STACK
+
 /**
- * @param {Layer} layer
- * @param {string} outputDir
- * @param {string} format
- * @returns {Promise<string>} Returns a Promise with the output path.
- */
-function RenderLayer(layer, outputDir, format) {
+   * @override
+   */
+function RenderImageStack(layer, outputDir, format) {
   return new Promise((resolve, reject) => {
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let outputPath = Path.join(outputDir, filename);
+    let cmd = `${layer.args.foundation.Command()} ${outputPath}`;
+
+    LinuxCommands.Command.LOCAL.Execute(cmd, []).then(output => {
+      if (output.stderr) {
+        reject(`Failed to render special image stack: ${output.stderr}`);
+        return;
+      }
+
+      resolve(outputPath);
+    }).catch(error => reject(`Failed to render special image stack: ${error}`));
+  });
+}
+
+//---------------------------------
+// SPECIAL PROCEDURE
+/**
+   * @override
+   */
+function RenderProcedure(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+    let outputPath = Path.join(outputDir, filename);
+
     let foundation = layer.args.foundation;
+    let desiredDest = foundation.args.dest;
 
-    let action = null;
+    // Temporarily change the output path
+    foundation.args.dest = outputPath;
 
-    if (foundation.type == 'Special')
-      action = RenderSpecialLayer(layer, outputDir, format);
-    else
-      action = RenderNormalLayer(layer, outputDir, format);
+    foundation.Render().then(success => {
 
-    action.then(tempOutputPath => {
-      resolve(tempOutputPath);
+      // Restore dest
+      foundation.args.dest = desiredDest;
+
+      // Move file to desired dest
+      LinuxCommands.Move.Move(outputPath, desiredDest, LinuxCommands.Command.LOCAL).then(success => {
+        resolve(desiredDest);
+      }).catch(error => `Failed to move special procedure render: ${error}`);
+    }).catch(error => `Failed to render special procedure render: ${error}`);
+  });
+}
+
+//---------------------------------
+// SPECIAL RENDERER
+
+function RenderSpecialLayer(layer, outputDir, format) {
+  return new Promise((resolve, reject) => {
+    let subtype = layer.args.foundation.subtype;
+    let specialRenderer = null;
+
+    if (subtype == 'chain')
+      specialRenderer = RenderChain(layer, outputDir, format);
+    else if (subtype == 'command')
+      specialRenderer = RenderCommand(layer, outputDir, format);
+    else if (subtype == 'stack')
+      specialRenderer = RenderImageStack(layer, outputDir, format);
+    else if (subtype == 'procedure')
+      specialRenderer = RenderProcedure(layer, outputDir, format);
+    else {
+      reject(`Failed to render: unknown special type "${subtype}".`);
+      return;
+    }
+
+    specialRenderer.then(tempFilepath => {
+
+      // Get dimensions
+
+      GetInfo(temp).then(infoObj => {
+        let info = infoObj.info;
+        let w = info.dimensions.width;
+        let h = info.dimensions.height;
+
+        // Process rendered image as an image canvas
+
+        let imgCanvas = ImageCanvas.Builder
+          .source(tempFilepath)
+          .width(w)
+          .height(h)
+          .build();
+
+        let originalArgs = layer.args;
+
+        let tempLayer = Layer.Builder
+          .foundation(imgCanvas)
+          .overlays(originalArgs.overlays)
+          .applyManyEffects(originalArgs.appliedEffects)
+          .drawMany(originalArgs.primitives)
+          .offset(originalArgs.offset)
+          .gravity(originalArgs.gravity)
+          .id(originalArgs.id);
+
+        if (originalArgs.drawPrimitivesFirst)
+          tempLayer = tempLayer.drawPrimitivesFirst();
+        else
+          tempLayer = tempLayer.applyEffectsFirst();
+
+        tempLayer = tempLayer.build();
+
+        RenderOrdinaryLayer(tempLayer, outputDir, format).then(recentFilepath => {
+          resolve(recentFilepath);
+        }).catch(error => reject(`Special renderer failed: ${error}`));
+      }).catch(error => reject(`Special renderer failed: ${error}`));
     }).catch(error => reject(error));
   });
 }
@@ -857,8 +817,27 @@ class Renderer {
 
           let layer = this.layer_;
           let format = this.format_;
+          let type = layer.args.foundation.type;
 
-          RenderLayer(layer, tempDirPath, format).then(recentFilepath => {
+          let renderer = null;
+
+          if (type == 'Special') {
+            let sRenderer = new SpecialRenderer();
+            renderer = sRenderer.Render(layer, tempDirPath, format);
+          }
+          else {
+            let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+            let outputPath = Path.join(outputDir, filename);
+
+            renderer = OrdinaryRenderer.Builder
+              .layer(layer)
+              .format(format)
+              .outputPath(outputPath)
+              .build()
+              .Render();
+          }
+
+          renderer.then(recentFilepath => {
 
             // Check if there are any overlays to render.
             let overlays = layer.args.overlays;
@@ -882,7 +861,25 @@ class Renderer {
               let actions = [];
 
               overlays.forEach(oLayer => {
-                let a = RenderLayer(oLayer, tempDirPath, format);
+                let type = oLayer.args.foundation.type;
+                let a = null;
+
+                if (type == 'Special') {
+                  let sRenderer = new SpecialRenderer();
+                  a = sRenderer.Render(layer, tempDirPath, format);
+                }
+                else {
+                  let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
+                  let outputPath = Path.join(outputDir, filename);
+
+                  a = OrdinaryRenderer.Builder
+                    .layer(layer)
+                    .format(format)
+                    .outputPath(outputPath)
+                    .build()
+                    .Render();
+                }
+
                 actions.push(a);
               });
 
