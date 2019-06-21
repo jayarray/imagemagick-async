@@ -598,7 +598,15 @@ class OrdinaryRenderer {
               let actions = [];
 
               overlays.forEach(oLayer => {
-                let a = RenderLayer(oLayer, tempDirPath, format);
+                let type = oLayer.args.foundation.type;
+                let r = null;
+
+                if (type == 'Special')
+                  r = new SpecialRenderer();
+                else
+                  r = new OrdinaryRenderer();
+
+                let a = r.Render(oLayer, tempDirPath, format);
                 actions.push(a);
               });
 
@@ -650,7 +658,7 @@ class OrdinaryRenderer {
                 }).catch(error => reject(`ORDINARY_RENDERER_ERROR: ${error}`));
               }).catch(error => reject(`ORDINARY_RENDERER_ERROR: ${error}`));
             }
-          }).catch(error => reject(`ORDINARY_RENDERER_ERROR: ${error}`));
+          }).catch(error => reject(error));
         }).catch(error => reject(`ORDINARY_RENDERER_ERROR: ${error}`));
       }
     });
