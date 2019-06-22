@@ -18,8 +18,8 @@ let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
 let ImageCanvas = require(Path.join(Filepath.CanvasDir(), 'imagecanvas.js')).ImageCanvas;
 let Identify = require(Path.join(Filepath.QueryInfoDir(), 'identify.js'));
 
-let OrdinaryRenderer = require(Filepath.RenderDir(), 'ordinaryrenderer.js').OrdinaryRenderer;
-let SpecialRenderer = require(Filepath.RenderDir(), 'specialrenderer.js').SpecialRenderer;
+let OrdinaryRenderer = require(Path.join(Filepath.RenderDir(), 'ordinaryrenderer.js')).OrdinaryRenderer;
+let SpecialRenderer = require(Path.join(Filepath.RenderDir(), 'specialrenderer.js')).SpecialRenderer;
 
 //-----------------------------------
 // HELPER FUNCTIONS
