@@ -111,6 +111,7 @@ function RenderChain(layer, outputDir, format) {
 
 class SpecialChainRenderer extends SpecialRendererBaseClass {
   constructor() {
+    super();
   }
 
   /**

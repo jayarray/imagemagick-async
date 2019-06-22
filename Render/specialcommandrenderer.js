@@ -12,6 +12,7 @@ let LinuxCommands = require('linux-commands-async');
 
 class SpecialCommandRenderer extends SpecialRendererBaseClass {
   constructor() {
+    super();
   }
 
   /**

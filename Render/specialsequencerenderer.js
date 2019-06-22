@@ -12,6 +12,7 @@ let LinuxCommands = require('linux-commands-async');
 
 class SpecialSequenceRenderer extends SpecialRendererBaseClass {
   constructor() {
+    super();
   }
 
   Render(layer, outputDir, format) {

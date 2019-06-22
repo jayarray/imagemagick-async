@@ -12,6 +12,7 @@ let LinuxCommands = require('linux-commands-async');
 
 class SpecialImageStackRenderer extends SpecialRendererBaseClass {
   constructor() {
+    super();
   }
 
   /**
