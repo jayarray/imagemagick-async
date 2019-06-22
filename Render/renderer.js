@@ -827,7 +827,7 @@ class Renderer {
           }
           else {
             let filename = Guid.Filename(Guid.DEFAULT_LENGTH, format);
-            let outputPath = Path.join(outputDir, filename);
+            let outputPath = Path.join(tempDirPath, filename);
 
             renderer = OrdinaryRenderer.Builder
               .layer(layer)
