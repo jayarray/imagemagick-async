@@ -5,15 +5,15 @@ let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 
 let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
-let Layer = require(Filepath.LayerDir(), 'layer.js').Layer;
-let ImageCanvas = require(Filepath.CanvasDir(), 'imagecanvas.js').ImageCanvas;
+let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
+let ImageCanvas = require(Path.join(Filepath.CanvasDir(), 'imagecanvas.js')).ImageCanvas;
 let GetInfo = require(Path.join(Filepath.QueryInfoDir(), 'identify.js')).GetInfo;
-let OrdinaryRenderer = require(Filepath.RenderDir(), 'ordinaryrenderer.js').OrdinaryRenderer;
-let SpecialChainRenderer = require(Filepath.RenderDir(), 'specialchainrenderer.js').SpecialChainRenderer;
-let SpecialCommandRenderer = require(Filepath.RenderDir(), 'specialcommandrenderer.js').SpecialCommandRenderer;
-let SpecialProcedureRenderer = require(Filepath.RenderDir(), 'specialprocedurerenderer.js').SpecialProcedureRenderer;
-let SpecialSequenceRenderer = require(Filepath.RenderDir(), 'specialsequencerenderer.js').SpecialSequenceRenderer;
-let SpecialImageStackRenderer = require(Filepath.RenderDir(), 'specialimagestackrenderer.js').SpecialImageStackRenderer;
+let OrdinaryRenderer = require(Path.join(Filepath.RenderDir(), 'ordinaryrenderer.js')).OrdinaryRenderer;
+let SpecialChainRenderer = require(Path.join(Filepath.RenderDir(), 'specialchainrenderer.js')).SpecialChainRenderer;
+let SpecialCommandRenderer = require(Path.join(Filepath.RenderDir(), 'specialcommandrenderer.js')).SpecialCommandRenderer;
+let SpecialProcedureRenderer = require(Path.join(Filepath.RenderDir(), 'specialprocedurerenderer.js')).SpecialProcedureRenderer;
+let SpecialSequenceRenderer = require(Path.join(Filepath.RenderDir(), 'specialsequencerenderer.js')).SpecialSequenceRenderer;
+let SpecialImageStackRenderer = require(Path.join(Filepath.RenderDir(), 'specialimagestackrenderer.js')).SpecialImageStackRenderer;
 
 //--------------------------------------
 
