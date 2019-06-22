@@ -28,25 +28,25 @@ class SpecialRenderer {
       let specialRenderer = null;
 
       if (subtype == 'chain')
-        specialRenderer = SpecialChainRenderer(layer, outputDir, format);
+        specialRenderer = new SpecialChainRenderer();
       else if (subtype == 'command')
-        specialRenderer = SpecialCommandRenderer(layer, outputDir, format);
+        specialRenderer = new SpecialCommandRenderer(l);
       else if (subtype == 'procedure')
-        specialRenderer = SpecialProcedureRenderer(layer, outputDir, format);
+        specialRenderer = new SpecialProcedureRenderer();
       else if (subtype == 'sequence')
-        specialRenderer = SpecialSequenceRenderer(layer, outputDir, format);
+        specialRenderer = new SpecialSequenceRenderer();
       else if (subtype == 'stack')
-        specialRenderer = SpecialImageStackRenderer(layer, outputDir, format);
+        specialRenderer = new SpecialImageStackRenderer();
       else {
         reject(`Failed to render: unknown special type "${subtype}".`);
         return;
       }
 
-      specialRenderer.Render().then(tempFilepath => {
+      specialRenderer.Render(layer, outputDir, format).then(tempFilepath => {
 
         // Get dimensions
 
-        GetInfo(temp).then(infoObj => {
+        GetInfo(tempFilepath).then(infoObj => {
           let info = infoObj.info;
           let w = info.dimensions.width;
           let h = info.dimensions.height;
