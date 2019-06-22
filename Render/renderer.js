@@ -625,7 +625,7 @@ function RenderSpecialLayer(layer, outputDir, format) {
 
       // Get dimensions
 
-      GetInfo(temp).then(infoObj => {
+      GetInfo(tempFilepath).then(infoObj => {
         let info = infoObj.info;
         let w = info.dimensions.width;
         let h = info.dimensions.height;
