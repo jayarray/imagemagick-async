@@ -848,11 +848,11 @@ class Renderer {
               LinuxCommands.Move.Move(recentFilepath, this.outputPath_, LocalCommand).then(success => {
 
                 // Clean up temp directory
-                LinuxCommands.Directory.Remove(tempDirPath, LocalCommand).then(success => {
+                return LinuxCommands.Directory.Remove(tempDirPath, LocalCommand);
+              }).then(success => {
 
-                  // Return render filepath
-                  resolve(this.outputPath_);
-                }).catch(error => reject(`RENDERER_ERROR: ${error}`));
+                // Return render filepath
+                resolve(this.outputPath_);
               }).catch(error => reject(`RENDERER_ERROR: ${error}`));
             }
             else {
