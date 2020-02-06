@@ -75,11 +75,8 @@ class VoronoiCanvas extends CanvasBaseClass {
 
     let args = ['-size', `${this.args.width}x${this.args.height}`, 'canvas:', '-colorspace', 'RGB', '-sparse-color', 'Voronoi', stringArr.join(' ')];
 
-    if (this.softBlend_)
+    if (this.args.softBlend)
       args.push('-colorspace', 'sRGB');
-
-    if (this.primitives.length > 0)
-      this.primitives.forEach(p => args = args.concat(p.Args()));
 
     return args;
   }
