@@ -115,7 +115,9 @@ function RenderFoundationTempFileWithoutEffects(layer, outputDir, format) {
 
         // Get all primitive args
         let primitiveArgs = [];
-        primitives.forEach(p => primitiveArgs.concat(p.Args()));
+        primitives.forEach(p => {
+          primitiveArgs = primitiveArgs.concat(p.Args())
+        });
 
         // Determine orderof args
         if (layer.args.drawPrimitivesFirst)
