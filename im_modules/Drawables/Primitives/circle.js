@@ -31,7 +31,7 @@ class Circle extends PrimitivesBaseClass {
        */
       center(coordinates) {
         this.args.center = coordinates;
-        return this.args;
+        return this;
       }
 
       /**
