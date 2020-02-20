@@ -29,7 +29,7 @@ class Line extends LineSegmentBaseClass {
        * @param {number} n 
        */
       x(n) {
-        this.x = n;
+        this.args.x = n;
         return this;
       }
 
@@ -37,7 +37,7 @@ class Line extends LineSegmentBaseClass {
        * @param {number} n 
        */
       y(n) {
-        this.y = n;
+        this.args.y = n;
         return this;
       }
 

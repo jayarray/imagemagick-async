@@ -29,7 +29,7 @@ class QuadraticBezier extends LineSegmentBaseClass {
        * @param {Coordinates} coordinates 
        */
       control(coordinates) {
-        this.control = coordinates;
+        this.args.control = coordinates;
         return this;
       }
 
@@ -37,7 +37,7 @@ class QuadraticBezier extends LineSegmentBaseClass {
        * @param {Coordinates} coordinates 
        */
       endPoint(coordinates) {
-        this.endPoint = coordinates;
+        this.args.endPoint = coordinates;
         return this;
       }
 
