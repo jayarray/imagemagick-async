@@ -85,8 +85,8 @@ class Image extends PrimitivesBaseClass {
       height = this.args.height;
     }
 
-    let x = this.corner.args.x;
-    let y = this.corner.args.y;
+    let x = this.args.corner.args.x;
+    let y = this.args.corner.args.y;
 
     if (this.args.offset) {
       x += this.args.offset.args.x;
