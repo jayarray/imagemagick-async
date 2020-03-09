@@ -86,8 +86,14 @@ class EllipticalArc extends LineSegmentBaseClass {
   String() {
     let params = EllipticalArc.Parameters();
 
-    let rX = this.args.radius.args.x + this.args.offset.args.x;
-    let rY = this.args.radius.args.y + this.args.offset.args.y;
+    let rX = this.args.radius.args.x;
+    let rY = this.args.radius.args.y;
+
+    if (this.args.offset) {
+      rX += this.args.offset.args.x;
+      rY += this.args.offset.args.y;
+    }
+    
     let angle = this.args.angle ? this.args.angle : params.angle.default;
     let largeFlag = this.args.largeFlag ? 1 : 0;
     let sweepFlag = this.args.sweepFlag ? 1 : 0;

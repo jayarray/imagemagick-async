@@ -88,14 +88,31 @@ class Line extends PrimitivesBaseClass {
     if (this.args.width)
       args.push('-strokewidth', this.args.width);
 
+    let sx = this.args.start.args.x;
+    let sy = this.args.start.args.y;
+
+    if (this.args.offset) {
+      sx += this.args.offset.args.x;
+      sy += this.args.offset.args.y;
+    }
+
     let start = Coordinates.Builder
-      .x(this.args.start.args.x + this.args.offset.args.x)
-      .y(this.args.start.args.y + this.args.offset.args.y)
+      .x(sx)
+      .y(sy)
       .build();
 
+
+    let ex = this.args.end.args.x;
+    let ey = this.args.end.args.y;
+
+    if (this.args.offset) {
+      ex += this.args.offset.args.x;
+      ey += this.args.offset.args.y;
+    }
+
     let end = Coordinates.Builder
-      .x(this.args.end.args.x + this.args.offset.args.x)
-      .y(this.args.end.args.y + this.args.offset.args.y)
+      .x(ex)
+      .y(ey)
       .build();
 
     args.push('-draw', `line ${start.String()} ${end.String()}`);

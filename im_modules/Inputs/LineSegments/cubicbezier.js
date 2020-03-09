@@ -68,10 +68,17 @@ class CubicBezier extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    let c1X = this.args.control1.args.x + this.args.offset.args.x;
-    let c1Y = this.args.control1.args.y + this.args.offset.args.y;
-    let c2X = this.args.control2.args.x + this.args.offset.args.x;
-    let c2Y = this.args.control2.args.y + this.args.offset.args.y;
+    let c1X = this.args.control1.args.x;
+    let c1Y = this.args.control1.args.y;
+    let c2X = this.args.control2.args.x;
+    let c2Y = this.args.control2.args.y;
+
+    if (this.args.offset) {
+      c1x += this.args.offset.args.x;
+      c1Y += this.args.offset.args.y;
+      c2x += this.args.offset.args.x;
+      c2Y += this.args.offset.args.y;
+    }
 
     return `C ${c1X},${c1Y} ${c2X},${c2Y} ${this.args.endPoint.String()}`;
   }

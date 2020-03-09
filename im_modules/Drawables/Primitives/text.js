@@ -125,7 +125,16 @@ class Text extends PrimitivesBaseClass {
     if (this.args.gravity)
       args.push('-gravity', this.args.gravity);
 
-    args.push('-draw', `text ${this.args.offset.args.x},${this.args.offset.args.y} '${this.args.string}'`);
+
+    let x = 0;
+    let y = 0;
+
+    if (this.args.offset) {
+      x += this.args.offset.args.x;
+      y += this.args.offset.args.y;
+    }
+
+    args.push('-draw', `text ${x},${y} '${this.args.string}'`);
     return args;
   }
 

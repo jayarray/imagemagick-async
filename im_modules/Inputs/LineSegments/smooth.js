@@ -73,8 +73,13 @@ class Smooth extends LineSegmentBaseClass {
     if (this.args.isQuadraticBezier)
       char = 'T';
 
-    let cX = this.args.control.args.x + this.args.offset.args.x;
-    let cY = this.args.control.args.y + this.args.offset.args.y;
+    let cX = this.args.control.args.x;
+    let cY = this.args.control.args.y;
+
+    if (this.args.offset) {
+      cX += this.args.offset.args.x;
+      cY += this.args.offset.args.y;
+    }
 
     return `${char} ${cX},${cY} ${this.args.endPoint.String()}`;
   }

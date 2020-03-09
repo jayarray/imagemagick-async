@@ -60,8 +60,13 @@ class Line extends LineSegmentBaseClass {
    * @override
    */
   String() {
-    let x = this.args.x + this.args.offset.args.x;
-    let y = this.args.y + this.args.offset.args.y;
+    let x = this.args.x;
+    let y = this.args.y;
+
+    if (this.args.offset) {
+      x += this.args.offset.args.x;
+      y += this.args.offset.args.y;
+    }
 
     return `L ${x},${y}`;
   }

@@ -106,18 +106,37 @@ class Star extends PrimitivesBaseClass {
    */
   Args() {
     // Compute offset center
+
+    let ocx = this.args.center.args.x;
+    let ocy = this.args.center.args.y;
+
+    if (this.args.offset) {
+      ocx += this.args.offset.args.x;
+      ocy += this.args.offset.args.y;
+    }
+
     let offsetCenter = Coordinates.Builder
-      .x(this.args.center.args.x + this.args.offset.args.x)
-      .y(this.args.center.args.y + this.args.offset.args.y)
+      .x(ocx)
+      .y(ocy)
       .build();
 
     // Compute offset vertex
+
+    let ovx = this.args.vertex.args.x;
+    let ovy = this.args.vertex.args.y;
+
+    if (this.args.offset) {
+      ovx += this.args.offset.args.x;
+      ovy += this.args.offset.args.y;
+    }
+
     let offsetVertex = Coordinates.Builder
-      .x(this.args.vertex.args.x + this.args.offset.args.x)
-      .y(this.args.vertex.args.y + this.args.offset.args.y)
+      .x(ovx)
+      .y(ovy)
       .build();
 
     // Get all major vertices
+
     let majorDegrees = 360 / this.args.vertices;
     let majorVertices = [offsetVertex];
 
@@ -127,6 +146,7 @@ class Star extends PrimitivesBaseClass {
     }
 
     // Compute minor vertex
+
     let slope = HelperFunctions.GetSlope(offsetCenter, offsetVertex);
     let yIntercept = offsetCenter.args.y - (offsetCenter.args.x * slope);
     let minorX = null;

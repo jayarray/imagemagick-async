@@ -85,10 +85,15 @@ class Image extends PrimitivesBaseClass {
       height = this.args.height;
     }
 
-    let adjustedX = this.corner.args.x + this.args.offset.args.x;
-    let adjustedY = this.corner.args.y + this.args.offset.args.y;
+    let x = this.corner.args.x;
+    let y = this.corner.args.y;
 
-    return ['-draw', `image over ${adjustedX},${adjustedY} ${width},${height} ${this.args.source}`];
+    if (this.args.offset) {
+      x += this.args.offset.args.x;
+      y += this.args.offset.args.y;
+    }
+
+    return ['-draw', `image over ${x},${y} ${width},${height} ${this.args.source}`];
   }
 
   /**

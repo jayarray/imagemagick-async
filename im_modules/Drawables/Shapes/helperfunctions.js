@@ -5,7 +5,7 @@ let index = PathParts.indexOf('imagemagick-async');
 let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js'));
+let Coordinates = require(Path.join(Filepath.InputsDir(), 'coordinates.js')).Coordinates;
 
 //---------------------------------
 

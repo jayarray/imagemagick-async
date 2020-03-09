@@ -101,14 +101,32 @@ class Circle extends PrimitivesBaseClass {
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
 
-    let center = Coordinates.Builder()
-      .x(this.args.center.args.x + this.args.offset.args.x)
-      .y(this.args.center.args.y + this.args.offset.args.y)
+
+    let cx = this.args.center.args.x;
+    let cy = this.args.center.args.y;
+
+    if (this.args.offset) {
+      cx += this.args.offset.args.x;
+      cy += this.args.offset.args.y;
+    }
+
+    let center = Coordinates.Builder
+      .x(cx)
+      .y(cy)
       .build();
 
-    let edge = Coordinates.Builder()
-      .x(this.args.edge.args.x + this.args.offset.args.x)
-      .y(this.args.edge.args.y + this.args.offset.args.y)
+
+    let ex = this.args.edge.args.x;
+    let ey = this.args.edge.args.y;
+
+    if (this.args.offset) {
+      ex += this.args.offset.args.x;
+      ey += this.args.offset.args.y;
+    }
+
+    let edge = Coordinates.Builder
+      .x(ex)
+      .y(ey)
       .build();
 
     args.push('-draw', `circle ${center.String()} ${edge.String()}`);

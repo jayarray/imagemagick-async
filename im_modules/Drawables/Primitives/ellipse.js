@@ -125,9 +125,17 @@ class Ellipse extends PrimitivesBaseClass {
     if (this.args.strokeWidth)
       args.push('-strokewidth', this.args.strokeWidth);
 
+    let cx = this.args.center.args.x;
+    let cy = this.args.center.args.y;
+
+    if (this.args.offset) {
+      cx += this.args.offset.args.x;
+      cy += this.args.offset.args.y;
+    }
+
     let center = Coordinates.Builder
-      .x(this.args.center.args.x + this.args.offset.args.x)
-      .y(this.args.center.args.y + this.args.offset.args.y)
+      .x(cx)
+      .y(cy)
       .build();
 
     let angleStart = this.args.angleStart || params.angleStart.default;

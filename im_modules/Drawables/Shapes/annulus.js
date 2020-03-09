@@ -106,9 +106,18 @@ class Annulus extends PrimitivesBaseClass {
     let args = [];
 
     // Compute offset center
+
+    let offsetX = this.args.center.args.x;
+    let offsetY = this.args.center.args.y;
+
+    if (this.args.offset) {
+      offsetX += this.args.offset.args.x;
+      offsetY += this.args.offset.args.y;
+    }
+
     let offsetCenter = Coordinates.Builder
-      .x(this.args.center.args.x + this.args.offset.args.x)
-      .y(this.args.center.args.y + this.args.offset.args.y)
+      .x(offsetX)
+      .y(offsetY)
       .build();
 
     // Minor outline
