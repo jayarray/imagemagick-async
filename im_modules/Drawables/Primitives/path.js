@@ -91,9 +91,19 @@ class Path extends PrimitivesBaseClass {
     let strArray = [];
 
     this.args.points.forEach(p => {
-      let pStr = Coordinates.Builder
-        .x(p.args.x + this.args.offset.args.x)
-        .y(p.args.y + this.args.offset.args.y)
+      let pStr = null;
+
+      let x = p.args.x;
+      let y = p.args.y;
+
+      if (this.args.offset) {
+        x += this.args.offset.args.x;
+        y += this.args.offset.args.y
+      }
+
+      pStr = Coordinates.Builder
+        .x(x)
+        .y(y)
         .build()
         .String();
 
