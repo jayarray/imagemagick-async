@@ -154,8 +154,13 @@ function DrawPrimitivesSecond(source, primitives) {
     let args = [source];
 
     // Add primitive args
+
     let primitiveArgs = [];
-    primitives.forEach(x => primitiveArgs.concat(x.Args()));
+
+    primitives.forEach(x => {
+      primitiveArgs = primitiveArgs.concat(x.Args());
+    });
+    
     args = args.concat(primitiveArgs);
 
     // Append destination (same as source)
