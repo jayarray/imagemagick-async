@@ -93,7 +93,7 @@ class Image extends PrimitivesBaseClass {
       y += this.args.offset.args.y;
     }
 
-    return ['-draw', `image over ${x},${y} ${width},${height} ${this.args.source}`];
+    return ['-draw', `image over ${x},${y} ${width},${height} "${this.args.source}"`];
   }
 
   /**
