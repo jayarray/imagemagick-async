@@ -134,7 +134,7 @@ class Text extends PrimitivesBaseClass {
       y += this.args.offset.args.y;
     }
 
-    args.push('-draw', `text ${x},${y} '${this.args.string}'`);
+    args.push('-draw', `text ${x},${y} "${this.args.string}"`);
     return args;
   }
 
