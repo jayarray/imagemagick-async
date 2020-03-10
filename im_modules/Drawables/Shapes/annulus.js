@@ -56,7 +56,7 @@ class Annulus extends PrimitivesBaseClass {
        * @param {Color} color The color of the annulus.
        */
       color(color) {
-        this.color = color;
+        this.args.color = color;
         return this
       }
 
