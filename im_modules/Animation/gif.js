@@ -88,7 +88,7 @@ class Gif extends AnimationBaseClass {
   Args() {
     let params = Gif.Parameters();
 
-    let args = ['delay'];
+    let args = ['-delay'];
 
     // Add delay
     if (this.args.delay)
