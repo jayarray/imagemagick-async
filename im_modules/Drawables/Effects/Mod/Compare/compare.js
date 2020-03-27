@@ -70,10 +70,17 @@ class Compare extends CompareBaseClass {
    * @override
    */
   Args() {
-    let args = ['-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.args.highlightColor.String()];
+    let args = [];
 
-    if (this.args.lowlightColor)
-      args.push('-lowlight-color', this.args.lowlightColor.String());
+    if (this.args.highlightColor || this.args.lowlightColor) {
+      args.push('-metric', 'AE', '-fuzz', '5%');
+
+      if (this.args.highlightColor)
+        args.push('-highlight-color', this.args.highlightColor.String());
+
+      if (this.args.lowlightColor)
+        args.push('-lowlight-color', this.args.lowlightColor.String());
+    }
 
     args.push(this.args.source1, this.args.source2);
 
