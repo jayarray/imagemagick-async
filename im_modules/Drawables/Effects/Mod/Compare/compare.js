@@ -55,7 +55,7 @@ class Compare extends CompareBaseClass {
        * @param {Color} color This color serves as a background for the highlight color. Omitting it results in the image from source1 being displayed in the background. (Optional)
        */
       lowlightColor(color) {
-        this.args.highlightColor = color;
+        this.args.lowlightColor = color;
         return this;
       }
 
@@ -70,7 +70,7 @@ class Compare extends CompareBaseClass {
    * @override
    */
   Args() {
-    let args = [this.args.source1, this.args.source2, '-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.args.highlightColor.String()];
+    let args = ['-metric', 'AE', '-fuzz', '5%', '-highlight-color', this.args.highlightColor.String(), this.args.source1, this.args.source2];
 
     if (this.args.lowlightColor)
       args.push('-lowlight-color', this.args.lowlightColor.String());
