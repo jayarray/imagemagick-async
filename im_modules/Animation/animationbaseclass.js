@@ -15,6 +15,7 @@ class AnimationBaseClass extends ObjectInterface {
     this.name = properties.name;
     this.args = properties.args;
     this.command = properties.command;
+    this.order = properties.order;
   }
 
   /**
