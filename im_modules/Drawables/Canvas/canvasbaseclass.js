@@ -19,6 +19,7 @@ class CanvasBaseClass extends DrawableBaseClass {
     });
 
     this.command = 'convert';
+    this.order = ['args'];
   }
 
   /**
