@@ -13,6 +13,7 @@ let CanvasBaseClass = require(Path.join(Filepath.CanvasDir(), 'canvasbaseclass.j
 class ImageCanvas extends CanvasBaseClass {
   constructor(builder) {
     super(builder);
+    this.order = ['src'];
   }
 
   /**
