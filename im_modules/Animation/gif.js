@@ -28,6 +28,7 @@ class Gif extends AnimationBaseClass {
         this.name = 'Gif';
         this.args = {};
         this.command = 'convert';
+        this.order = ['args'];
       }
 
       /**
