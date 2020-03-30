@@ -16,6 +16,8 @@ class ComposeBaseClass extends ModBaseClass {
       args: properties.args,
       command: 'convert'
     });
+
+    this.order = ['args'];
   }
 
   /**

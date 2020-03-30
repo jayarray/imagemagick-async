@@ -16,6 +16,8 @@ class ColorBaseClass extends ModBaseClass {
       args: properties.args,
       command: 'convert'
     });
+
+    this.order = ['src', 'args'];
   }
 }
 

@@ -16,6 +16,8 @@ class CompareBaseClass extends ModBaseClass {
       args: properties.args,
       command: properties.command
     });
+
+    this.order = ['args'];
   }
 
   /**

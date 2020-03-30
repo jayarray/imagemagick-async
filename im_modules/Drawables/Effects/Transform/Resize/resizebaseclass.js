@@ -15,6 +15,8 @@ class ResizeBaseClass extends TransformBaseClass {
       name: properties.name,
       args: properties.args
     });
+
+    this.order = ['src', 'args'];
   }
 }
 

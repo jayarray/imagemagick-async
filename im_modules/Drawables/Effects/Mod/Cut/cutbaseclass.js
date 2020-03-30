@@ -16,6 +16,8 @@ class CutBaseClass extends ModBaseClass {
       args: properties.args,
       command: 'convert'
     });
+
+    this.order = ['args'];
   }
 
   /**

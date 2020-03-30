@@ -18,6 +18,7 @@ class FxBaseClass extends EffectBaseClass {
     });
 
     this.command = 'convert';
+    this.order = ['src', 'args'];
   }
 }
 

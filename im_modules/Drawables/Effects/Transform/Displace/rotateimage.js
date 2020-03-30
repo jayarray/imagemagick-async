@@ -15,6 +15,8 @@ class RotateImage extends DisplaceBaseClass {
   constructor(builder) {
     super(builder);
 
+    this.order = ['args'];
+
     this.hypotenuse = builder.hypotenuse;
     this.offset = builder.offset;
   }
