@@ -18,20 +18,358 @@ let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
 let ImageCanvas = require(Path.join(Filepath.CanvasDir(), 'imagecanvas.js')).ImageCanvas;
 let Identify = require(Path.join(Filepath.QueryInfoDir(), 'identify.js'));
 
-let OrdinaryRenderer = require(Path.join(Filepath.RenderDir(), 'ordinaryrenderer.js')).OrdinaryRenderer;
+let SpecialRenderer = require(Path.join(Filepath.RenderDir(), 'specialrenderer.js')).SpecialRenderer;
+let CanvasRenderer = require(Path.join(Filepath.RenderDir(), 'canvasrenderer.js')).Render;
+let PrimitivesRenderer = require(Path.join(Filepath.RenderDir(), 'primitivesrenderer.js')).Render;
+let EffectsRenderer = require(Path.join(Filepath.RenderDir(), 'effectsrenderer.js')).Render;
 let SpecialRenderer = require(Path.join(Filepath.RenderDir(), 'specialrenderer.js')).SpecialRenderer;
 
 //-----------------------------------
 // HELPER FUNCTIONS
 
 /**
- * Use this for composing images
- * @param {string} source
- * @param {Array<{filepath: string, offset: Offset}>} filepathOffsetTuples 
- * @param {string} gravity 
- * @param {string} outputPath Destination for output file.
- * @returns {Promise} Returns a Promise taht resolves if successful.
+ * @returns {string} Returns a random dir name.
  */
+function GetRandomDirectoryName() {
+  let name = Guid.Create(Guid.DEFAULT_LENGTH);
+  return name;
+}
+
+/**
+ * @param {string} extension The file type (i.e. png, jpeg, etc)
+ * @returns {string} Returns a random file name.
+ */
+function GetRandomFileName(extension) {
+  let name = Guid.Filename(Guid.DEFAULT_LENGTH, extension);
+  return name;
+}
+
+/**
+ * @param {string} filepath The file location
+ * @returns {string} Returns the file extension
+ */
+function GetFileExtension(filepath) {
+  let extension = LinuxCommands.Path.Extension(filepath).replace('.', '');
+  return extension;
+}
+
+/**
+ * @param {string} tempDir The full path to the temp dir
+ * @param {string} dest The output path
+ * @returns {string} Returns a generated filepath
+ */
+function GetTempFilepath(tempDir, dest) {
+  let extension = GetFileExtension(dest);
+  let filename = GetRandomFileName(extension);
+  let tempFilepath = Path.join(tempDir, filename);
+  return tempFilepath;
+}
+
+/**
+ * @param {string} fromPath The source path
+ * @param {string} toPath The output path
+ * @returns {Promise} Returns a Promise that resolves if successful.
+ */
+function MoveFile(fromPath, toPath) {
+  return new Promise((resolve, reject) => {
+    LinuxCommands.Move.Move(fromPath, toPath, LocalCommand.Command.LOCAL).then(success => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * @param {string} fromPath The source path
+ * @param {string} toPath The output path
+ * @returns {Promise} Returns a Promise that resolves if successful.
+ */
+function MoveDirectory(fromPath, toPath) {
+  return new Promise((resolve, reject) => {
+    LinuxCommands.Move.Move(fromPath, toPath, LocalCommand.Command.LOCAL).then(success => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * @param {string} parentDir The path to the parent directory
+ * @returns {Promise<string>} Returns a Promise with the path for the newly created directory.
+ */
+function CreateTempDir(parentDir) {
+  return new Promise((resolve, reject) => {
+    let dirName = GetRandomDirectoryName();
+    let tempDirPath = Path.join(parentDir, dirName);
+
+    LinuxCommands.Directory.Create(tempDirPath, LinuxCommands.Command.LOCAL).then(success => {
+      resolve(tempDirPath);
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * @param {string} dirPath The path to the directory
+ * @returns {Promise} Returns a Promise that resolves if successful.
+ */
+function RemoveDir(dirPath) {
+  return new Promise((resolve, reject) => {
+    LinuxCommands.Directory.Remove(dirPath, LinuxCommands.Command.LOCAL).then(success => {
+      resolve();
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * Execute the 1st step in rendering a layer.
+ * @param {object} foundation A canvas object
+ * @param {string} dest The output path for the render
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image.
+ */
+function RenderFoundation(foundation, dest) {
+  return new Promise((resolve, reject) => {
+
+    // Create temp dir
+    let parentDir = LinuxCommands.Path.ParentDir(dest);
+    CreateTempDir(parentDir).then(tempDirPath => {
+
+      // Render canvas
+      let tempFilepath = GetTempFilepath(tempDirPath, dest);
+      CanvasRenderer(foundation, tempFilepath).then(outputPath => {
+
+        // Move render to dest
+        MoveFile(outputPath, dest).then(success => {
+
+          // Clean up temp dir 
+          RemoveDir(tempDirPath).then(success => {
+            resolve(dest);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => {
+
+        // Clean up temp dir 
+        RemoveDir(tempDirPath).then(success => {
+          reject(error);
+        }).catch(error => reject(error));
+      });
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * Execute the 2nd/3rd step in rendering a layer.
+ * @param {string} imgPath The filepath of the image you want to draw on
+ * @param {Array<>} primitives A list of primitive objects. 
+ * @param {string} dest The output path for the render
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image.
+ */
+function DrawPrimitives(imgPath, primitives, dest) {
+  return new Promise((resolve, reject) => {
+
+    // Create temp dir
+    let parentDir = LinuxCommands.Path.ParentDir(dest);
+    CreateTempDir(parentDir).then(tempDirPath => {
+
+      // Render primitives
+      let tempFilepath = GetTempFilepath(tempDirPath, dest);
+      PrimitivesRenderer.Render(imgPath, primitives, tempFilepath).then(outputPath => {
+
+        // Move render to dest
+        MoveFile(outputPath, dest).then(success => {
+
+          // Clean up temp dir 
+          RemoveDir(tempDirPath).then(success => {
+            resolve(dest);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => {
+
+        // Clean up temp dir 
+        RemoveDir(tempDirPath).then(success => {
+          reject(error);
+        }).catch(error => reject(error));
+      });
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * Execute the 2nd/3rd step in rendering a layer.
+ * @param {string} imgPath The filepath of the image you want to draw on
+ * @param {Array<>} effects A list of effect objects. 
+ * @param {string} dest The output path for the render
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image.
+ */
+function ApplyEffects(imgPath, effects, dest) {
+  return new Promise((resolve, reject) => {
+
+    // Create temp dir
+    let parentDir = LinuxCommands.Path.ParentDir(dest);
+    CreateTempDir(parentDir).then(tempDirPath => {
+
+      // Apply effects to image
+      let tempFilepath = GetTempFilepath(tempDirPath, dest);
+      EffectsRenderer.Render(imgPath, effects, tempFilepath).then(outputPath => {
+
+        // Move render to dest
+        MoveFile(outputPath, dest).then(success => {
+
+          // Clean up temp dir 
+          RemoveDir(tempDirPath).then(success => {
+            resolve(dest);
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => {
+
+        // Clean up temp dir 
+        RemoveDir(tempDirPath).then(success => {
+          reject(error);
+        }).catch(error => reject(error));
+      });
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * @param {string} foundationPath The location of the image used as a foundation. 
+ * @param {string} dest The output path
+ * @param {boolean} drawPrimitivesFirst If true, primitives will be drawn first and effects applied after. Otherwise, vice versa.
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image.
+ */
+function RenderPrimitivesAndEffects(foundationPath, primitives, effects, drawPrimitivesFirst) {
+  return new Promise((resolve, reject) => {
+    if (drawPrimitivesFirst) {
+      DrawPrimitives(foundationPath, primitives, foundationPath).then(outputPath1 => {
+        ApplyEffects(outputPath1, effects, outputPath1).then(outputPath2 => {
+          resolve(outputPath2);
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    }
+    else {
+      ApplyEffects(foundationPath, effects, foundationPath).then(outputPath1 => {
+        DrawPrimitives(outputPath1, primitives, outputPath1).then(outputPath2 => {
+          resolve(outputPath2);
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    }
+  });
+}
+
+
+/**
+ * Execute the 4th step in rendering a layer.
+ * @param {object} layer The layer object to be rendered
+ * @param {string} dest The output path for the render
+ * @returns {Promise<{filepath: string, offset: object}>} Returns a Promise containing an object with properties 'filepath' and 'offset'.
+ */
+function RenderOverlay(layer, dest) {
+  return new Promise((resolve, reject) => {
+    RenderFoundation(layer.args.foundation, dest).then(foundationPath => {
+      RenderPrimitivesAndEffects(foundationPath, layer.args.primitives, layer.args.appliedEffects, layer.args.drawPrimitivesFirst).then(outputPath => {
+        let o = {
+          filepath: outputPath,
+          offset: layer.args.offset
+        };
+
+        resolve(o);
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+/**
+ * Execute the last step in rendering a layer.
+ * @param {string} foundationOutputPath The location for the rendered foundation
+ * @param {Array<{filepath: string, offset: object}>} filepathOffsetTuples A list of objects with properties 'filepath' and 'offset'.
+ * @param {string} gravity A valid string value for gravity
+ * @param {string} dest The output path of the render
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image
+ */
+function CreateComposite(foundationOutputPath, filepathOffsetTuples, gravity, dest) {
+  return new Promise((resolve, reject) => {
+    let args = [foundationOutputPath];
+
+    if (gravity)
+      args.push('-gravity', gravity);
+
+    filepathOffsetTuples.forEach(t => {
+      let currFilepath = t.filepath;
+      let currOffset = t.offset;
+
+      args.push('-draw', `image over ${currOffset.args.x},${currOffset.args.y} 0,0 '${currFilepath}'`);
+    });
+
+    args.push(dest);
+
+    LocalCommand.Execute('convert', args).then(output => {
+      if (output.stderr) {
+        reject(`Failed to compose images: ${output.stderr}`);
+        return;
+      }
+
+      resolve(dest);
+    }).catch(error => `Failed to compose images: ${error}`);
+  });
+}
+
+
+/**
+ * @param {object} layer The layer object to be rendered
+ * @param {string} dest The output path of the render
+ */
+function RenderLayer(layer, dest) {
+  return new Promise((resolve, reject) => {
+    RenderFoundation(layer.args.foundation, dest).then(foundationPath => {
+      RenderPrimitivesAndEffects(foundationPath, layer.args.primitives, layer.args.appliedEffects, layer.args.drawPrimitivesFirst).then(outputPath => {
+
+        // Render any overlays
+
+        let overlays = layer.args.overlays;
+
+        if (!overlays || overlays.length == 0) {
+          resolve(outputPath);
+          return;
+        }
+
+        // Create temp dir
+        let parentDir = LinuxCommands.Path.ParentDir(dest);
+        CreateTempDir(parentDir).then(tempDirPath => {
+
+          let overlayActions = [];
+
+          layer.args.overlays.forEach(oLayer => {
+            let tempFilePath = GetTempFilepath(tempDirPath, dest);
+            let action = RenderOverlay(oLayer, tempFilePath);
+            overlayActions.push(action);
+          });
+
+          Promise.all(overlayActions).then(results => {
+
+            // Create a single composite image
+            CreateComposite(foundationPath, results, layer.args.gravity, dest).then(compDest => {
+
+              // Clean up temp stuff
+              RemoveDir(tempDirPath).then(success => {
+                resolve(dest);
+              }).catch(error => reject(error));
+            }).catch(error => reject(error));
+          }).catch(error => {
+
+            // Clean up temp dir
+            RemoveDir(tempDirPath).then(success => {
+              reject(error);
+            }).catch(error => reject(error));
+          });
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+
+
 function ComposeImages(source, filepathOffsetTuples, gravity, outputPath) {
   return new Promise((resolve, reject) => {
     let args = [source];
@@ -160,7 +498,7 @@ function DrawPrimitivesSecond(source, primitives) {
     primitives.forEach(x => {
       primitiveArgs = primitiveArgs.concat(x.Args());
     });
-    
+
     args = args.concat(primitiveArgs);
 
     // Append destination (same as source)
