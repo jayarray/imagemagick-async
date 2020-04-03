@@ -6,18 +6,15 @@ let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let ChainBaseClass = require(Path.join(Filepath.SpecialChainDir(), 'chainbaseclass.js')).ChainBaseClass;
-let Chain = require(Path.join(Filepath.SpecialChainDir(), 'chain.js')).Chain;
-let Item = require(Path.join(Filepath.SpecialChainDir(), 'item.js'));
-let Mask = require(Path.join(Filepath.ModMasksDir(), 'mask.js')).Mask;
-let Layer = require(Path.join(Filepath.LayerDir(), 'layer.js')).Layer;
+let SpecialBaseClass = require(Path.join(Filepath.SpecialDir(), 'specialbaseclass.js')).SpecialBaseClass;
 let Impression = require(Path.join(Filepath.FxDir(), 'impression.js')).Impression;
 let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
 
 //---------------------------------
 
-class ShadeAndHighlight extends ChainBaseClass {
+class ShadeAndHighlight extends SpecialBaseClass {
   constructor(builder) {
     super(builder);
   }
@@ -66,80 +63,59 @@ class ShadeAndHighlight extends ChainBaseClass {
   /**
    * @override 
    */
-  Chain() {
-    let source = this.args.source;
-    let sourceFormat = LinuxCommands.Path.Extension(source).replace('.', '');
-    let sourceParentDir = LinuxCommands.Path.ParentDir(source);
-    let tempDirPath = Path.join(sourceParentDir, Guid.Create());
+  Render(dest) {
+    return new Promise((resolve, reject) => {
 
-    let chainBuilder = Chain.Builder
-      .setTempDirPath(tempDirPath);
+      let source = this.args.source;
+      let sourceFormat = LinuxCommands.Path.Extension(source).replace('.', '');
+      let destParentDir = LinuxCommands.Path.ParentDir(dest);
 
+      // Create shaded image without using 90x90 (light source NOT directly above image)
 
-    // (1) Create shaded image without using 90x90 (light source NOT directly above image)
+      let elevatedShade = Impression.Builder
+        .source(source)
+        .direction(this.args.direction)
+        .elevation(this.args.elevation)
+        .build();
 
-    let elevatedShade = Impression.Builder
-      .source(source)
-      .direction(this.args.direction)
-      .elevation(this.args.elevation)
-      .build();
+      let tempFilename1 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
+      let tempFilepath1 = Path.join(destParentDir, tempFilename1);
 
-    let elevateLayer = Layer.Builder
-      .foundation(elevatedShade)
-      .build();
+      elevatedShade.Render(tempFilepath1).then(outputPath1 => {
 
-    let tempFilename1 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
-    let tempOutputPath1 = Path.join(tempDirPath, tempFilename1);
+        // Create shaded image using 90x90 (light source IS directly above image)
 
-    let renderItem1 = Item.RenderItem.Builder
-      .setOutputPath(tempOutputPath1)
-      .setLayer(elevateLayer)
-      .build();
+        let directLightShade = Impression.Builder
+          .source(this.args.source)
+          .direction(90)
+          .elevation(90)
+          .build();
 
-    chainBuilder = chainBuilder.add(renderItem1);
+        let tempFilename2 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
+        let tempFilepath2 = Path.join(destParentDir, tempFilename2);
 
+        directLightShade.Render(tempFilepath2).then(outputPath2 => {
 
-    // (2) Create shaded image using 90x90 (light source IS directly above image)
+          // Combine 1st and 2nd render (in that order) to create a hollow "shaded shape"
 
-    let directLightShade = Impression.Builder
-      .source(this.args.source)
-      .direction(90)
-      .elevation(90)
-      .build();
+          let cmdStr = `convert ${tempFilepath1} \\( ${tempFilepath2} -normalize -negate \\) -alpha Off -compose CopyOpacity -composite ${dest}`;
 
-    let directLightLayer = Layer.Builder
-      .foundation(directLightShade)
-      .build();
+          LocalCommand.Execute(cmdStr, []).then(output => {
+            if (output.stderr) {
+              reject(output.stderr);
+              return;
+            }
 
-    let tempFilename2 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
-    let tempOutputPath2 = Path.join(tempDirPath, tempFilename2);
+            // Clean up temp files
+            LinuxCommands.Remove.Files([tempFilepath1, tempFilepath2], LocalCommand).then(success => {
 
-    let renderItem2 = Item.RenderItem.Builder
-      .setOutputPath(tempOutputPath2)
-      .setLayer(directLightLayer)
-      .build();
-
-    chainBuilder = chainBuilder.add(renderItem2);
-
-
-    // 3) Combine (1) and (2) (in that order) to create a hollow "shaded shape"
-
-    let tempFilename3 = Guid.Filename(Guid.DEFAULT_LENGTH, sourceFormat);
-    let tempOutputPath3 = Path.join(tempDirPath, tempFilename3);
-    let cmdStr = `convert ${tempOutputPath1} \\( ${tempOutputPath2} -normalize -negate \\) -alpha Off -compose CopyOpacity -composite ${tempOutputPath3}`;
-
-    let cmdStrItem = Item.CommandStringItem.Builder
-      .setOutputPath(tempOutputPath3)
-      .setCommand(cmdStr)
-      .build();
-
-    chainBuilder = chainBuilder.add(cmdStrItem);
-    chainBuilder = chainBuilder.setOutputPath(tempOutputPath3);
-
-    // Return object
-
-    let chainObj = chainBuilder.build();
-    return chainObj;
+              // Return render location
+              resolve(dest);
+            }).catch(error => reject(error));
+          }).catch(error => reject(error));
+        }).catch(error => reject(error));
+      }).catch(error => reject(error));
+    });
   }
 
   /**

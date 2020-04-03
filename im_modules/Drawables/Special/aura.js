@@ -6,11 +6,14 @@ let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 
 let Err = require(Path.join(RootDir, 'error.js'));
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
-let ImageStackBaseClass = require(Path.join(Filepath.SpecialImageStackDir(), 'imagestackbaseclass.js')).ImageStackBaseClass;
+let SpecialBaseClass = require(Path.join(Filepath.SpecialDir(), 'specialbaseclass.js')).SpecialBaseClass;
+
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
 
 //---------------------------------
 
-class Aura extends ImageStackBaseClass {
+class Aura extends SpecialBaseClass {
   constructor(builder) {
     super(builder);
   }
@@ -90,6 +93,39 @@ class Aura extends ImageStackBaseClass {
     cmdStr += ' -compose DstOver -composite';
 
     return cmdStr;
+  }
+
+  /**
+   * 
+   * @param {string} dest 
+   */
+  Render(dest) {
+    return new Promise((resolve, reject) => {
+
+      // Create command string
+
+      let adjustedOpacity = 100 - this.args.opacity;
+
+      if (adjustedOpacity >= 1)
+        adjustedOpacity = Math.min(adjustedOpacity, 100);
+      else
+        adjustedOpacity = Math.max(adjustedOpacity, 0.1);
+
+      let cmdStr = `convert ${this.args.source}`;
+      cmdStr += ` \\( +clone -channel A -blur ${this.args.blurRadius}x${this.args.blurSigma} -level 0,${adjustedOpacity}% +channel +level-colors '${this.args.color.String()}' \\)`;
+      cmdStr += ` -compose DstOver -composite ${dest}`;
+
+
+      // Execute command
+      LocalCommand.Execute(cmdStr, []).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        resolve(dest);
+      }).catch(error => reject(error));
+    });
   }
 
   /**

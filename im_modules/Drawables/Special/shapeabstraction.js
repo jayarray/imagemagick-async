@@ -1,5 +1,6 @@
 let Path = require('path');
 let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
 
 let PathParts = __dirname.split(Path.sep);
 let index = PathParts.indexOf('imagemagick-async');
@@ -11,7 +12,7 @@ let Guid = require(Path.join(Filepath.LayerDir(), 'guid.js'));
 let Color = require(Path.join(Filepath.InputsDir(), 'color.js')).Color;
 let Spot = require(Path.join(Filepath.InputsDir(), 'spot.js')).Spot;
 let Shapes = require(Path.join(Filepath.InputsDir(), 'spot.js')).SHAPES;
-let ProcedureBaseClass = require(Path.join(Filepath.SpecialProcedureDir(), 'procedurebaseclass.js')).ProcedureBaseClass;
+let SpecialBaseClass = require(Path.join(Filepath.SpecialDir(), 'specialbaseclass.js')).SpecialBaseClass;
 
 //-------------------------------
 // HELPER FUNCTIONS
@@ -162,7 +163,7 @@ function Spotify(imgSource, allArgs, dest) {
                                     data = {};
 
                                     // Finish
-                                    resolve();
+                                    resolve(dest);
                                   }).catch(error => reject(`Failed to clean up temp files: ${error}`));
                                 }).catch(error => reject(`Failed to process image: ${error}`));
                               }).catch(error => reject(`Failed to get hhh value: ${error}`));
@@ -184,9 +185,10 @@ function Spotify(imgSource, allArgs, dest) {
 
 //------------------------------
 
-class ShapeAbstraction extends ProcedureBaseClass {
+class ShapeAbstraction extends SpecialBaseClass {
   constructor(builder) {
     super(builder);
+    this.requiresDestToRender = true;
   }
 
   /**
@@ -280,17 +282,15 @@ class ShapeAbstraction extends ProcedureBaseClass {
   }
 
   /**
-   * 
-   * @param {string} dest 
+   * @override 
    */
-  Render() {
+  Render(dest) {
     return new Promise((resolve, reject) => {
-      Spotify(this.args.source, this.args, this.args.dest).then(success => {
-        resolve();
+      Spotify(this.args.source, this.args, dest).then(outputPath => {
+        resolve(outputPath);
       }).catch(error => reject(`Failed to render shape abstraction: ${error}`));
     });
   }
-
 
   /**
    * @override
