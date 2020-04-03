@@ -7,6 +7,9 @@ let RootDir = PathParts.slice(0, index + 1).join(Path.sep);
 let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let DrawableBaseClass = require(Path.join(Filepath.DrawablesDir(), 'drawablebaseclass.js')).DrawableBaseClass;
 
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
+
 //---------------------------------
 
 class CanvasBaseClass extends DrawableBaseClass {
@@ -34,6 +37,39 @@ class CanvasBaseClass extends DrawableBaseClass {
    */
   IsConsolidatable() {
     return false;
+  }
+
+  /**
+   * @param {string} dest The output path for the render.
+   * @returns {Promise<string>} Returns a Promise with the output path for the newly rendered image.
+   */
+  Render(dest) {
+    return new Promise((resolve, reject) => {
+      let cmd = this.command;
+      let args = this.Args();
+      let orderArg = this.order[0];
+
+      if (orderArg == 'src') {  // Image Canvas
+        let src = args[0];
+
+        LinuxCommands.Copy.File(src, dest, LocalCommand).then(success => {
+          resolve(dest);
+        }).catch(error => reject(error));
+      }
+      else {  // All other canvases
+        args.push(dest);
+
+        LocalCommand.Execute(cmd, args).then(output => {
+          if (output.stderr) {
+            reject(output.stderr);
+            return;
+          }
+
+          resolve(dest);
+        }).catch(error => reject(`Failed to render '${this.name}' effect: ${error}`));
+      }
+
+    });
   }
 }
 

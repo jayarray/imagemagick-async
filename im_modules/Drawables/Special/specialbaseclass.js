@@ -17,14 +17,7 @@ class SpecialBaseClass extends ObjectInterface {
       args: properties.args
     });
 
-    this.subtype = properties.subtype;
-  }
-
-  /**
-   * @returns {string} Returns the exact command needed for rendering. (Does not include output path).
-   */
-  Command() {
-    // override
+    this.requiresDestToRender = false;
   }
 
   /**
@@ -39,6 +32,14 @@ class SpecialBaseClass extends ObjectInterface {
    */
   IsLayer() {
     return true;
+  }
+
+  /**
+   * @param {string} dest The desired output path for the render. 
+   * @returns {Promise<string>} Returns a Promise that contains the output path of the newly rendered image.
+   */
+  Render(dest) {
+    // Override
   }
 }
 
