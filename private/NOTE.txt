@@ -1,2 +1,0 @@
-All scripts in this folder are for updating files in the following folder: 
-  im_modules > Constants
