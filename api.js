@@ -67,7 +67,7 @@ Api.Drawables = {
   },
   Effects: {
     Fx: {
-      Aura: require(Path.join(Filepath.SpecialImageStackDir(), 'aura.js')).Aura,
+      Aura: require(Path.join(Filepath.SpecialDir(), 'aura.js')).Aura,
       Blur: require(Path.join(Filepath.FxDir(), 'blur.js')).Blur,
       CharcoalSketch: require(Path.join(Filepath.FxDir(), 'charcoalsketch.js')).CharcoalSketch,
       ColoringBookSketch: require(Path.join(Filepath.FxDir(), 'coloringbooksketch.js')).ColoringBookSketch,
@@ -79,8 +79,8 @@ Api.Drawables = {
       PencilSketch: require(Path.join(Filepath.FxDir(), 'pencilsketch.js')).PencilSketch,
       Pixelate: require(Path.join(Filepath.FxDir(), 'pixelate.js')).Pixelate,
       RadialBlur: require(Path.join(Filepath.FxDir(), 'radialblur.js')).RadialBlur,
-      ShapeAbstraction: require(Path.join(Filepath.SpecialProcedureDir(), 'shapeabstraction.js')).ShapeAbstraction,
-      ShadeAndHighlight: require(Path.join(Filepath.SpecialChainDir(), 'shadeandhighlight.js')).ShadeAndHighlight,
+      ShapeAbstraction: require(Path.join(Filepath.SpecialDir(), 'shapeabstraction.js')).ShapeAbstraction,
+      ShadeAndHighlight: require(Path.join(Filepath.SpecialDir(), 'shadeandhighlight.js')).ShadeAndHighlight,
       Shadow: require(Path.join(Filepath.FxDir(), 'shadow.js')).Shadow,
       Swirl: require(Path.join(Filepath.FxDir(), 'swirl.js')).Swirl,
       Wave: require(Path.join(Filepath.FxDir(), 'wave.js')).Wave
@@ -209,20 +209,8 @@ Api.Layer = {
 }
 
 
-// Render
-
-Api.Render = {
-  Renderer: require(Path.join(Filepath.RenderDir(), 'renderer.js')).Renderer
-}
-
-// Special
-
-Api.Special = {
-  Chain: {
-    RenderItem: require(Path.join(Filepath.SpecialChainDir(), 'item.js')).RenderItem,
-    CommandStringItem: require(Path.join(Filepath.SpecialChainDir(), 'item.js')).CommandStringItem,
-    Chain: require(Path.join(Filepath.SpecialChainDir(), 'chain.js')).RenderItem
-  }
-}
+//------------------------
+// EXPORTS
+//------------------------
 
 exports.Api = Api;
