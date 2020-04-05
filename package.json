@@ -1,6 +1,6 @@
 {
   "name": "imagemagick-async",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "An API for Image Magick commands.",
   "main": "api.js",
   "dependencies": {
