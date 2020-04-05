@@ -46,29 +46,16 @@ class CanvasBaseClass extends DrawableBaseClass {
   Render(dest) {
     return new Promise((resolve, reject) => {
       let cmd = this.command;
-      let args = this.Args();
-      let orderArg = this.order[0];
+      let args = this.Args().concat(dest);
 
-      if (orderArg == 'src') {  // Image Canvas
-        let src = args[0];
+      LocalCommand.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
 
-        LinuxCommands.Copy.File(src, dest, LocalCommand).then(success => {
-          resolve(dest);
-        }).catch(error => reject(error));
-      }
-      else {  // All other canvases
-        args.push(dest);
-
-        LocalCommand.Execute(cmd, args).then(output => {
-          if (output.stderr) {
-            reject(output.stderr);
-            return;
-          }
-
-          resolve(dest);
-        }).catch(error => reject(`Failed to render '${this.name}' effect: ${error}`));
-      }
-
+        resolve(dest);
+      }).catch(error => reject(`Failed to render '${this.name}' effect: ${error}`));
     });
   }
 }
