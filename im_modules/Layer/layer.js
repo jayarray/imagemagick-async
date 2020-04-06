@@ -106,9 +106,9 @@ function ApplyEffects(imgPath, effects, dest) {
         let currEffect = fxArr[0];
         let nextEffects = fxArr.slice(1);
 
-        if (currEffect.args.source1)
+        if (currEffect.args.source1 != null)
           currEffect.args.source1 = source;
-        else if (currEffect.args.source)
+        else if (currEffect.args.source != null)
           currEffect.args.source = source;
 
         currEffect.Render(outputPath).then(newOutputPath => {
