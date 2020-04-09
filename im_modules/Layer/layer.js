@@ -125,6 +125,42 @@ function ApplyEffects(imgPath, effects, dest) {
 
 
 /**
+ * @param {string} imgPath The path to the image you will be drawing to.
+ * @param {Array<>} primitives A list of primitives you want to draw on the image.
+ * @param {Array<>} effects A list of effects you want to apply to the image.
+ * @param {string} dest The output destination path for the rendered image.
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image. 
+ */
+function DrawPrimitivesFirst(imgPath, primitives, effects, dest) {
+  return new Promise((resolve, reject) => {
+    DrawPrimitives(imgPath, primitives, dest).then(outputPath1 => {
+      ApplyEffects(outputPath1, effects, outputPath1).then(outputPath2 => {
+        resolve(outputPath2);
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
+ * @param {string} imgPath The path to the image you will be drawing to.
+ * @param {Array<>} primitives A list of primitives you want to draw on the image.
+ * @param {Array<>} effects A list of effects you want to apply to the image.
+ * @param {string} dest The output destination path for the rendered image.
+ * @returns {Promise<string>} Returns a Promise with the output path of the newly rendered image. 
+ */
+function ApplyEffectsFirst(imgPath, primitives, effects, dest) {
+  return new Promise((resolve, reject) => {
+    ApplyEffects(imgPath, effects, dest).then(outputPath1 => {
+      DrawPrimitives(outputPath1, primitives, outputPath1).then(outputPath2 => {
+        resolve(outputPath2);
+      }).catch(error => reject(error));
+    }).catch(error => reject(error));
+  });
+}
+
+
+/**
  * @param {Array<>} overlays A list of Layer objects.
  * @param {string} parentDir The directory where you want to render the overlays.
  * @param {string} extension The file extension type to render the image in.
@@ -349,6 +385,7 @@ class Layer extends ObjectInterface {
     return new Builder();
   }
 
+
   /**
    * @param {string} dest The desired output path for the render.
    * @returns {Promise<string>} Returns a Promise with the output path for the newly rendered layer.
@@ -361,47 +398,40 @@ class Layer extends ObjectInterface {
 
         // Apply primitives or effects (check order)
 
-        let firstAction = null;
-        let secondAction = null;
+        let action = null;
 
-        if (this.args.drawPrimitivesFirst) {
-          firstAction = DrawPrimitives(imgPath1, this.args.primitives, imgPath1);
-          secondAction = ApplyEffects(imgPath1, this.args.appliedEffects, imgPath1);
-        }
-        else {
-          firstAction = ApplyEffects(imgPath1, this.args.appliedEffects, imgPath1);
-          secondAction = DrawPrimitives(imgPath1, this.args.primitives, imgPath1);
-        }
+        if (this.args.drawPrimitivesFirst)
+          action = DrawPrimitivesFirst(imgPath1, this.args.primitives, this.args.appliedEffects, imgPath1);
+        else
+          action = ApplyEffectsFirst(imgPath1, this.args.primitives, this.args.appliedEffects, imgPath1);
 
 
-        firstAction.then(outputPath1 => {
-          secondAction.then(outputPath2 => {
+        action.then(outputPath=> {
 
-            // Render any overlays
+          // Render any overlays
 
-            let overlays = this.args.overlays;  // <- these are all Layer objects
+          let overlays = this.args.overlays;  // <- these are all Layer objects
 
-            if (!overlays || overlays.length == 0) {
-              resolve(outputPath2);
-              return;
-            }
-            else {
-              let parentDir = LinuxCommands.Path.ParentDir(outputPath2);
-              let extension = GetFileExtension(outputPath2);
+          if (!overlays || overlays.length == 0) {
+            resolve(outputPath);
+            return;
+          }
+          else {
+            let parentDir = LinuxCommands.Path.ParentDir(outputPath);
+            let extension = GetFileExtension(outputPath);
 
-              RenderOverlays(overlays, parentDir, extension).then(filepathOffsetPairs => {
-                CreateComposite(outputPath2, filepathOffsetPairs, this.args.gravity, outputPath2).then(outputPath3 => {
+            RenderOverlays(overlays, parentDir, extension).then(filepathOffsetPairs => {
+              CreateComposite(outputPath, filepathOffsetPairs, this.args.gravity, outputPath).then(compOutputPath => {
 
-                  // Clean up overlay temp files
+                // Clean up overlay temp files
 
-                  let tempFilepaths = filepathOffsetPairs.map(x => x.filepath);
-                  LinuxCommands.Remove.Files(tempFilepaths, LocalCommand).then(success => {
-                    resolve(outputPath3);
-                  }).catch(error => reject(error));
+                let tempFilepaths = filepathOffsetPairs.map(x => x.filepath);
+                LinuxCommands.Remove.Files(tempFilepaths, LocalCommand).then(success => {
+                  resolve(compOutputPath);
                 }).catch(error => reject(error));
               }).catch(error => reject(error));
-            }
-          }).catch(error => reject(error));
+            }).catch(error => reject(error));
+          }
         }).catch(error => reject(error));
       }).catch(error => reject(error));
     });
