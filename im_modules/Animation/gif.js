@@ -9,6 +9,9 @@ let Filepath = require(Path.join(RootDir, 'filepath.js')).Filepath;
 let AnimationBaseClass = require(Path.join(Filepath.AnimationDir(), 'animationbaseclass.js')).AnimationBaseClass;
 let DisposeValues = require(Path.join(Filepath.ConstantsDir(), 'dispose.json')).values;
 
+let LinuxCommands = require('linux-commands-async');
+let LocalCommand = LinuxCommands.Command.LOCAL;
+
 //--------------------------------------
 // GIF
 
@@ -127,7 +130,7 @@ class Gif extends AnimationBaseClass {
           .build()
       )
       .build()
-      .Strong();
+      .String();
 
     if (filepathsErr)
       errors.push(filepathsErr);
@@ -189,6 +192,26 @@ class Gif extends AnimationBaseClass {
   }
 
   /**
+   * @param {string} dest The output path for the gif.
+   * @returns {Promise<string>} Returns a Promise with the output path for the newly created gif.
+   */
+  Render(dest) {
+    return new Promise((resolve, reject) => {
+      let cmd = this.command;
+      let args = this.Args().concat(dest);
+
+      LocalCommand.Execute(cmd, args).then(output => {
+        if (output.stderr) {
+          reject(output.stderr);
+          return;
+        }
+
+        resolve(dest);
+      }).catch(error => reject(`Failed to render '${this.name}' effect: ${error}`));
+    });
+  }
+
+  /**
    * @override
    */
   static Parameters() {
@@ -217,11 +240,6 @@ class Gif extends AnimationBaseClass {
         default: 'Undefined',
         options: DisposeValues,
         required: false
-      },
-      outputPath: {
-        type: 'string',
-        default: '',
-        required: true
       }
     };
   }
