@@ -26,23 +26,10 @@ class AnimationBaseClass extends ObjectInterface {
   }
 
   /**
-   * @param {string} dest The output path for the render.
-   * @returns {Promise<string>} Returns a Promise with the output path for the newly rendered image.
+   * @override
    */
-  Render(dest) {
-    return new Promise((resolve, reject) => {
-      let cmd = this.command;
-      let args = this.Args().concat(dest);
-
-      LocalCommand.Execute(cmd, args).then(output => {
-        if (output.stderr) {
-          reject(output.stderr);
-          return;
-        }
-
-        resolve(dest);
-      }).catch(error => reject(`Failed to render '${this.name}' effect: ${error}`));
-    });
+  Render() {
+    // Override
   }
 }
 
