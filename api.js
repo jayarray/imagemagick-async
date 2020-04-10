@@ -15,7 +15,8 @@ let Api = {};
 // Animation
 
 Api.Animation = {
-  Gif: require(Path.join(Filepath.AnimationDir(), 'gif.js')).Gif
+  Gif: require(Path.join(Filepath.AnimationDir(), 'gif.js')).Gif,
+  GifExplode: require(Path.join(Filepath.AnimationDir(), 'gifexplode.js')).GifExplode
 };
 
 
