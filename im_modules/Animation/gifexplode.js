@@ -168,11 +168,17 @@ class GifExplode extends AnimationBaseClass {
     // Get file extension
     let fileExtension = LinuxCommands.Path.Extension(filepath).replace('.', '');
 
+    // Get parent dir
+    let parentDir = LinuxCommands.Path.ParentDir(filepath);
+
+    // Get file name
+    let fileName = LinuxCommands.Path.Filename(filepath);
+
     // Get sequence name
-    let sequenceNameStartIndex = filepath.indexOf(this.args.sequenceName);
+    let sequenceNameStartIndex = fileName.indexOf(this.args.sequenceName);
     let sequenceLength = this.args.sequenceName.length;
     let sequenceNameEndIndex = sequenceNameStartIndex + sequenceLength;
-    let sequenceName = filepath.substring(sequenceNameStartIndex, sequenceNameEndIndex);
+    let sequenceName = fileName.substring(sequenceNameStartIndex, sequenceNameEndIndex);
 
     // Get underscore index
     let underscoreIndex = sequenceNameEndIndex;
@@ -181,9 +187,9 @@ class GifExplode extends AnimationBaseClass {
     let numberStartindex = underscoreIndex + 1;
     let numberEndIndex = numberStartindex;
 
-    for (let i = 0; i < filepath.length; ++i) {
+    for (let i = 0; i < fileName.length; ++i) {
       let index = i + numberStartindex;
-      let currChar = filepath.charAt(index);
+      let currChar = fileName.charAt(index);
 
       if (!isNaN(currChar))
         numberEndIndex += 1;
@@ -191,7 +197,7 @@ class GifExplode extends AnimationBaseClass {
         break;
     }
 
-    let numberStr = filepath.substring(numberStartindex, numberEndIndex);
+    let numberStr = fileName.substring(numberStartindex, numberEndIndex);
     let adjustedNumber = Number(numberStr) + 1;
 
     return {
